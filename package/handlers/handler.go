@@ -5,62 +5,62 @@ import "github.com/gin-gonic/gin"
 type Handler struct {
 }
 
-func point_operations(group *gin.RouterGroup) {
+func (handler *Handler) pointOperations(group *gin.RouterGroup) {
 	points := group.Group(":id/points")
 	{
-		points.GET("/")
-		points.POST("/")
-		points.DELETE("/")
+		points.POST("/", handler.createPoints)
+		points.GET("/", handler.getPoints)
+		// points.DELETE("/")
 
-		points.GET("/:point_id")
-		points.PUT("/:point_id")
-		points.DELETE("/:point_id")
+		points.GET("/:point_id", handler.getPointById)
+		points.PUT("/:point_id", handler.updatePointById)
+		points.DELETE("/:point_id", handler.deletePointById)
 	}
 }
 
-func (h *Handler) InitEndpoints() *gin.Engine {
+func (handler *Handler) InitEndpoints() *gin.Engine {
 	router := gin.New()
 
 	api := router.Group("/api")
 	{
 		sign_lists := api.Group("/sign-lists")
 		{
-			sign_lists.GET("/")
-			sign_lists.POST("/")
-			sign_lists.DELETE("/")
+			sign_lists.POST("/", handler.createSignLists)
+			sign_lists.GET("/", handler.getSignLists)
+			// sign_lists.DELETE("/")
 
-			sign_lists.GET("/:id")
-			sign_lists.PUT("/:id")
-			sign_lists.DELETE("/:id")
+			sign_lists.GET("/:id", handler.getSignListById)
+			sign_lists.PUT("/:id", handler.updateSignListById)
+			sign_lists.DELETE("/:id", handler.deleteSignListById)
 
-			point_operations(sign_lists)
+			handler.pointOperations(sign_lists)
 		}
 
-		polygon_lists := api.Group("/polygon-lists")
-		{
-			polygon_lists.GET("/")
-			polygon_lists.POST("/")
-			polygon_lists.DELETE("/")
+		// polygon_lists := api.Group("/polygon-lists")
+		// {
+		// 	polygon_lists.POST("/")
+		// 	polygon_lists.GET("/")
+		// 	polygon_lists.DELETE("/")
 
-			polygon_lists.GET("/:id")
-			polygon_lists.PUT("/:id")
-			polygon_lists.DELETE("/:id")
+		// 	polygon_lists.GET("/:id")
+		// 	polygon_lists.PUT("/:id")
+		// 	polygon_lists.DELETE("/:id")
 
-			point_operations(sign_lists)
-		}
+		// 	handler.pointOperations(sign_lists)
+		// }
 
-		graph_lists := api.Group("/graph-lists")
-		{
-			graph_lists.GET("/")
-			graph_lists.POST("/")
-			graph_lists.DELETE("/")
+		// graph_lists := api.Group("/graph-lists")
+		// {
+		// 	graph_lists.POST("/")
+		// 	graph_lists.GET("/")
+		// 	graph_lists.DELETE("/")
 
-			graph_lists.GET("/:id")
-			graph_lists.PUT("/:id")
-			graph_lists.DELETE("/:id")
+		// 	graph_lists.GET("/:id")
+		// 	graph_lists.PUT("/:id")
+		// 	graph_lists.DELETE("/:id")
 
-			point_operations(sign_lists)
-		}
+		// 	handler.pointOperations(sign_lists)
+		// }
 	}
 
 	return router
