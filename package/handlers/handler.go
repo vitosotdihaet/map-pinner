@@ -1,8 +1,16 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/vitosotdihaet/map-pinner/package/services"
+)
 
 type Handler struct {
+	service *services.Service
+}
+
+func NewHandler(service *services.Service) *Handler {
+	return &Handler{service: service}
 }
 
 func (handler *Handler) pointOperations(group *gin.RouterGroup) {
@@ -23,18 +31,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		sign_lists := api.Group("/sign-lists")
-		{
-			sign_lists.POST("/", handler.createSignLists)
-			sign_lists.GET("/", handler.getSignLists)
-			// sign_lists.DELETE("/")
-
-			sign_lists.GET("/:id", handler.getSignListById)
-			sign_lists.PUT("/:id", handler.updateSignListById)
-			sign_lists.DELETE("/:id", handler.deleteSignListById)
-
-			handler.pointOperations(sign_lists)
-		}
+		handler.pointOperations(api)
 
 		// polygon_lists := api.Group("/polygon-lists")
 		// {
@@ -46,7 +43,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 		// 	polygon_lists.PUT("/:id")
 		// 	polygon_lists.DELETE("/:id")
 
-		// 	handler.pointOperations(sign_lists)
+		// 	handler.pointOperations(points_lists)
 		// }
 
 		// graph_lists := api.Group("/graph-lists")
@@ -59,7 +56,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 		// 	graph_lists.PUT("/:id")
 		// 	graph_lists.DELETE("/:id")
 
-		// 	handler.pointOperations(sign_lists)
+		// 	handler.pointOperations(points_lists)
 		// }
 	}
 

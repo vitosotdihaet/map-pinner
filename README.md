@@ -18,3 +18,15 @@
 - Технология отображения 2d
 - Разместить на localhost
 - Работа со слоями должна быть реализована через API типа REST
+
+# Миграция базы данных
+
+Поднятие
+```sh
+./migrate -path ./schema/ -database 'postgres://postgres:{POSTGRES_PASSWORD}@{POSTGRES_ADDRESS}/postgres?sslmode=disable' up
+```
+
+Попускание
+```sh
+./migrate -path ./schema/ -database 'postgres://postgres:{POSTGRES_PASSWORD}@{POSTGRES_ADDRESS}/postgres?sslmode=disable' down
+```
