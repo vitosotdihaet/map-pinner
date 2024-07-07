@@ -15,14 +15,14 @@ async function drawPoints() {
     if (points == null || points.length == 0) { return }
 
     points.forEach(point => {
-        L.marker([point.lattitude, point.longitude]).addTo(map);
+        L.marker([point.latitude, point.longitude]).addTo(map);
     });
 }
 
 async function drawPolygons() {
     const points = await fetchGeospatialData('/api/points');
     if (points == null || points.length == 0) { return }
-    var coordinates_points = points.map(point => new L.LatLng(point.lattitude, point.longitude));
+    var coordinates_points = points.map(point => new L.LatLng(point.latitude, point.longitude));
     coordinates_points.push(coordinates_points[0])
 
     new L.Geodesic(coordinates_points, {

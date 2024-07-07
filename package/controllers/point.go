@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/package/entities"
 )
 
@@ -21,7 +20,7 @@ func (postgres *PointPostgres) Create(point entities.Point) (int, error) {
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v)) RETURNING id;",
 		pointsTable, WGSSRID,
 	)
-	row := postgres.postgres.QueryRow(query, point.Name, point.Longitude, point.Lattitude)
+	row := postgres.postgres.QueryRow(query, point.Name, point.Longitude, point.Latitude)
 
 	var id int
 	if err := row.Scan(&id); err != nil {
@@ -44,10 +43,9 @@ func (postgres *PointPostgres) GetAll() ([]entities.Point, error) {
 	var points []entities.Point
 	for rows.Next() {
 		var point entities.Point
-		if err := rows.Scan(&point.ID, &point.Name, &point.Longitude, &point.Lattitude); err != nil {
+		if err := rows.Scan(&point.ID, &point.Name, &point.Longitude, &point.Latitude); err != nil {
 			return nil, err
 		}
-		logrus.Tracef("%v\n", point)
 		points = append(points, point)
 	}
 
@@ -66,7 +64,7 @@ func (postgres *PointPostgres) GetById(id uint64) (entities.Point, error) {
 
 	var point entities.Point
 	point.ID = id
-	if err := row.Scan(&point.Name, &point.Longitude, &point.Lattitude); err != nil {
+	if err := row.Scan(&point.Name, &point.Longitude, &point.Latitude); err != nil {
 		return point, err
 	}
 
@@ -78,7 +76,7 @@ func (postgres *PointPostgres) UpdateById(newPoint entities.Point) error {
 		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePoint($2, $3), %v) WHERE id = $4;",
 		pointsTable, WGSSRID,
 	)
-	row := postgres.postgres.QueryRow(query, newPoint.Name, newPoint.Longitude, newPoint.Lattitude, newPoint.ID)
+	row := postgres.postgres.QueryRow(query, newPoint.Name, newPoint.Longitude, newPoint.Latitude, newPoint.ID)
 
 	if err := row.Err(); err != nil {
 		return err
