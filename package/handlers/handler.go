@@ -35,30 +35,30 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	{
 		handler.pointOperations(api)
 
-		// polygon_lists := api.Group("/polygon-lists")
+		polygons := api.Group("/polygons")
+		{
+			polygons.POST("/", handler.createPolygons)
+			polygons.GET("/", handler.getPolygons)
+			// polygons.DELETE("/")
+
+			polygons.GET("/:id", handler.getPolygonById)
+			polygons.PUT("/:id", handler.updatePolygonById)
+			polygons.DELETE("/:id", handler.deletePolygonById)
+
+			handler.pointOperations(polygons)
+		}
+
+		// graphs := api.Group("/graphs")
 		// {
-		// 	polygon_lists.POST("/")
-		// 	polygon_lists.GET("/")
-		// 	polygon_lists.DELETE("/")
+		// 	graphs.POST("/")
+		// 	graphs.GET("/")
+		// 	// graphs.DELETE("/")
 
-		// 	polygon_lists.GET("/:id")
-		// 	polygon_lists.PUT("/:id")
-		// 	polygon_lists.DELETE("/:id")
+		// 	graphs.GET("/:id")
+		// 	graphs.PUT("/:id")
+		// 	graphs.DELETE("/:id")
 
-		// 	handler.pointOperations(polygon_lists)
-		// }
-
-		// graph_lists := api.Group("/graph-lists")
-		// {
-		// 	graph_lists.POST("/")
-		// 	graph_lists.GET("/")
-		// 	graph_lists.DELETE("/")
-
-		// 	graph_lists.GET("/:id")
-		// 	graph_lists.PUT("/:id")
-		// 	graph_lists.DELETE("/:id")
-
-		// 	handler.pointOperations(points_lists)
+		// 	handler.pointOperations(graphs)
 		// }
 	}
 

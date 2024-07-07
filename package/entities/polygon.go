@@ -1,5 +1,7 @@
 package entities
 
 type Polygon struct {
-	points [20]Point
+	ID     uint64 `json:"id"`
+	Name   string `json:"name" binding:"required"`
+	Points [20]*Point
 }

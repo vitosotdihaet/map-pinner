@@ -1,5 +1,7 @@
 package entities
 
 type Graph struct {
-	points [30]Point
+	ID     uint64 `json:"id"`
+	Name   string `json:"name" binding:"required"`
+	Points [30]*Point
 }

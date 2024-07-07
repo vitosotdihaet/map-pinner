@@ -13,7 +13,13 @@ type Point interface {
 	DeleteById(id uint64) error
 }
 
-type Polygon interface{}
+type Polygon interface{
+	GetAll() ([]entities.Polygon, error)
+	Create(point entities.Polygon) (int, error)
+	GetById(id uint64) (entities.Polygon, error)
+	UpdateById(newPoint entities.Polygon) error
+	DeleteById(id uint64) error
+}
 
 type Graph interface{}
 
@@ -26,5 +32,6 @@ type Service struct {
 func NewService(database *controllers.Database) *Service {
 	return &Service{
 		Point: NewPointService(database.Point),
+		Polygon: NewPolygonService(database.Polygon),
 	}
 }
