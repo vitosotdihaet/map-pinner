@@ -8,9 +8,9 @@ import (
 type Point interface {
 	GetAll() ([]entities.Point, error)
 	Create(point entities.Point) (int, error)
-	// GetById(id int) (entities.Point, error)
-	// UpdateById(id int, newPoint entities.Point) error
-	// DeleteById(id int) error
+	GetById(id uint64) (entities.Point, error)
+	UpdateById(newPoint entities.Point) error
+	DeleteById(id uint64) error
 }
 
 type Polygon interface{}

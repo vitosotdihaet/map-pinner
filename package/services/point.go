@@ -20,3 +20,15 @@ func (service *PointService) Create(point entities.Point) (int, error) {
 func (service *PointService) GetAll() ([]entities.Point, error) {
 	return service.database.GetAll()
 }
+
+func (service *PointService) GetById(id uint64) (entities.Point, error) {
+	return service.database.GetById(id)
+}
+
+func (service *PointService) UpdateById(newPoint entities.Point) error {
+	return service.database.UpdateById(newPoint)
+}
+
+func (service *PointService) DeleteById(id uint64) error {
+	return service.database.DeleteById(id)
+}
