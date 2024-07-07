@@ -20,12 +20,13 @@ async function drawPoints() {
 }
 
 async function drawPolygons() {
-    const points = await fetchGeospatialData('/api/points');
-    if (points == null || points.length == 0) { return }
-    var coordinates_points = points.map(point => new L.LatLng(point.latitude, point.longitude));
-    coordinates_points.push(coordinates_points[0])
+    const polygonPoints = await fetchGeospatialData('/api/polygons');
+    if (polygonPoints == null || polygonPoints.length == 0) { return }
 
-    new L.Geodesic(coordinates_points, {
+    var coordinates = polygonPoints.map(point => new L.LatLng(point.latitude, point.longitude));
+    coordinates.push(coordinates[0])
+
+    new L.Geodesic(coordinates, {
         color: 'blue',
         weight: 2,
         opacity: 0.5,
