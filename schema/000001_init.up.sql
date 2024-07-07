@@ -9,16 +9,17 @@ create table points (
     geom geometry(point, 4326) not null
 );
 
-create table polygons (
-    id serial primary key not null unique,
-    name varchar(255) not null,
-    geom geometry(polygon, 4326) not null
-);
 
 create table polygon_points (
     polygon_id int references polygons(id) on delete cascade not null,
     point_id int references points(id) on delete cascade not null,
     primary key (polygon_id, point_id)
+);
+
+create table polygons (
+    id serial primary key not null unique,
+    name varchar(255) not null,
+    geom geometry(polygon, 4326) not null
 );
 
 
