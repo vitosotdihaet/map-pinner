@@ -14,7 +14,7 @@ func NewHandler(service *services.Service) *Handler {
 }
 
 func (handler *Handler) pointOperations(group *gin.RouterGroup) {
-	points := group.Group(":id/points")
+	points := group.Group("/points")
 	{
 		points.POST("/", handler.createPoints)
 		points.GET("/", handler.getPoints)
@@ -28,6 +28,8 @@ func (handler *Handler) pointOperations(group *gin.RouterGroup) {
 
 func (handler *Handler) InitEndpoints() *gin.Engine {
 	router := gin.New()
+
+	router.Static("/static", "./public")
 
 	api := router.Group("/api")
 	{
@@ -43,7 +45,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 		// 	polygon_lists.PUT("/:id")
 		// 	polygon_lists.DELETE("/:id")
 
-		// 	handler.pointOperations(points_lists)
+		// 	handler.pointOperations(polygon_lists)
 		// }
 
 		// graph_lists := api.Group("/graph-lists")
