@@ -1,8 +1,8 @@
-package services
+package controllers
 
 import (
-	"github.com/vitosotdihaet/map-pinner/package/controllers"
-	"github.com/vitosotdihaet/map-pinner/package/entities"
+	"github.com/jmoiron/sqlx"
+	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
 type Point interface {
@@ -23,15 +23,15 @@ type Polygon interface{
 
 type Graph interface{}
 
-type Service struct {
+type Database struct {
 	Point
 	Polygon
 	Graph
 }
 
-func NewService(database *controllers.Database) *Service {
-	return &Service{
-		Point: NewPointService(database.Point),
-		Polygon: NewPolygonService(database.Polygon),
+func NewDatabase(postgres *sqlx.DB) *Database {
+	return &Database{
+		Point: NewPointPostgres(postgres),
+		Polygon: NewPolygonPostgres(postgres),
 	}
 }

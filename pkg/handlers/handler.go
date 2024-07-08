@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/vitosotdihaet/map-pinner/package/services"
+	"github.com/vitosotdihaet/map-pinner/pkg/services"
 )
 
 type Handler struct {
@@ -29,7 +29,7 @@ func (handler *Handler) pointOperations(group *gin.RouterGroup) {
 func (handler *Handler) InitEndpoints() *gin.Engine {
 	router := gin.New()
 
-	router.Static("/static", "./public")
+	router.Static("/static", "./web")
 
 	api := router.Group("/api")
 	{

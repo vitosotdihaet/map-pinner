@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
-	"github.com/vitosotdihaet/map-pinner/package/entities"
+	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
 

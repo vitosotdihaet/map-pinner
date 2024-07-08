@@ -6,10 +6,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/vitosotdihaet/map-pinner/package/controllers"
-	"github.com/vitosotdihaet/map-pinner/package/handlers"
-	"github.com/vitosotdihaet/map-pinner/package/server"
-	"github.com/vitosotdihaet/map-pinner/package/services"
+	"github.com/vitosotdihaet/map-pinner/pkg/controllers"
+	"github.com/vitosotdihaet/map-pinner/pkg/handlers"
+	"github.com/vitosotdihaet/map-pinner/pkg/server"
+	"github.com/vitosotdihaet/map-pinner/pkg/services"
 
 	_ "github.com/lib/pq"
 )
@@ -52,7 +52,7 @@ func main() {
 }
 
 func initConfig() error {
-	viper.AddConfigPath("config")
+	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }

@@ -1,8 +1,8 @@
 package services
 
 import (
-	"github.com/vitosotdihaet/map-pinner/package/controllers"
-	"github.com/vitosotdihaet/map-pinner/package/entities"
+	"github.com/vitosotdihaet/map-pinner/pkg/controllers"
+	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
 type PointService struct {

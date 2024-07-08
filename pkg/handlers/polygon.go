@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vitosotdihaet/map-pinner/package/entities"
+	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
 func (handler *Handler) getPolygons(context *gin.Context) {

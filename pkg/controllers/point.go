@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/vitosotdihaet/map-pinner/package/entities"
+	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
 type PointPostgres struct {
