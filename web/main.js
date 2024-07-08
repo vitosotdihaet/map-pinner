@@ -83,6 +83,13 @@ class Marker {
         this.point = point
 
         this.map_marker = L.marker([point.latitude, point.longitude], { draggable: true })
+        this.map_marker.on('drag', function (event) {
+            // for some reason this shit work, though it shouldn't (should be event.originalEvent.button)
+            if (event.originalEvent.buttons == 1) return
+            event.target.dragging.disable()
+            event.target.setLatLng([point.latitude, point.longitude])
+            setTimeout(() => event.target.dragging.enable(), 0);
+        })
         this.setPopup()
     }
 
@@ -146,8 +153,8 @@ function hideMarkers(markers) {
 }
 
 async function addMarkerOnClick(event) {
-    // don't add new marker if middle mouse button is pressed
-    if (event.originalEvent.button == 1) return
+    // don't add new marker if not left mouse button is pressed
+    if (event.originalEvent.button != 0) return
 
     let latlng = event.latlng
 
