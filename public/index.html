@@ -13,9 +13,22 @@
 </head>
 <body>
     <div class="sidenav">
-        <a id="showAllPoints">Show all points</a>
-        <a id="showAllPolygons">Show all polygons</a>
-        <!-- <a id="showGraphs">Show all graphs</a> -->
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'Points')">Points</button>
+            <button class="tablinks" onclick="openTab(event, 'Polygons')">Polygons</button>
+            <button class="tablinks" onclick="openTab(event, 'Graphs')">Graphs</button>
+        </div>
+
+        <div id="Points" class="tabcontent">
+            <button id="showAllPoints">Show all points</a>
+            <button id="hideAllPoints">Hide all points</a>
+        </div>
+        <div id="Polygons" class="tabcontent">
+            <button id="showAllPolygons">Show all polygons</a>
+        </div>
+        <div id="Graphs" class="tabcontent">
+            <button id="showGraphs">Show all graphs</a>
+        </div>
     </div>
     <div class="main">
         <div id="map"></div>

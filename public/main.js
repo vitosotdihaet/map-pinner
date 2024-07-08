@@ -25,7 +25,8 @@ function drawPoints(points) {
     if (points == null || points.length == 0) { return }
 
     points.forEach(point => {
-        L.marker([point.latitude, point.longitude]).addTo(map)
+        let marker = [point.latitude, point.longitude]
+        loadedMarkerPoints[L.marker(marker).addTo(map)] = marker
     })
 }
 
@@ -38,9 +39,12 @@ function drawPolygons(polygons) {
         let coordinates = []
         polygonPoints.forEach(point => {
             if (point != null) {
-                coordinates.push(new L.LatLng(point.latitude, point.longitude))
+                marker = new L.LatLng(point.latitude, point.longitude)
+                coordinates.push(marker)
             }
         })
+
+        loadedShapePolygons[coordinates] = polygonPoints
 
         new L.Geodesic(coordinates, {
             color: randomColor({ "luminosity": "bright", "hue": "blue" }),
@@ -52,8 +56,8 @@ function drawPolygons(polygons) {
 }
 
 
-let loadedPoints
-let loadedPolygons
+let loadedMarkerPoints = {}
+let loadedShapePolygons = {}
 
 async function showAllPoints() {
     loadedPoints = await getAllPoints();
@@ -75,3 +79,23 @@ document.getElementById('showAllPolygons').addEventListener('click', function(ev
     event.preventDefault()
     showAllPolygons()
 })
+
+
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+document.getElementsByClassName("tablinks")[0].click();
