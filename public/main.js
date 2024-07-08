@@ -1,7 +1,8 @@
 var map = L.map('map').setView([55.76, 37.64], 0)
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy OpenStreetMap contributors'
+    attribution: '&copy OpenStreetMap contributors',
+    // detectRetina: true
 }).addTo(map)
 
 
