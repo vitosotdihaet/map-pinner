@@ -1,35 +1,42 @@
-var map = L.map('map').setView([55.76, 37.64], 0);
+var map = L.map('map').setView([55.76, 37.64], 0)
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
+    attribution: '&copy OpenStreetMap contributors'
+}).addTo(map)
 
-async function fetchGeospatialData(url) {
-    const response = await fetch(url);
-    return await response.json();
+
+async function fetchData(url) {
+    const response = await fetch(url)
+    return await response.json()
 }
 
 
-async function drawPoints() {
-    const points = await fetchGeospatialData('/api/points');
+async function getAllPoints() {
+    return await fetchData('/api/points')
+}
+
+async function getAllPolygons() {
+    return await fetchData('/api/polygons')
+}
+
+
+function drawPoints(points) {
     if (points == null || points.length == 0) { return }
 
     points.forEach(point => {
-        L.marker([point.latitude, point.longitude]).addTo(map);
-    });
+        L.marker([point.latitude, point.longitude]).addTo(map)
+    })
 }
 
-async function drawPolygons() {
-    const polygons = await fetchGeospatialData('/api/polygons');
+function drawPolygons(polygons) {
+    if (polygons == null || polygons.length == 0) { return }
+
     polygons.forEach(polygon => {
         polygonPoints = polygon.Points
-
-        console.log(polygonPoints)
 
         let coordinates = []
         polygonPoints.forEach(point => {
             if (point != null) {
-                console.log(point)
                 coordinates.push(new L.LatLng(point.latitude, point.longitude))
             }
         })
@@ -39,9 +46,20 @@ async function drawPolygons() {
             weight: 3,
             opacity: 0.75,
             fillOpacity: 0.5
-        }).addTo(map);
+        }).addTo(map)
     })
 }
 
-drawPoints();
-drawPolygons();
+
+let loadedPoints
+let loadedPolygons
+
+async function initializeMap() {
+    loadedPoints = await getAllPoints();
+    drawPoints(loadedPoints);
+
+    loadedPolygons = await getAllPolygons();
+    drawPolygons(loadedPolygons);
+}
+
+initializeMap();
