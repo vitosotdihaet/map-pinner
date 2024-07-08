@@ -55,12 +55,23 @@ function drawPolygons(polygons) {
 let loadedPoints
 let loadedPolygons
 
-async function initializeMap() {
+async function showAllPoints() {
     loadedPoints = await getAllPoints();
     drawPoints(loadedPoints);
+}
 
+async function showAllPolygons() {
     loadedPolygons = await getAllPolygons();
     drawPolygons(loadedPolygons);
 }
 
-initializeMap();
+
+document.getElementById('showAllPoints').addEventListener('click', function(event) {
+    event.preventDefault()
+    showAllPoints()
+})
+
+document.getElementById('showAllPolygons').addEventListener('click', function(event) {
+    event.preventDefault()
+    showAllPolygons()
+})
