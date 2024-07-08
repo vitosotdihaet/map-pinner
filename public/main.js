@@ -1,4 +1,4 @@
-var map = L.map('map').setView([51.505, -0.09], 13);
+var map = L.map('map').setView([55.76, 37.64], 0);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -35,10 +35,10 @@ async function drawPolygons() {
         })
 
         new L.Geodesic(coordinates, {
-            color: 'blue',
-            weight: 2,
-            opacity: 0.5,
-            fillOpacity: 0.2
+            color: randomColor({ "luminosity": "bright", "hue": "blue" }),
+            weight: 3,
+            opacity: 0.75,
+            fillOpacity: 0.5
         }).addTo(map);
     })
 }
