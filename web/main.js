@@ -1,9 +1,22 @@
-var map = L.map('map').setView([55.76, 37.64], 5)
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy OpenStreetMap contributors',
-    // detectRetina: true
-}).addTo(map)
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+document.getElementsByClassName("tablinks")[0].click();
+
 
 
 async function fetchData(url) {
@@ -11,6 +24,16 @@ async function fetchData(url) {
     return await response.json()
 }
 
+async function postData(url, body) {
+    const response = await fetch(url, {
+        method: "POST",
+        body: body,
+        // headers: {
+        //   "Content-type": "application/json; charset=UTF-8"
+        // }
+    });
+    return await response.json()
+}
 
 async function getAllPoints() {
     return await fetchData('/api/points')
@@ -19,6 +42,24 @@ async function getAllPoints() {
 async function getAllPolygons() {
     return await fetchData('/api/polygons')
 }
+
+async function postPoint(point) {
+    return postData("/api/points", JSON.stringify({
+        latitude: point.latitude,
+        longitude: point.longitude
+    }))
+}
+
+
+
+var map = L.map('map').setView([55.76, 37.64], 5)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy OpenStreetMap contributors',
+    // detectRetina: true
+}).addTo(map)
+
+
 
 // type Marker = L.Marker
 // marker functions
@@ -56,9 +97,38 @@ function hideMarkers(markers) {
     shownMarkers = shownMarkersCopy
 }
 
+async function addMarker(event) {
+    let latlng = event.latlng
+
+    let marker = L.marker(event.latlng).addTo(map);
+    shownMarkers.push(marker);
+
+    point = {
+        latitude: latlng.lat,
+        longitude: latlng.lng
+    }
+
+    return await postPoint(point)
+}
+
 async function drawAllPoints() {
     drawMarkers(pointsToMarkers(await getAllPoints()));
 }
+
+
+let shownMarkers = []
+
+map.on('click', addMarker);
+document.getElementById('showAllPoints').addEventListener('click', function(event) {
+    event.preventDefault()
+    drawAllPoints()
+})
+document.getElementById('hideAllPoints').addEventListener('click', function(event) {
+    event.preventDefault()
+    hideMarkers(shownMarkers)
+})
+
+
 
 
 // type Shape = []L.Geodesic
@@ -115,22 +185,7 @@ async function drawAllPolygons() {
     drawShapes(polygonsToShapes(await getAllPolygons()));
 }
 
-
-
-let shownMarkers = []
 let shownShapes = []
-
-
-
-document.getElementById('showAllPoints').addEventListener('click', function(event) {
-    event.preventDefault()
-    drawAllPoints()
-})
-
-document.getElementById('hideAllPoints').addEventListener('click', function(event) {
-    event.preventDefault()
-    hideMarkers(shownMarkers)
-})
 
 
 document.getElementById('showAllPolygons').addEventListener('click', function(event) {
@@ -144,21 +199,5 @@ document.getElementById('hideAllPolygons').addEventListener('click', function(ev
 })
 
 
-function openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
 
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
 
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-}
-
-document.getElementsByClassName("tablinks")[0].click();
