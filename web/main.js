@@ -84,11 +84,11 @@ class Marker {
 
         this.map_marker = L.marker([point.latitude, point.longitude], { draggable: true })
         this.map_marker.on('drag', function (event) {
-            // for some reason this shit work, though it shouldn't (should be event.originalEvent.button)
+            // for some reason this shit works, though it shouldn't (should be event.originalEvent.button)
             if (event.originalEvent.buttons == 1) return
             event.target.dragging.disable()
             event.target.setLatLng([point.latitude, point.longitude])
-            setTimeout(() => event.target.dragging.enable(), 0);
+            setTimeout(() => event.target.dragging.enable());
         })
         this.setPopup()
     }
@@ -260,7 +260,7 @@ function hideShapes(shapes) {
 }
 
 async function drawAllPolygons() {
-    drawShapes(polygonsToShapes(await getAllPolygons()));
+    drawShapes(polygonsToShapes(await PolygonFetch.getAll()));
 }
 
 let shownShapes = []
