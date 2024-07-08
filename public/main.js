@@ -20,18 +20,27 @@ async function drawPoints() {
 }
 
 async function drawPolygons() {
-    const polygonPoints = await fetchGeospatialData('/api/polygons');
-    if (polygonPoints == null || polygonPoints.length == 0) { return }
+    const polygons = await fetchGeospatialData('/api/polygons');
+    polygons.forEach(polygon => {
+        polygonPoints = polygon.Points
 
-    var coordinates = polygonPoints.map(point => new L.LatLng(point.latitude, point.longitude));
-    coordinates.push(coordinates[0])
+        console.log(polygonPoints)
 
-    new L.Geodesic(coordinates, {
-        color: 'blue',
-        weight: 2,
-        opacity: 0.5,
-        fillOpacity: 0.2
-    }).addTo(map);
+        let coordinates = []
+        polygonPoints.forEach(point => {
+            if (point != null) {
+                console.log(point)
+                coordinates.push(new L.LatLng(point.latitude, point.longitude))
+            }
+        })
+
+        new L.Geodesic(coordinates, {
+            color: 'blue',
+            weight: 2,
+            opacity: 0.5,
+            fillOpacity: 0.2
+        }).addTo(map);
+    })
 }
 
 drawPoints();

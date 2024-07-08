@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vitosotdihaet/map-pinner/package/entities"
 )
 
 func (handler *Handler) getPolygons(context *gin.Context) {
@@ -17,22 +18,22 @@ func (handler *Handler) getPolygons(context *gin.Context) {
 }
 
 func (handler *Handler) createPolygons(context *gin.Context) {
-	// var inputPolygon entities.Polygon
+	var inputPolygon entities.Polygon
 
-	// if err := context.BindJSON(&inputPolygon); err != nil {
-	// 	newErrorResponse(context, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
+	if err := context.ShouldBindJSON(&inputPolygon); err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// id, err := handler.service.Polygon.Create(inputPolygon)
-	// if err != nil {
-	// 	newErrorResponse(context, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	id, err := handler.service.Polygon.Create(inputPolygon)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// context.JSON(http.StatusOK, map[string]interface{} {
-	// 	"id": id,
-	// })
+	context.JSON(http.StatusOK, map[string]interface{} {
+		"id": id,
+	})
 }
 
 func (handler *Handler) getPolygonById(context *gin.Context) {

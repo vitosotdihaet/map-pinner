@@ -46,19 +46,20 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 }
 
 func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (int, error) {
-	postgisPoints := make([]string, len(polygon.Points) + 1)
-	for i, point := range polygon.Points {
+	postgisPoints := make([]string, polygon.Length + 1)
+	for i := range polygon.Length {
+		point := polygon.Points[i]
 		postgisPoints[i] = fmt.Sprintf("ST_MakePoint(%f, %f)", point.Latitude, point.Longitude)
 	}
 
-	postgisPoints[len(polygon.Points)] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
+	postgisPoints[polygon.Length] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), 4326)) RETURNING id;", 
 		polygonsTable, strings.Join(postgisPoints, ", "),
 	)
 
-	row := postgres.postgres.QueryRow(query, polygon.Name, polygon.ID)
+	row := postgres.postgres.QueryRow(query, polygon.Name)
 
 	var id int
 	if err := row.Scan(&id); err != nil {
