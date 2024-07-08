@@ -16,6 +16,7 @@ import (
 
 func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
+	logrus.SetLevel(logrus.TraceLevel)
 
 	if err := initConfig(); err != nil {
 		logrus.Fatalf("error while getting the config: %s", err.Error())
