@@ -127,14 +127,14 @@ func (postgres *PolygonPostgres) UpdateById(newPolygon entities.Polygon) error {
 }
 
 func (postgres *PolygonPostgres) DeleteById(id uint64) error {
-	// query := fmt.Sprintf(
-	// 	"DELETE FROM %s WHERE id = $1;", polygonsTable,
-	// )
-	// row := postgres.postgres.QueryRow(query, id)
+	query := fmt.Sprintf(
+		"DELETE FROM %s WHERE id = $1;", polygonsTable,
+	)
+	row := postgres.postgres.QueryRow(query, id)
 
-	// if err := row.Err(); err != nil {
-	// 	return err
-	// }
+	if err := row.Err(); err != nil {
+		return err
+	}
 
 	return nil
 }

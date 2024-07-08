@@ -41,9 +41,9 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 			polygons.GET("/", handler.getPolygons)
 			// polygons.DELETE("/")
 
-			polygons.GET("/:id", handler.getPolygonById)
-			polygons.PUT("/:id", handler.updatePolygonById)
-			polygons.DELETE("/:id", handler.deletePolygonById)
+			polygons.GET("/:polygon_id", handler.getPolygonById)
+			polygons.PUT("/:polygon_id", handler.updatePolygonById)
+			polygons.DELETE("/:polygon_id", handler.deletePolygonById)
 
 			handler.pointOperations(polygons)
 		}

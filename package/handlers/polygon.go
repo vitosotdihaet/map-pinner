@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/vitosotdihaet/map-pinner/package/entities"
@@ -74,19 +75,19 @@ func (handler *Handler) updatePolygonById(context *gin.Context) {
 }
 
 func (handler *Handler) deletePolygonById(context *gin.Context) {
-	// polygonIdStr := context.Param("polygon_id")
+	polygonIdStr := context.Param("polygon_id")
 
-	// id, err := strconv.ParseUint(polygonIdStr, 10, 64)
-	// if err != nil {
-	// 	newErrorResponse(context, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
+	id, err := strconv.ParseUint(polygonIdStr, 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// err = handler.service.Polygon.DeleteById(id)
-	// if err != nil {
-	// 	newErrorResponse(context, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	err = handler.service.Polygon.DeleteById(id)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// context.JSON(http.StatusOK, id)
+	context.JSON(http.StatusOK, id)
 }
