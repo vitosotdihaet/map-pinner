@@ -20,64 +20,127 @@ async function getAllPolygons() {
     return await fetchData('/api/polygons')
 }
 
-
-function drawPoints(points) {
+// type Marker = L.Marker
+// marker functions
+function pointsToMarkers(points) {
     if (points == null || points.length == 0) { return }
 
+    let markers = []
     points.forEach(point => {
-        let marker = [point.latitude, point.longitude]
-        loadedMarkerPoints[L.marker(marker).addTo(map)] = marker
+        markers.push(L.marker([point.latitude, point.longitude]))
+    })
+
+    return markers
+}
+
+function drawMarkers(markers) {
+    markers.forEach(marker => {
+        shownMarkers.push(marker)
+        marker.addTo(map)
     })
 }
 
-function drawPolygons(polygons) {
+function hideMarkers(markers) {
+    let shownMarkersCopy = [...shownMarkers]
+
+    for (let i = 0; i < markers.length; i++) {
+        const marker = markers[i]
+        map.removeLayer(marker)
+
+        const index = shownMarkersCopy.indexOf(marker)
+        if (index > -1) {
+            shownMarkersCopy.splice(index, 1)
+        }
+    }
+
+    shownMarkers = shownMarkersCopy
+}
+
+async function drawAllPoints() {
+    drawMarkers(pointsToMarkers(await getAllPoints()));
+}
+
+
+// type Shape = []L.Geodesic
+// shape functions
+function polygonsToShapes(polygons) {
     if (polygons == null || polygons.length == 0) { return }
 
+    let shapes = []
     polygons.forEach(polygon => {
         polygonPoints = polygon.Points
 
         let coordinates = []
         polygonPoints.forEach(point => {
             if (point != null) {
-                marker = new L.LatLng(point.latitude, point.longitude)
-                coordinates.push(marker)
+                coordinates.push(new L.LatLng(point.latitude, point.longitude))
             }
         })
 
-        loadedShapePolygons[coordinates] = polygonPoints
-
-        new L.Geodesic(coordinates, {
+        shapes.push(new L.Geodesic(coordinates, {
             color: randomColor({ "luminosity": "bright", "hue": "blue" }),
             weight: 3,
             opacity: 0.75,
             fillOpacity: 0.5
-        }).addTo(map)
+        }))
+    })
+
+    return shapes
+}
+
+function drawShapes(shapes) {
+    shapes.forEach(shape => {
+        shownShapes.push(shape)
+        shape.addTo(map)
     })
 }
 
+function hideShapes(shapes) {
+    let shownShapesCopy = [...shownShapes]
 
-let loadedMarkerPoints = {}
-let loadedShapePolygons = {}
+    for (let i = 0; i < shapes.length; i++) {
+        const shape = shapes[i]
+        map.removeLayer(shape)
 
-async function showAllPoints() {
-    loadedPoints = await getAllPoints();
-    drawPoints(loadedPoints);
+        const index = shownShapesCopy.indexOf(shape)
+        if (index > -1) {
+            shownShapesCopy.splice(index, 1)
+        }
+    }
+
+    shownShapes = shownShapesCopy
 }
 
-async function showAllPolygons() {
-    loadedPolygons = await getAllPolygons();
-    drawPolygons(loadedPolygons);
+async function drawAllPolygons() {
+    drawShapes(polygonsToShapes(await getAllPolygons()));
 }
+
+
+
+let shownMarkers = []
+let shownShapes = []
+
 
 
 document.getElementById('showAllPoints').addEventListener('click', function(event) {
     event.preventDefault()
-    showAllPoints()
+    drawAllPoints()
 })
+
+document.getElementById('hideAllPoints').addEventListener('click', function(event) {
+    event.preventDefault()
+    hideMarkers(shownMarkers)
+})
+
 
 document.getElementById('showAllPolygons').addEventListener('click', function(event) {
     event.preventDefault()
-    showAllPolygons()
+    drawAllPolygons()
+})
+
+document.getElementById('hideAllPolygons').addEventListener('click', function(event) {
+    event.preventDefault()
+    hideShapes(shownShapes)
 })
 
 
