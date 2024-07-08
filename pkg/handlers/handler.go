@@ -1,9 +1,45 @@
 package handlers
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/services"
 )
+
+
+func requestLogger() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		now := time.Now()
+
+		context.Next()
+
+		latency := time.Since(now)
+
+		logrus.Infof("%s %s %s %s\n",
+			context.Request.Method,
+			context.Request.RequestURI,
+			context.Request.Proto,
+			latency,
+		)
+	}
+}
+
+func responseLogger() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Writer.Header().Set("X-Content-Type-Options", "nosniff")
+
+		context.Next()
+
+		logrus.Infof("%d %s %s\n",
+			context.Writer.Status(),
+			context.Request.Method,
+			context.Request.RequestURI,
+		)
+	}
+}
+
 
 type Handler struct {
 	service *services.Service
@@ -28,6 +64,9 @@ func (handler *Handler) pointOperations(group *gin.RouterGroup) {
 
 func (handler *Handler) InitEndpoints() *gin.Engine {
 	router := gin.New()
+
+	router.Use(requestLogger())
+    router.Use(responseLogger())
 
 	router.Static("/static", "./web")
 
