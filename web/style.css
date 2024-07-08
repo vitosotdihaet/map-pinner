@@ -31,7 +31,7 @@ html, body {
     outline: none;
     cursor: pointer;
     padding: 10px 0px;
-    transition: 0.3s;
+    transition: 0.25s;
     font-size: 20px;
     width: 100%;
 }
@@ -41,7 +41,7 @@ html, body {
 }
 
 .tab button.active {
-    background-color: #d1d1d1;
+    background-color: #d4d4d4;
 }
 
 .tabcontent {
@@ -68,6 +68,10 @@ html, body {
     margin-left: var(--navbar-width);
     width: 100% - var(--navbar-width);
     height: 100%;
+}
+
+.popup {
+    font-size: 15px
 }
 
 
