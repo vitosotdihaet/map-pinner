@@ -91,9 +91,9 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 			graphs.GET("/", handler.getGraphs)
 			// graphs.DELETE("/")
 
-			graphs.GET("/:id", handler.getGraphById)
-			graphs.PUT("/:id", handler.updateGraphById)
-			graphs.DELETE("/:id", handler.deleteGraphById)
+			graphs.GET("/:graph_id", handler.getGraphById)
+			graphs.PUT("/:graph_id", handler.updateGraphById)
+			graphs.DELETE("/:graph_id", handler.deleteGraphById)
 
 			handler.pointOperations(graphs)
 		}
