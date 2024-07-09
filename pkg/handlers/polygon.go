@@ -90,5 +90,7 @@ func (handler *Handler) deletePolygonById(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, id)
+	context.JSON(http.StatusOK, map[string]interface{} {
+		"id": id,
+	})
 }
