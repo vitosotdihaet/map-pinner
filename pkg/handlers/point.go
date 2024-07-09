@@ -56,14 +56,23 @@ func (handler *Handler) getPointById(context *gin.Context) {
 }
 
 func (handler *Handler) updatePointById(context *gin.Context) {
+	pointIdStr := context.Param("point_id")
+
+	id, err := strconv.ParseUint(pointIdStr, 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var inputPoint entities.Point
+	inputPoint.ID = id
 
 	if err := context.BindJSON(&inputPoint); err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err := handler.service.Point.UpdateById(inputPoint)
+	err = handler.service.Point.UpdateById(inputPoint)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
