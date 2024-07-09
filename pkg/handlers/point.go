@@ -8,6 +8,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 func (handler *Handler) getPoints(context *gin.Context) {
 	points, err := handler.service.Point.GetAll()
 	if err != nil {

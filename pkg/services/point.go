@@ -5,6 +5,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 type PointService struct {
 	database controllers.Point
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 func (handler *Handler) getPolygons(context *gin.Context) {
 	polygons, err := handler.service.Polygon.GetAll()
 	if err != nil {

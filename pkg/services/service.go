@@ -5,6 +5,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 type Point interface {
 	GetAll() ([]entities.Point, error)
 	Create(point entities.Point) (uint64, error)

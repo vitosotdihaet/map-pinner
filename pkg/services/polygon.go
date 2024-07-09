@@ -5,6 +5,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 type PolygonService struct {
 	databasePoint controllers.Point
 	databasePolygon controllers.Polygon

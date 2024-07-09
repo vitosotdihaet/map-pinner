@@ -9,6 +9,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 func polygonToWKT(polygon entities.Polygon) []string {
 	postgisPoints := make([]string, polygon.Length + 1)
 	for i := range polygon.Length {

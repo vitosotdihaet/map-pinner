@@ -8,6 +8,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+
 type PointPostgres struct {
 	postgres *sqlx.DB
 }
