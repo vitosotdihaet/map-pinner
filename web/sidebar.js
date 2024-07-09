@@ -17,6 +17,7 @@ function openTab(evt, tabName) {
 
 document.getElementsByClassName("tablinks")[1].click();
 
+// Markers
 map.on('click', Marker.addMarkerOnMapClick);
 document.getElementById('showAllPoints').addEventListener('click', function(event) {
     event.preventDefault()
@@ -25,4 +26,15 @@ document.getElementById('showAllPoints').addEventListener('click', function(even
 document.getElementById('hideAllPoints').addEventListener('click', function(event) {
     event.preventDefault()
     hideMarkers([...shownMarkers])
+})
+
+// Shapes
+document.getElementById('showAllPolygons').addEventListener('click', function(event) {
+    event.preventDefault()
+    drawAllPolygons()
+})
+
+document.getElementById('hideAllPolygons').addEventListener('click', function(event) {
+    event.preventDefault()
+    hideShapes(shownShapes)
 })

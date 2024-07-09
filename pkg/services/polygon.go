@@ -28,8 +28,8 @@ func (service *PolygonService) GetById(id uint64) (entities.Polygon, error) {
 	return service.database.GetById(id)
 }
 
-func (service *PolygonService) UpdateById(newPolygon entities.Polygon) error {
-	return service.database.UpdateById(newPolygon)
+func (service *PolygonService) UpdateById(id uint64, polygonUpdate entities.PolygonUpdate) error {
+	return service.database.UpdateById(id, polygonUpdate)
 }
 
 func (service *PolygonService) DeleteById(id uint64) error {

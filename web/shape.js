@@ -37,8 +37,6 @@ class Shape {
             coordinates.push([point.latitude, point.longitude])
         })
 
-        console.log(coordinates)
-
         this.mapShape = L.geodesic(coordinates, {
             color: randomColor({ "luminosity": "bright", "hue": "blue" }),
             weight: 5,
@@ -53,12 +51,11 @@ class Shape {
                     ID: ${this.polygon.id}<br/>
                     Name: <input type="text" class="popupNameInput" id="${this.polygon.id}" maxlength="255" size="10" value="${this.polygon.name}"/><br/>
                 </div>
-                <button class="popupDeleteShapeButton" onclick="deleteShape(shownShapes, ${this.polygon.id})">Delete</button>
-                <button class="popupUpdateShapeButton" onclick="updateShape(shownShapes, ${this.polygon.id})">Update</button>
+                <button class="popupDeleteButton" onclick="deleteShape(shownShapes, ${this.polygon.id})">Delete</button>
+                <button class="popupUpdateButton" onclick="updateShape(shownShapes, ${this.polygon.id})">Update</button>
                 `
             )
         ).openPopup()
-        console.log(this.mapShape)
     }
 
     draw() {
@@ -147,6 +144,29 @@ function hideShapes(shapes) {
     })
 }
 
+function deleteShape(shapes, id) {
+    shapes.forEach(shape => {
+        if (shape.polygon.id == id) {
+            shape.delete()
+            return
+        }
+    })
+}
+
+function updateShape(shapes, id) {
+    let name = document.getElementsByClassName('popupNameInput')[0].value
+
+    shapes.forEach(shape => {
+        if (shape.polygon.id == id) {
+            shape.update({
+                name: name,
+            })
+            return
+        }
+    })
+}
+
+
 async function drawAllPolygons() {
     drawShapes(polygonsToShapes(await PolygonFetch.getAll()));
 }
@@ -159,14 +179,3 @@ shownShapes.has = function (id) {
     }
     return false
 }
-
-
-document.getElementById('showAllPolygons').addEventListener('click', function(event) {
-    event.preventDefault()
-    drawAllPolygons()
-})
-
-document.getElementById('hideAllPolygons').addEventListener('click', function(event) {
-    event.preventDefault()
-    hideShapes(shownShapes)
-})

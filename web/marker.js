@@ -62,8 +62,8 @@ class Marker {
                     Latitude: ${this.point.latitude.toFixed(4)}<br/>
                     Longitude: ${this.point.longitude.toFixed(4)}
                 </div>
-                <button class="popupDeleteMarkerButton" onclick="deleteMarker(shownMarkers, ${this.point.id})">Delete</button>
-                <button class="popupUpdateMarkerButton" onclick="updateMarker(shownMarkers, ${this.point.id})">Update</button>
+                <button class="popupDeleteButton" onclick="deleteMarker(shownMarkers, ${this.point.id})">Delete</button>
+                <button class="popupUpdateButton" onclick="updateMarker(shownMarkers, ${this.point.id})">Update</button>
                 `
             )
         ).openPopup()

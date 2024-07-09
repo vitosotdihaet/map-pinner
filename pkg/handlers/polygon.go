@@ -57,21 +57,29 @@ func (handler *Handler) getPolygonById(context *gin.Context) {
 }
 
 func (handler *Handler) updatePolygonById(context *gin.Context) {
-	var inputPolygon entities.Polygon
+	polygonIdStr := context.Param("polygon_id")
+
+	id, err := strconv.ParseUint(polygonIdStr, 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var inputPolygon entities.PolygonUpdate
 
 	if err := context.BindJSON(&inputPolygon); err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err := handler.service.Polygon.UpdateById(inputPolygon)
+	err = handler.service.Polygon.UpdateById(id, inputPolygon)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	context.JSON(http.StatusOK, map[string]interface{} {
-		"id": inputPolygon.ID,
+		"id": id,
 	})
 }
 

@@ -10,43 +10,6 @@ import (
 )
 
 
-func polygonToWKT(polygon entities.Polygon) []string {
-	postgisPoints := make([]string, len(polygon.Points) + 1)
-	for i, point := range polygon.Points {
-		postgisPoints[i] = fmt.Sprintf("ST_MakePoint(%f, %f)", point.Latitude, point.Longitude)
-	}
-
-	postgisPoints[len(polygon.Points)] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
-
-	return postgisPoints
-}
-
-func parseWKT(wkt string) []entities.Point {
-	// Remove the "POLYGON((" prefix and "))" suffix
-	wkt = strings.TrimPrefix(wkt, "POLYGON((")
-	wkt = strings.TrimSuffix(wkt, "))")
-
-	// Split the coordinates
-	coordPairs := strings.Split(wkt, ",")
-
-	points := make([]entities.Point, 0)
-	for _, pair := range coordPairs {
-		coords := strings.Fields(pair)
-
-		if len(coords) != 2 {
-			logrus.Errorf("invalid wkt polygon parsing: %s", wkt)
-			break
-		}
-
-		var point entities.Point
-		fmt.Sscanf(coords[0], "%f", &point.Longitude)
-		fmt.Sscanf(coords[1], "%f", &point.Latitude)
-		points = append(points, point)
-	}
-
-	return points
-}
-
 
 type PolygonPostgres struct {
 	postgres *sqlx.DB
@@ -57,7 +20,7 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 }
 
 func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
-	postgisPoints := polygonToWKT(polygon)
+	postgisPoints := pointsToWKT(polygon.Points)
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
@@ -121,20 +84,30 @@ func (postgres *PolygonPostgres) GetById(id uint64) (entities.Polygon, error) {
 	return polygon, nil
 }
 
-func (postgres *PolygonPostgres) UpdateById(newPolygon entities.Polygon) error {
-	postgisPoints := polygonToWKT(newPolygon)
+func (postgres *PolygonPostgres) UpdateById(id uint64, polygonUpdate entities.PolygonUpdate) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
 
-	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v) WHERE id = $4;",
-		polygonsTable, strings.Join(postgisPoints, ", "), WGSSRID,
-	)
-	row := postgres.postgres.QueryRow(query, newPolygon.Name)
-
-	if err := row.Err(); err != nil {
-		return err
+	if polygonUpdate.Points != nil {
+		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(pointsToWKT(*polygonUpdate.Points), ", "), WGSSRID))
 	}
 
-	return nil
+	if polygonUpdate.Name != nil {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, *polygonUpdate.Name)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+	logrus.Tracef("%s", setQuery)
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", polygonsTable, setQuery, argId)
+	args = append(args, id)
+
+	_, err := postgres.postgres.Exec(query, args...)
+
+	return err
 }
 
 func (postgres *PolygonPostgres) DeleteById(id uint64) error {

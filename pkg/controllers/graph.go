@@ -9,17 +9,6 @@ import (
 )
 
 
-func graphToWKT(graph entities.Graph) []string {
-	postgisPoints := make([]string, len(graph.Points) + 1)
-	for i, point := range graph.Points {
-		postgisPoints[i] = fmt.Sprintf("ST_MakePoint(%f, %f)", point.Latitude, point.Longitude)
-	}
-
-	postgisPoints[len(graph.Points)] = fmt.Sprintf("ST_MakePoint(%f, %f)", graph.Points[0].Latitude, graph.Points[0].Longitude)
-
-	return postgisPoints
-}
-
 
 type GraphPostgres struct {
 	postgres *sqlx.DB
@@ -30,10 +19,10 @@ func NewGraphPostgres(postgres *sqlx.DB) *GraphPostgres {
 }
 
 func (postgres *GraphPostgres) Create(graph entities.Graph) (uint64, error) {
-	postgisPoints := graphToWKT(graph)
+	postgisPoints := pointsToWKT(graph.Points)
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakeGraph(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
+		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
 		graphsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
 	row := postgres.postgres.QueryRow(query, graph.Name)
@@ -95,10 +84,10 @@ func (postgres *GraphPostgres) GetById(id uint64) (entities.Graph, error) {
 }
 
 func (postgres *GraphPostgres) UpdateById(newGraph entities.Graph) error {
-	postgisPoints := graphToWKT(newGraph)
+	postgisPoints := pointsToWKT(newGraph.Points)
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakeGraph(ST_MakeLine(ARRAY[%s])), %v) WHERE id = $4;",
+		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v) WHERE id = $4;",
 		graphsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
 	row := postgres.postgres.QueryRow(query, newGraph.Name)

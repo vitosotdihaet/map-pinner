@@ -75,7 +75,7 @@ html, body {
     font-size: 15px
 }
 
-.popupDeleteMarkerButton {
+.popupDeleteButton {
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -89,12 +89,12 @@ html, body {
     display: inline-block;
 }
 
-.popupDeleteMarkerButton:hover {
+.popupDeleteButton:hover {
     background: #7a7a7a;
     text-decoration: none;
 }
 
-.popupUpdateMarkerButton {
+.popupUpdateButton {
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -108,7 +108,7 @@ html, body {
     display: inline-block;
 }
 
-.popupUpdateMarkerButton:hover {
+.popupUpdateButton:hover {
     background: #3b84b8;
     text-decoration: none;
 }

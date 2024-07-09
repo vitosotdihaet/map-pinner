@@ -34,3 +34,8 @@ func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 
 	return nil
 }
+
+type PolygonUpdate struct {
+	Name   *string `json:"name"`
+	Points *[]Point `json:"points"`
+}

@@ -18,7 +18,7 @@ type Polygon interface {
 	GetAll() ([]entities.Polygon, error)
 	Create(polygon entities.Polygon) (uint64, error)
 	GetById(id uint64) (entities.Polygon, error)
-	UpdateById(newPolygon entities.Polygon) error
+	UpdateById(id uint64, newPolygon entities.PolygonUpdate) error
 	DeleteById(id uint64) error
 }
 
