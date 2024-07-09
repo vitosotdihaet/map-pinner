@@ -168,12 +168,12 @@ class Marker {
     static async addMarkerOnMapClick(event) {
         // don't add new marker if not left mouse button is pressed
         if (event.originalEvent.button != 0) return
-    
+
         let latlng = event.latlng
 
         let point = new Point('', 0, latlng.lat, latlng.lng)
         let marker = new Marker(point)
-    
+
         let newId = await PointFetch.create(point)
 
         marker.updateId(newId.id)
