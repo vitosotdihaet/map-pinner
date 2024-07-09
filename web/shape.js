@@ -175,7 +175,7 @@ async function drawAllPolygons() {
 let shownShapes = []
 shownShapes.has = function (id) {
     for (let i = 0; i < this.length; i++) {
-        if (this[i].point.id == id) return true
+        if (this[i].polygon.id == id) return true
     }
     return false
 }
