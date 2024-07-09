@@ -22,7 +22,7 @@ type Polygon interface{
 	DeleteById(id uint64) error
 }
 
-type Graph interface{}
+type Graph Polygon
 
 type Database struct {
 	Point
@@ -34,5 +34,6 @@ func NewDatabase(postgres *sqlx.DB) *Database {
 	return &Database{
 		Point: NewPointPostgres(postgres),
 		Polygon: NewPolygonPostgres(postgres),
+		Graph: NewPolygonPostgres(postgres),
 	}
 }

@@ -7,33 +7,31 @@ import (
 
 
 type PolygonService struct {
-	databasePoint controllers.Point
-	databasePolygon controllers.Polygon
+	database controllers.Polygon
 }
 
-func NewPolygonService(databasePolygon controllers.Polygon, databasePoint controllers.Point) *PolygonService {
+func NewPolygonService(database controllers.Polygon) *PolygonService {
 	return &PolygonService {
-		databasePolygon: databasePolygon,
-		databasePoint: databasePoint,
+		database: database,
 	}
 }
 
 func (service *PolygonService) Create(polygon entities.Polygon) (uint64, error) {
-	return service.databasePolygon.Create(polygon)
+	return service.database.Create(polygon)
 }
 
 func (service *PolygonService) GetAll() ([]entities.Polygon, error) {
-	return service.databasePolygon.GetAll()
+	return service.database.GetAll()
 }
 
 func (service *PolygonService) GetById(id uint64) (entities.Polygon, error) {
-	return service.databasePolygon.GetById(id)
+	return service.database.GetById(id)
 }
 
 func (service *PolygonService) UpdateById(newPolygon entities.Polygon) error {
-	return service.databasePolygon.UpdateById(newPolygon)
+	return service.database.UpdateById(newPolygon)
 }
 
 func (service *PolygonService) DeleteById(id uint64) error {
-	return service.databasePolygon.DeleteById(id)
+	return service.database.DeleteById(id)
 }

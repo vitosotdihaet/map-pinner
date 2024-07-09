@@ -22,7 +22,7 @@ type Polygon interface{
 	DeleteById(id uint64) error
 }
 
-type Graph interface{}
+type Graph Polygon
 
 type Service struct {
 	Point
@@ -33,6 +33,7 @@ type Service struct {
 func NewService(database *controllers.Database) *Service {
 	return &Service{
 		Point: NewPointService(database.Point),
-		Polygon: NewPolygonService(database.Polygon, database.Point),
+		Polygon: NewPolygonService(database.Polygon),
+		Graph: NewPolygonService(database.Graph),
 	}
 }

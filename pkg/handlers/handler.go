@@ -83,22 +83,20 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 			polygons.GET("/:polygon_id", handler.getPolygonById)
 			polygons.PUT("/:polygon_id", handler.updatePolygonById)
 			polygons.DELETE("/:polygon_id", handler.deletePolygonById)
-
-			handler.pointOperations(polygons)
 		}
 
-		// graphs := api.Group("/graphs")
-		// {
-		// 	graphs.POST("/")
-		// 	graphs.GET("/")
-		// 	// graphs.DELETE("/")
+		graphs := api.Group("/graphs")
+		{
+			graphs.POST("/", handler.createPolygons)
+			graphs.GET("/", handler.getPolygons)
+			// graphs.DELETE("/")
 
-		// 	graphs.GET("/:id")
-		// 	graphs.PUT("/:id")
-		// 	graphs.DELETE("/:id")
+			graphs.GET("/:id", handler.getPolygonById)
+			graphs.PUT("/:id", handler.updatePolygonById)
+			graphs.DELETE("/:id", handler.deletePolygonById)
 
-		// 	handler.pointOperations(graphs)
-		// }
+			handler.pointOperations(graphs)
+		}
 	}
 
 	return router
