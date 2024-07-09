@@ -21,7 +21,7 @@ document.getElementsByClassName("tablinks")[0].click();
 
 
 // requests
-async function fetchData(url) {
+async function getData(url) {
     const response = await fetch(url)
     return await response.json()
 }
@@ -30,9 +30,6 @@ async function postData(url, body) {
     const response = await fetch(url, {
         method: "POST",
         body: body,
-        // headers: {
-        //   "Content-type": "application/json; charset=UTF-8"
-        // }
     });
     return await response.json()
 }
@@ -41,9 +38,14 @@ async function deleteData(url, body) {
     const response = await fetch(url, {
         method: "DELETE",
         body: body,
-        // headers: {
-        //   "Content-type": "application/json; charset=UTF-8"
-        // }
+    });
+    return await response.json()
+}
+
+async function putData(url, body) {
+    const response = await fetch(url, {
+        method: "PUT",
+        body: body,
     });
     return await response.json()
 }
@@ -59,7 +61,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 class PointFetch {
     static async getAll() {
-        return await fetchData('/api/points')
+        return getData('/api/points')
     }
 
     static async create(point) {
@@ -68,6 +70,10 @@ class PointFetch {
 
     static async delete(point) {
         return deleteData(`/api/points/${point.id}`, "")
+    }
+
+    static async update(point) {
+        return putData(`/api/points/${point.id}`, JSON.stringify(point))
     }
 }
 
@@ -87,54 +93,56 @@ class Marker {
     }
 
     setupMapMarker() {
-        this.map_marker = L.marker([this.point.latitude, this.point.longitude])
+        this.mapMarker = L.marker([this.point.latitude, this.point.longitude])
 
+        let point = this.point
         this.setDraggable(true)
-        this.map_marker.on('drag', function (event) {
+        this.mapMarker.on('drag', function (event) {
             // for some reason this shit works, though it shouldn't (should be event.originalEvent.button)
             if (event.originalEvent.buttons == 1) return
             event.target.dragging.disable()
-            event.target.setLatLng([this.point.latitude, this.point.longitude])
+            event.target.setLatLng([point.latitude, point.longitude])
             setTimeout(() => event.target.dragging.enable());
         })
 
-        this.map_marker.bindPopup(
+        let marker = this
+        this.mapMarker.on('dragend', function (event) {
+            let latlng = event.target.getLatLng()
+            marker.update({
+                latitude: latlng.lat,
+                longitude: latlng.lng
+            })
+        })
+
+        this.mapMarker.bindPopup(
             L.popup().setContent(
                 `
                 <div class="popup">
                     ID: ${this.point.id}<br/>
-                    Name: <input type="text" maxlength="255" size="10" value="${this.point.name}"/><br/>
+                    Name: <input type="text" class="popupNameInput" id="${this.point.id}" maxlength="255" size="10" value="${this.point.name}"/><br/>
                     Latitude: ${this.point.latitude.toFixed(4)}<br/>
                     Longitude: ${this.point.longitude.toFixed(4)}
                 </div>
-                <button class="popupDeleteMarkerButton" class="deleteMarker" onclick="deleteMarker(shownMarkers, ${this.point.id})" id="${this.point.id}">Delete</button>
-                <button class="popupUpdateMarkerButton" class="updateMarker" onclick="" id="${this.point.id}">Update</button>
+                <button class="popupDeleteMarkerButton" onclick="deleteMarker(shownMarkers, ${this.point.id})">Delete</button>
+                <button class="popupUpdateMarkerButton" onclick="updateMarker(shownMarkers, ${this.point.id})">Update</button>
                 `
             )
         ).openPopup()
-
-        // document.getElementById(this.point.id).addEventListener('click', function(event) {
-        //     event.preventDefault()
-        //     this.deleteMarker(event)
-        // })
     }
 
     setDraggable(value) {
-        this.map_marker.options.draggable = value
+        this.mapMarker.options.draggable = value
     }
 
     draw() {
         if (shownMarkers.has(this.point.id)) return
-        this.map_marker.addTo(map)
+        this.mapMarker.addTo(map)
         shownMarkers.push(this)
     }
 
     update(updateInfo) {
         if (updateInfo.name !== undefined) {
             this.point.name = updateInfo.name
-        }
-        if (updateInfo.id !== undefined) {
-            this.point.id = updateInfo.id
         }
         if (updateInfo.latitude !== undefined) {
             this.point.latitude = updateInfo.latitude
@@ -143,6 +151,16 @@ class Marker {
             this.point.longitude = updateInfo.longitude
         }
 
+        updateInfo.id = this.point.id
+
+        this.hide()
+        this.setupMapMarker()
+        this.draw()
+        PointFetch.update(updateInfo)
+    }
+
+    updateId(newId) {
+        this.point.id = newId
         this.setupMapMarker()
     }
 
@@ -151,25 +169,25 @@ class Marker {
         if (event.originalEvent.button != 0) return
     
         let latlng = event.latlng
-    
+
         let point = new Point('', 0, latlng.lat, latlng.lng)
         let marker = new Marker(point)
     
         let newId = await PointFetch.create(point)
 
-        marker.update(newId)
+        marker.updateId(newId.id)
         marker.draw()
 
         return marker
     }
 
-    async delete(event) {
+    async delete() {
         PointFetch.delete(this.point)
         this.hide()
     }
 
     hide() {
-        map.removeLayer(this.map_marker)
+        map.removeLayer(this.mapMarker)
         const index = shownMarkers.indexOf(this)
         if (index > -1) {
             shownMarkers.splice(index, 1)
@@ -196,20 +214,31 @@ function drawMarkers(markers) {
 }
 
 function hideMarkers(markers) {
-    let shownMarkersCopy = [...shownMarkers]
-
     for (let i = 0; i < markers.length; i++) {
         markers[i].hide()
     }
-
-    shownMarkers = shownMarkersCopy
-    shownMarkers.has = _has
 }
 
 function deleteMarker(markers, id) {
     markers.forEach(marker => {
         if (marker.point.id == id) {
             marker.delete()
+            return
+        }
+    })
+}
+
+function updateMarker(markers, id) {
+    let name = document.getElementsByClassName('popupNameInput')[0].value
+
+    markers.forEach(marker => {
+        if (marker.point.id == id) {
+            let latlng = marker.mapMarker.getLatLng()
+            marker.update({
+                name: name,
+                latitude: latlng.lat,
+                longitude: latlng.lng
+            })
             return
         }
     })
@@ -229,9 +258,7 @@ function _has(id) {
 
     return false
 }
-
-hideMarkers(shownMarkers)
-
+shownMarkers.has = _has
 
 map.on('click', Marker.addMarkerOnMapClick);
 document.getElementById('showAllPoints').addEventListener('click', function(event) {
@@ -240,7 +267,7 @@ document.getElementById('showAllPoints').addEventListener('click', function(even
 })
 document.getElementById('hideAllPoints').addEventListener('click', function(event) {
     event.preventDefault()
-    hideMarkers(shownMarkers)
+    hideMarkers([...shownMarkers])
 })
 
 
@@ -252,7 +279,7 @@ document.getElementById('hideAllPoints').addEventListener('click', function(even
 
 class PolygonFetch {
     static async getAll() {
-        return await fetchData('/api/polygons')
+        return await getData('/api/polygons')
     }
 }
 
