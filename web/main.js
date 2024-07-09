@@ -156,6 +156,7 @@ class Marker {
         this.hide()
         this.setupMapMarker()
         this.draw()
+
         PointFetch.update(updateInfo)
     }
 
@@ -195,9 +196,9 @@ class Marker {
     }
 }
 
-// other marker functions
+// other marker related functions
 function pointsToMarkers(points) {
-    if (points == null || points.length == 0) { return }
+    if (points == null || points.length == 0) { return [] }
 
     let markers = []
     points.forEach(point => {
@@ -206,6 +207,7 @@ function pointsToMarkers(points) {
 
     return markers
 }
+
 
 function drawMarkers(markers) {
     markers.forEach(marker => {
@@ -219,6 +221,7 @@ function hideMarkers(markers) {
     }
 }
 
+
 function deleteMarker(markers, id) {
     markers.forEach(marker => {
         if (marker.point.id == id) {
@@ -230,6 +233,7 @@ function deleteMarker(markers, id) {
 
 function updateMarker(markers, id) {
     let name = document.getElementsByClassName('popupNameInput')[0].value
+    console.log(name)
 
     markers.forEach(marker => {
         if (marker.point.id == id) {
@@ -246,19 +250,18 @@ function updateMarker(markers, id) {
 
 
 async function drawAllPoints() {
-    drawMarkers(pointsToMarkers(await PointFetch.getAll()));
+    drawMarkers(pointsToMarkers(await PointFetch.getAll()))
 }
 
 
 let shownMarkers = []
-function _has(id) {
+shownMarkers.has = function (id) {
     for (let i = 0; i < this.length; i++) {
         if (this[i].point.id == id) return true
     }
 
     return false
 }
-shownMarkers.has = _has
 
 map.on('click', Marker.addMarkerOnMapClick);
 document.getElementById('showAllPoints').addEventListener('click', function(event) {
@@ -274,15 +277,12 @@ document.getElementById('hideAllPoints').addEventListener('click', function(even
 
 
 
-// type Shape = []L.Geodesic
-// shape functions
 
 class PolygonFetch {
     static async getAll() {
         return await getData('/api/polygons')
     }
 }
-
 
 
 function polygonsToShapes(polygons) {
