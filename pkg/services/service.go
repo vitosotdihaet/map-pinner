@@ -14,15 +14,21 @@ type Point interface {
 	DeleteById(id uint64) error
 }
 
-type Polygon interface{
+type Polygon interface {
 	GetAll() ([]entities.Polygon, error)
-	Create(point entities.Polygon) (uint64, error)
+	Create(polygon entities.Polygon) (uint64, error)
 	GetById(id uint64) (entities.Polygon, error)
 	UpdateById(newPolygon entities.Polygon) error
 	DeleteById(id uint64) error
 }
 
-type Graph Polygon
+type Graph interface {
+	GetAll() ([]entities.Graph, error)
+	Create(graph entities.Graph) (uint64, error)
+	GetById(id uint64) (entities.Graph, error)
+	UpdateById(newGraph entities.Graph) error
+	DeleteById(id uint64) error
+}
 
 type Service struct {
 	Point
@@ -34,6 +40,6 @@ func NewService(database *controllers.Database) *Service {
 	return &Service{
 		Point: NewPointService(database.Point),
 		Polygon: NewPolygonService(database.Polygon),
-		Graph: NewPolygonService(database.Graph),
+		Graph: NewGraphService(database.Graph),
 	}
 }

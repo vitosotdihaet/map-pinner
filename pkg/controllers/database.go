@@ -14,7 +14,7 @@ type Point interface {
 	DeleteById(id uint64) error
 }
 
-type Polygon interface{
+type Polygon interface {
 	GetAll() ([]entities.Polygon, error)
 	Create(polygon entities.Polygon) (uint64, error)
 	GetById(id uint64) (entities.Polygon, error)
@@ -22,7 +22,13 @@ type Polygon interface{
 	DeleteById(id uint64) error
 }
 
-type Graph Polygon
+type Graph interface {
+	GetAll() ([]entities.Graph, error)
+	Create(graph entities.Graph) (uint64, error)
+	GetById(id uint64) (entities.Graph, error)
+	UpdateById(newGraph entities.Graph) error
+	DeleteById(id uint64) error
+}
 
 type Database struct {
 	Point
@@ -34,6 +40,6 @@ func NewDatabase(postgres *sqlx.DB) *Database {
 	return &Database{
 		Point: NewPointPostgres(postgres),
 		Polygon: NewPolygonPostgres(postgres),
-		Graph: NewPolygonPostgres(postgres),
+		Graph: NewGraphPostgres(postgres),
 	}
 }

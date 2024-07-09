@@ -87,13 +87,13 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 
 		graphs := api.Group("/graphs")
 		{
-			graphs.POST("/", handler.createPolygons)
-			graphs.GET("/", handler.getPolygons)
+			graphs.POST("/", handler.createGraphs)
+			graphs.GET("/", handler.getGraphs)
 			// graphs.DELETE("/")
 
-			graphs.GET("/:id", handler.getPolygonById)
-			graphs.PUT("/:id", handler.updatePolygonById)
-			graphs.DELETE("/:id", handler.deletePolygonById)
+			graphs.GET("/:id", handler.getGraphById)
+			graphs.PUT("/:id", handler.updateGraphById)
+			graphs.DELETE("/:id", handler.deleteGraphById)
 
 			handler.pointOperations(graphs)
 		}
