@@ -37,6 +37,16 @@ async function postData(url, body) {
     return await response.json()
 }
 
+async function deleteData(url, body) {
+    const response = await fetch(url, {
+        method: "DELETE",
+        body: body,
+        // headers: {
+        //   "Content-type": "application/json; charset=UTF-8"
+        // }
+    });
+    return await response.json()
+}
 
 
 var map = L.map('map').setView([55.76, 37.64], 5)
@@ -52,8 +62,12 @@ class PointFetch {
         return await fetchData('/api/points')
     }
 
-    static async post(point) {
+    static async create(point) {
         return postData("/api/points", JSON.stringify(point))
+    }
+
+    static async delete(point) {
+        return deleteData(`/api/points/${point.id}`, "")
     }
 }
 
@@ -67,30 +81,46 @@ class Point {
 }
 
 class Marker {
-    setPopup() {
-        this.map_marker.bindPopup(
-            L.popup().setContent(
-                `<p class="popup">
-                 ID: ${this.point.id}<br/>
-                 Name: <input type="text" maxlength="255" size="10" value="${this.point.name}"/><br/>
-                 Latitude: ${this.point.latitude.toFixed(4)}<br/>
-                 Longitude: ${this.point.longitude.toFixed(4)}</p>`
-            )
-        ).openPopup()
-    }
-
     constructor(point) {
         this.point = point
+        this.setupMapMarker()
+    }
 
-        this.map_marker = L.marker([point.latitude, point.longitude], { draggable: true })
+    setupMapMarker() {
+        this.map_marker = L.marker([this.point.latitude, this.point.longitude])
+
+        this.setDraggable(true)
         this.map_marker.on('drag', function (event) {
             // for some reason this shit works, though it shouldn't (should be event.originalEvent.button)
             if (event.originalEvent.buttons == 1) return
             event.target.dragging.disable()
-            event.target.setLatLng([point.latitude, point.longitude])
+            event.target.setLatLng([this.point.latitude, this.point.longitude])
             setTimeout(() => event.target.dragging.enable());
         })
-        this.setPopup()
+
+        this.map_marker.bindPopup(
+            L.popup().setContent(
+                `
+                <div class="popup">
+                    ID: ${this.point.id}<br/>
+                    Name: <input type="text" maxlength="255" size="10" value="${this.point.name}"/><br/>
+                    Latitude: ${this.point.latitude.toFixed(4)}<br/>
+                    Longitude: ${this.point.longitude.toFixed(4)}
+                </div>
+                <button class="popupDeleteMarkerButton" class="deleteMarker" onclick="deleteMarker(shownMarkers, ${this.point.id})" id="${this.point.id}">Delete</button>
+                <button class="popupUpdateMarkerButton" class="updateMarker" onclick="" id="${this.point.id}">Update</button>
+                `
+            )
+        ).openPopup()
+
+        // document.getElementById(this.point.id).addEventListener('click', function(event) {
+        //     event.preventDefault()
+        //     this.deleteMarker(event)
+        // })
+    }
+
+    setDraggable(value) {
+        this.map_marker.options.draggable = value
     }
 
     draw() {
@@ -113,7 +143,37 @@ class Marker {
             this.point.longitude = updateInfo.longitude
         }
 
-        this.setPopup()
+        this.setupMapMarker()
+    }
+
+    static async addMarkerOnMapClick(event) {
+        // don't add new marker if not left mouse button is pressed
+        if (event.originalEvent.button != 0) return
+    
+        let latlng = event.latlng
+    
+        let point = new Point('', 0, latlng.lat, latlng.lng)
+        let marker = new Marker(point)
+    
+        let newId = await PointFetch.create(point)
+
+        marker.update(newId)
+        marker.draw()
+
+        return marker
+    }
+
+    async delete(event) {
+        PointFetch.delete(this.point)
+        this.hide()
+    }
+
+    hide() {
+        map.removeLayer(this.map_marker)
+        const index = shownMarkers.indexOf(this)
+        if (index > -1) {
+            shownMarkers.splice(index, 1)
+        }
     }
 }
 
@@ -139,33 +199,22 @@ function hideMarkers(markers) {
     let shownMarkersCopy = [...shownMarkers]
 
     for (let i = 0; i < markers.length; i++) {
-        const marker = markers[i]
-        map.removeLayer(marker.map_marker)
-
-        const index = shownMarkersCopy.indexOf(marker)
-        if (index > -1) {
-            shownMarkersCopy.splice(index, 1)
-        }
+        markers[i].hide()
     }
 
     shownMarkers = shownMarkersCopy
     shownMarkers.has = _has
 }
 
-async function addMarkerOnClick(event) {
-    // don't add new marker if not left mouse button is pressed
-    if (event.originalEvent.button != 0) return
-
-    let latlng = event.latlng
-
-    let point = new Point('', 0, latlng.lat, latlng.lng)
-    let marker = new Marker(point)
-
-    marker.draw()
-
-    newId = await PointFetch.post(point)
-    marker.update(newId)
+function deleteMarker(markers, id) {
+    markers.forEach(marker => {
+        if (marker.point.id == id) {
+            marker.delete()
+            return
+        }
+    })
 }
+
 
 async function drawAllPoints() {
     drawMarkers(pointsToMarkers(await PointFetch.getAll()));
@@ -184,7 +233,7 @@ function _has(id) {
 hideMarkers(shownMarkers)
 
 
-map.on('click', addMarkerOnClick);
+map.on('click', Marker.addMarkerOnMapClick);
 document.getElementById('showAllPoints').addEventListener('click', function(event) {
     event.preventDefault()
     drawAllPoints()
@@ -193,8 +242,6 @@ document.getElementById('hideAllPoints').addEventListener('click', function(even
     event.preventDefault()
     hideMarkers(shownMarkers)
 })
-
-
 
 
 
