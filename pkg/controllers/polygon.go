@@ -9,7 +9,7 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-func polygonsToWKT(polygon entities.Polygon) []string {
+func polygonToWKT(polygon entities.Polygon) []string {
 	postgisPoints := make([]string, polygon.Length + 1)
 	for i := range polygon.Length {
 		point := polygon.Points[i]
@@ -56,7 +56,7 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 }
 
 func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
-	postgisPoints := polygonsToWKT(polygon)
+	postgisPoints := polygonToWKT(polygon)
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
@@ -121,7 +121,7 @@ func (postgres *PolygonPostgres) GetById(id uint64) (entities.Polygon, error) {
 }
 
 func (postgres *PolygonPostgres) UpdateById(newPolygon entities.Polygon) error {
-	postgisPoints := polygonsToWKT(newPolygon)
+	postgisPoints := polygonToWKT(newPolygon)
 
 	query := fmt.Sprintf(
 		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v) WHERE id = $4;",
