@@ -8,12 +8,12 @@ import (
 type Polygon struct {
 	ID     uint64 `json:"id"`
 	Name   string `json:"name"`
-	Points []Point
+	Points []Point `json:"points"`
 }
 
 func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 	var raw struct {
-		Name   string           `json:"name"`
+		Name   string `json:"name"`
 		Points []json.RawMessage `json:"points"`
 	}
 
