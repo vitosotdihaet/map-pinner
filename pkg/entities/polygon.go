@@ -5,44 +5,31 @@ import (
 )
 
 
-const PolygonMaxPoints = 20
-
 type Polygon struct {
 	ID     uint64 `json:"id"`
 	Name   string `json:"name"`
-	Points [PolygonMaxPoints]*Point
-	Length int
+	Points []Point
 }
 
 func (polygon *Polygon) UnmarshalJSON(data []byte) error {
-	var rawPoints []map[string]interface{}
+	var raw struct {
+		Name   string           `json:"name"`
+		Points []json.RawMessage `json:"points"`
+	}
 
-	if err := json.Unmarshal(data, &rawPoints); err != nil {
+	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
 
-	for i, rawPoint := range rawPoints {
-		point := &Point{}
+	polygon.Name = raw.Name
+	polygon.Points = make([]Point, len(raw.Points))
 
-		if id, ok := rawPoint["id"].(float64); ok {
-			point.ID = uint64(id)
+	for i, rawPoint := range raw.Points {
+		var point Point
+		if err := json.Unmarshal(rawPoint, &point); err != nil {
+			return err
 		}
-		if name, ok := rawPoint["name"].(string); ok {
-			point.Name = name
-		}
-		if latitude, ok := rawPoint["latitude"].(float64); ok {
-			point.Latitude = latitude
-		}
-		if longitude, ok := rawPoint["longitude"].(float64); ok {
-			point.Longitude = longitude
-		}
-
-		if i < PolygonMaxPoints {
-			polygon.Points[i] = point
-			polygon.Length = i + 1
-		} else {
-			return nil
-		}
+		polygon.Points[i] = point
 	}
 
 	return nil

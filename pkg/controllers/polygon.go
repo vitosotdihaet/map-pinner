@@ -11,17 +11,17 @@ import (
 
 
 func polygonToWKT(polygon entities.Polygon) []string {
-	postgisPoints := make([]string, polygon.Length + 1)
-	for i := range polygon.Length {
-		point := polygon.Points[i]
+	postgisPoints := make([]string, len(polygon.Points) + 1)
+	for i, point := range polygon.Points {
 		postgisPoints[i] = fmt.Sprintf("ST_MakePoint(%f, %f)", point.Latitude, point.Longitude)
 	}
-	postgisPoints[polygon.Length] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
+
+	postgisPoints[len(polygon.Points)] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
 
 	return postgisPoints
 }
 
-func parseWKT(wkt string) [20]*entities.Point {
+func parseWKT(wkt string) []entities.Point {
 	// Remove the "POLYGON((" prefix and "))" suffix
 	wkt = strings.TrimPrefix(wkt, "POLYGON((")
 	wkt = strings.TrimSuffix(wkt, "))")
@@ -29,8 +29,8 @@ func parseWKT(wkt string) [20]*entities.Point {
 	// Split the coordinates
 	coordPairs := strings.Split(wkt, ",")
 
-	var points [20]*entities.Point
-	for i, pair := range coordPairs {
+	points := make([]entities.Point, 0)
+	for _, pair := range coordPairs {
 		coords := strings.Fields(pair)
 
 		if len(coords) != 2 {
@@ -41,7 +41,7 @@ func parseWKT(wkt string) [20]*entities.Point {
 		var point entities.Point
 		fmt.Sscanf(coords[0], "%f", &point.Longitude)
 		fmt.Sscanf(coords[1], "%f", &point.Latitude)
-		points[i] = &point
+		points = append(points, point)
 	}
 
 	return points
@@ -56,7 +56,13 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 	return &PolygonPostgres{postgres: postgres}
 }
 
-func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
+func (postgres *PolygonPostgres) Create(pointIds []uint64, polygon entities.Polygon) (uint64, error) {
+	tx, err := postgres.postgres.Begin()
+	if err != nil {
+		return 0, err
+	}
+	defer tx.Rollback()
+
 	postgisPoints := polygonToWKT(polygon)
 
 	query := fmt.Sprintf(
@@ -67,6 +73,34 @@ func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
+		return 0, err
+	}
+
+	// insert into polygon_points
+	values := make([]string, 0)
+	args := make([]any, 1)
+	args[0] = id
+
+	argId := 2
+
+	for _, pointId := range pointIds {
+		values = append(values, fmt.Sprintf("($1, $%d)", argId))
+		args = append(args, pointId)
+		argId++
+	}
+
+	valuesQuery := strings.Join(values, ", ")
+
+	query = fmt.Sprintf("INSERT INTO %s VALUES %s", polygonsPointsTable, valuesQuery)
+	logrus.Trace(query)
+
+	_, err = tx.Exec(query, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
 		return 0, err
 	}
 
