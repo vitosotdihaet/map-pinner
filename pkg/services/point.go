@@ -13,7 +13,7 @@ func NewPointService(database controllers.Point) *PointService {
 	return &PointService{database: database}
 }
 
-func (service *PointService) Create(point entities.Point) (int, error) {
+func (service *PointService) Create(point entities.Point) (uint64, error) {
 	return service.database.Create(point)
 }
 
@@ -25,8 +25,8 @@ func (service *PointService) GetById(id uint64) (entities.Point, error) {
 	return service.database.GetById(id)
 }
 
-func (service *PointService) UpdateById(newPoint entities.Point) error {
-	return service.database.UpdateById(newPoint)
+func (service *PointService) UpdateById(id uint64, pointUpdate entities.PointUpdate) error {
+	return service.database.UpdateById(id, pointUpdate)
 }
 
 func (service *PointService) DeleteById(id uint64) error {

@@ -16,6 +16,7 @@ type Polygon struct {
 
 func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 	var rawPoints []map[string]interface{}
+
 	if err := json.Unmarshal(data, &rawPoints); err != nil {
 		return err
 	}

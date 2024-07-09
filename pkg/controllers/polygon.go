@@ -9,6 +9,16 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
+func polygonsToWKT(polygon entities.Polygon) []string {
+	postgisPoints := make([]string, polygon.Length + 1)
+	for i := range polygon.Length {
+		point := polygon.Points[i]
+		postgisPoints[i] = fmt.Sprintf("ST_MakePoint(%f, %f)", point.Latitude, point.Longitude)
+	}
+	postgisPoints[polygon.Length] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
+
+	return postgisPoints
+}
 
 func parseWKT(wkt string) [20]*entities.Point {
 	// Remove the "POLYGON((" prefix and "))" suffix
@@ -45,23 +55,16 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 	return &PolygonPostgres{postgres: postgres}
 }
 
-func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (int, error) {
-	postgisPoints := make([]string, polygon.Length + 1)
-	for i := range polygon.Length {
-		point := polygon.Points[i]
-		postgisPoints[i] = fmt.Sprintf("ST_MakePoint(%f, %f)", point.Latitude, point.Longitude)
-	}
-
-	postgisPoints[polygon.Length] = fmt.Sprintf("ST_MakePoint(%f, %f)", polygon.Points[0].Latitude, polygon.Points[0].Longitude)
+func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
+	postgisPoints := polygonsToWKT(polygon)
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), 4326)) RETURNING id;", 
-		polygonsTable, strings.Join(postgisPoints, ", "),
+		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
+		polygonsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
-
 	row := postgres.postgres.QueryRow(query, polygon.Name)
 
-	var id int
+	var id uint64
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
@@ -118,15 +121,17 @@ func (postgres *PolygonPostgres) GetById(id uint64) (entities.Polygon, error) {
 }
 
 func (postgres *PolygonPostgres) UpdateById(newPolygon entities.Polygon) error {
-	// query := fmt.Sprintf(
-	// 	"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePolygon($2, $3), %v) WHERE id = $4;",
-	// 	polygonsTable, WGSSRID,
-	// )
-	// row := postgres.postgres.QueryRow(query, newPolygon.Name, newPolygon.Longitude, newPolygon.Lattitude, newPolygon.ID)
+	postgisPoints := polygonsToWKT(newPolygon)
 
-	// if err := row.Err(); err != nil {
-	// 	return err
-	// }
+	query := fmt.Sprintf(
+		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v) WHERE id = $4;",
+		polygonsTable, strings.Join(postgisPoints, ", "), WGSSRID,
+	)
+	row := postgres.postgres.QueryRow(query, newPolygon.Name)
+
+	if err := row.Err(); err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -12,6 +12,7 @@ const (
 	pointsTable = "points"
 
 	polygonsTable = "polygons"
+	polygonsPointsTable = "polygon_points"
 
 	edgesTable = "edges"
 	graphsEdges = "graph_edges"

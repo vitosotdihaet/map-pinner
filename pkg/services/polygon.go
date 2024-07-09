@@ -6,29 +6,38 @@ import (
 )
 
 type PolygonService struct {
-	database controllers.Polygon
+	databasePoint controllers.Point
+	databasePolygon controllers.Polygon
 }
 
-func NewPolygonService(database controllers.Polygon) *PolygonService {
-	return &PolygonService{database: database}
+func NewPolygonService(databasePolygon controllers.Polygon, databasePoint controllers.Point) *PolygonService {
+	return &PolygonService {
+		databasePolygon: databasePolygon,
+		databasePoint: databasePoint,
+	}
 }
 
-func (service *PolygonService) Create(polygon entities.Polygon) (int, error) {
-	return service.database.Create(polygon)
+func (service *PolygonService) Create(polygon entities.Polygon) (uint64, error) {
+	for i := 0; i < polygon.Length; i += 1 {
+		if id, err := service.databasePoint.Create(*polygon.Points[i]); err != nil {
+			return id, err
+		}
+	}
+	return service.databasePolygon.Create(polygon)
 }
 
 func (service *PolygonService) GetAll() ([]entities.Polygon, error) {
-	return service.database.GetAll()
+	return service.databasePolygon.GetAll()
 }
 
 func (service *PolygonService) GetById(id uint64) (entities.Polygon, error) {
-	return service.database.GetById(id)
+	return service.databasePolygon.GetById(id)
 }
 
 func (service *PolygonService) UpdateById(newPolygon entities.Polygon) error {
-	return service.database.UpdateById(newPolygon)
+	return service.databasePolygon.UpdateById(newPolygon)
 }
 
 func (service *PolygonService) DeleteById(id uint64) error {
-	return service.database.DeleteById(id)
+	return service.databasePolygon.DeleteById(id)
 }

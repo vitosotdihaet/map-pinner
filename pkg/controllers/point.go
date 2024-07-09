@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
@@ -15,14 +16,14 @@ func NewPointPostgres(postgres *sqlx.DB) *PointPostgres {
 	return &PointPostgres{postgres: postgres}
 }
 
-func (postgres *PointPostgres) Create(point entities.Point) (int, error) {
+func (postgres *PointPostgres) Create(point entities.Point) (uint64, error) {
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v)) RETURNING id;",
 		pointsTable, WGSSRID,
 	)
 	row := postgres.postgres.QueryRow(query, point.Name, point.Longitude, point.Latitude)
 
-	var id int
+	var id uint64
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}
@@ -71,18 +72,43 @@ func (postgres *PointPostgres) GetById(id uint64) (entities.Point, error) {
 	return point, nil
 }
 
-func (postgres *PointPostgres) UpdateById(newPoint entities.Point) error {
-	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePoint($2, $3), %v) WHERE id = $4;",
-		pointsTable, WGSSRID,
-	)
-	row := postgres.postgres.QueryRow(query, newPoint.Name, newPoint.Longitude, newPoint.Latitude, newPoint.ID)
+func (postgres *PointPostgres) UpdateById(id uint64, pointUpdate entities.PointUpdate) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
 
-	if err := row.Err(); err != nil {
-		return err
+	if pointUpdate.Name != nil {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, *pointUpdate.Name)
+		argId++
 	}
 
-	return nil
+	if pointUpdate.Latitude != nil && pointUpdate.Longitude != nil {
+		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePoint($%d, $%d), %d)", argId, argId + 1, WGSSRID))
+		args = append(args, *pointUpdate.Longitude)
+		args = append(args, *pointUpdate.Latitude)
+		argId += 2
+	} else {
+		if pointUpdate.Latitude != nil {
+			setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePoint(ST_X(geom), $%d), %d)", argId, WGSSRID))
+			args = append(args, *pointUpdate.Latitude)
+			argId++
+		} else {
+			setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePoint($%d, ST_Y(geom)), %d)", argId, WGSSRID))
+			args = append(args, *pointUpdate.Longitude)
+			argId++
+
+		}
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", pointsTable, setQuery, argId)
+	args = append(args, id)
+
+	_, err := postgres.postgres.Exec(query, args...)
+
+	return err
 }
 
 func (postgres *PointPostgres) DeleteById(id uint64) error {

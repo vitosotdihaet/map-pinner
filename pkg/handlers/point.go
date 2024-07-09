@@ -64,22 +64,21 @@ func (handler *Handler) updatePointById(context *gin.Context) {
 		return
 	}
 
-	var inputPoint entities.Point
-	inputPoint.ID = id
+	var inputPoint entities.PointUpdate
 
 	if err := context.BindJSON(&inputPoint); err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err = handler.service.Point.UpdateById(inputPoint)
+	err = handler.service.Point.UpdateById(id, inputPoint)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	context.JSON(http.StatusOK, map[string]interface{} {
-		"id": inputPoint.ID,
+		"id": id,
 	})
 }
 

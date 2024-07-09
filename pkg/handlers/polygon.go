@@ -21,7 +21,7 @@ func (handler *Handler) getPolygons(context *gin.Context) {
 func (handler *Handler) createPolygons(context *gin.Context) {
 	var inputPolygon entities.Polygon
 
-	if err := context.ShouldBindJSON(&inputPolygon); err != nil {
+	if err := context.BindJSON(&inputPolygon); err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -56,22 +56,22 @@ func (handler *Handler) getPolygonById(context *gin.Context) {
 }
 
 func (handler *Handler) updatePolygonById(context *gin.Context) {
-	// var inputPolygon entities.Polygon
+	var inputPolygon entities.Polygon
 
-	// if err := context.BindJSON(&inputPolygon); err != nil {
-	// 	newErrorResponse(context, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
+	if err := context.BindJSON(&inputPolygon); err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// err := handler.service.Polygon.UpdateById(inputPolygon)
-	// if err != nil {
-	// 	newErrorResponse(context, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	err := handler.service.Polygon.UpdateById(inputPolygon)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// context.JSON(http.StatusOK, map[string]interface{} {
-	// 	"id": inputPolygon.ID,
-	// })
+	context.JSON(http.StatusOK, map[string]interface{} {
+		"id": inputPolygon.ID,
+	})
 }
 
 func (handler *Handler) deletePolygonById(context *gin.Context) {
