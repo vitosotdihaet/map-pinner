@@ -38,21 +38,21 @@ func (handler *Handler) createPolygons(context *gin.Context) {
 }
 
 func (handler *Handler) getPolygonById(context *gin.Context) {
-	// polygonIdStr := context.Param("polygon_id")
+	polygonIdStr := context.Param("polygon_id")
 
-	// id, err := strconv.ParseUint(polygonIdStr, 10, 64)
-	// if err != nil {
-	// 	newErrorResponse(context, http.StatusBadRequest, err.Error())
-	// 	return
-	// }
+	id, err := strconv.ParseUint(polygonIdStr, 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
 
-	// polygon, err := handler.service.Polygon.GetById(id)
-	// if err != nil {
-	// 	newErrorResponse(context, http.StatusInternalServerError, err.Error())
-	// 	return
-	// }
+	polygon, err := handler.service.Polygon.GetById(id)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	// context.JSON(http.StatusOK, polygon)
+	context.JSON(http.StatusOK, polygon)
 }
 
 func (handler *Handler) updatePolygonById(context *gin.Context) {

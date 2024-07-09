@@ -98,16 +98,21 @@ func (postgres *PolygonPostgres) GetAll() ([]entities.Polygon, error) {
 }
 
 func (postgres *PolygonPostgres) GetById(id uint64) (entities.Polygon, error) {
-	// query := fmt.Sprintf(
-	// 	"SELECT name, ST_X(geom) AS longtitude, ST_Y(geom) AS lattitude FROM %s WHERE id = $1;", polygonsTable,
-	// )
-	// row := postgres.postgres.QueryRow(query, id)
+	query := fmt.Sprintf(
+		"SELECT name, ST_AsText(geom) AS geom FROM %s WHERE id = $1;", polygonsTable,
+	)
+	row := postgres.postgres.QueryRow(query, id)
 
 	var polygon entities.Polygon
-	// polygon.ID = id
-	// if err := row.Scan(&polygon.Name, &polygon.Longitude, &polygon.Lattitude); err != nil {
-	// 	return polygon, err
-	// }
+	polygon.ID = id
+
+	var wkt string
+
+	if err := row.Scan(&polygon.Name, &wkt); err != nil {
+		return polygon, err
+	}
+
+	polygon.Points = parseWKT(wkt)
 
 	return polygon, nil
 }
