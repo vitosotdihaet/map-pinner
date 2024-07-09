@@ -16,7 +16,7 @@ type Point interface {
 
 type Polygon interface{
 	GetAll() ([]entities.Polygon, error)
-	Create(pointIds []uint64, polygon entities.Polygon) (uint64, error)
+	Create(polygon entities.Polygon) (uint64, error)
 	GetById(id uint64) (entities.Polygon, error)
 	UpdateById(newPolygon entities.Polygon) error
 	DeleteById(id uint64) error

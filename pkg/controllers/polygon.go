@@ -56,13 +56,7 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 	return &PolygonPostgres{postgres: postgres}
 }
 
-func (postgres *PolygonPostgres) Create(pointIds []uint64, polygon entities.Polygon) (uint64, error) {
-	tx, err := postgres.postgres.Begin()
-	if err != nil {
-		return 0, err
-	}
-	defer tx.Rollback()
-
+func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
 	postgisPoints := polygonToWKT(polygon)
 
 	query := fmt.Sprintf(
@@ -73,34 +67,6 @@ func (postgres *PolygonPostgres) Create(pointIds []uint64, polygon entities.Poly
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
-		return 0, err
-	}
-
-	// insert into polygon_points
-	values := make([]string, 0)
-	args := make([]any, 1)
-	args[0] = id
-
-	argId := 2
-
-	for _, pointId := range pointIds {
-		values = append(values, fmt.Sprintf("($1, $%d)", argId))
-		args = append(args, pointId)
-		argId++
-	}
-
-	valuesQuery := strings.Join(values, ", ")
-
-	query = fmt.Sprintf("INSERT INTO %s VALUES %s", polygonsPointsTable, valuesQuery)
-	logrus.Trace(query)
-
-	_, err = tx.Exec(query, args...)
-	if err != nil {
-		return 0, err
-	}
-
-	// Commit the transaction
-	if err = tx.Commit(); err != nil {
 		return 0, err
 	}
 

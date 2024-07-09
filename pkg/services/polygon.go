@@ -19,15 +19,7 @@ func NewPolygonService(databasePolygon controllers.Polygon, databasePoint contro
 }
 
 func (service *PolygonService) Create(polygon entities.Polygon) (uint64, error) {
-	pointIds := make([]uint64, 0)
-	for _, point := range polygon.Points {
-		id, err := service.databasePoint.Create(point)
-		if err != nil {
-			return 0, err
-		}
-		pointIds = append(pointIds, id)
-	}
-	return service.databasePolygon.Create(pointIds, polygon)
+	return service.databasePolygon.Create(polygon)
 }
 
 func (service *PolygonService) GetAll() ([]entities.Polygon, error) {
