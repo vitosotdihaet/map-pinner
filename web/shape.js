@@ -122,7 +122,7 @@ class Shape {
 
 
 function polygonsToShapes(polygons) {
-    if (polygons == null) { return }
+    if (polygons == null) { return [] }
 
     let shapes = []
     polygons.forEach(polygon => {
@@ -170,6 +170,7 @@ function updateShape(shapes, id) {
 async function drawAllPolygons() {
     drawShapes(polygonsToShapes(await PolygonFetch.getAll()));
 }
+
 
 
 let shownShapes = []

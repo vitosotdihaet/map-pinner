@@ -36,5 +36,16 @@ document.getElementById('showAllPolygons').addEventListener('click', function(ev
 
 document.getElementById('hideAllPolygons').addEventListener('click', function(event) {
     event.preventDefault()
-    hideShapes(shownShapes)
+    hideShapes([...shownShapes])
+})
+
+// Directions
+document.getElementById('showAllGraphs').addEventListener('click', function(event) {
+    event.preventDefault()
+    drawAllGraphs()
+})
+
+document.getElementById('hideAllGraphs').addEventListener('click', function(event) {
+    event.preventDefault()
+    hideShapes([...shownDirections])
 })

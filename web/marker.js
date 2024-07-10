@@ -137,7 +137,7 @@ class Marker {
 
 // other marker related functions
 function pointsToMarkers(points) {
-    if (points == null || points.length == 0) { return [] }
+    if (points == null) { return [] }
 
     let markers = []
     points.forEach(point => {
