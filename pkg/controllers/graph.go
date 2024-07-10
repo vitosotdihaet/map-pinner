@@ -20,9 +20,12 @@ func NewGraphPostgres(postgres *sqlx.DB) *GraphPostgres {
 
 func (postgres *GraphPostgres) Create(graph entities.Graph) (uint64, error) {
 	postgisPoints := pointsToWKT(graph.Points)
+	if len(postgisPoints) > 0 {
+		postgisPoints = postgisPoints[:len(postgisPoints) - 1]
+	}
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
+		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v)) RETURNING id;", 
 		graphsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
 	row := postgres.postgres.QueryRow(query, graph.Name)
@@ -83,20 +86,33 @@ func (postgres *GraphPostgres) GetById(id uint64) (entities.Graph, error) {
 	return graph, nil
 }
 
-func (postgres *GraphPostgres) UpdateById(newGraph entities.Graph) error {
-	postgisPoints := pointsToWKT(newGraph.Points)
+func (postgres *GraphPostgres) UpdateById(id uint64, graphUpdate entities.GraphUpdate) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argId := 1
 
-	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, geom = ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v) WHERE id = $4;",
-		graphsTable, strings.Join(postgisPoints, ", "), WGSSRID,
-	)
-	row := postgres.postgres.QueryRow(query, newGraph.Name)
-
-	if err := row.Err(); err != nil {
-		return err
+	if graphUpdate.Points != nil {
+		wkt := pointsToWKT(*graphUpdate.Points)
+		if len(wkt) > 0 {
+			wkt = wkt[:len(wkt) - 1]
+		}
+		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(wkt, ", "), WGSSRID))
 	}
 
-	return nil
+	if graphUpdate.Name != nil {
+		setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+		args = append(args, *graphUpdate.Name)
+		argId++
+	}
+
+	setQuery := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", graphsTable, setQuery, argId)
+	args = append(args, id)
+
+	_, err := postgres.postgres.Exec(query, args...)
+
+	return err
 }
 
 func (postgres *GraphPostgres) DeleteById(id uint64) error {

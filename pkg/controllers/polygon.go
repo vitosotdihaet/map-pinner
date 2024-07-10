@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
@@ -100,7 +99,6 @@ func (postgres *PolygonPostgres) UpdateById(id uint64, polygonUpdate entities.Po
 	}
 
 	setQuery := strings.Join(setValues, ", ")
-	logrus.Tracef("%s", setQuery)
 
 	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", polygonsTable, setQuery, argId)
 	args = append(args, id)

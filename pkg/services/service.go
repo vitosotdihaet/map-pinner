@@ -26,7 +26,7 @@ type Graph interface {
 	GetAll() ([]entities.Graph, error)
 	Create(graph entities.Graph) (uint64, error)
 	GetById(id uint64) (entities.Graph, error)
-	UpdateById(newGraph entities.Graph) error
+	UpdateById(id uint64, graphUpdate entities.GraphUpdate) error
 	DeleteById(id uint64) error
 }
 

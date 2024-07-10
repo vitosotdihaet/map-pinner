@@ -28,8 +28,8 @@ func (service *GraphService) GetById(id uint64) (entities.Graph, error) {
 	return service.database.GetById(id)
 }
 
-func (service *GraphService) UpdateById(newGraph entities.Graph) error {
-	return service.database.UpdateById(newGraph)
+func (service *GraphService) UpdateById(id uint64, graphUpdate entities.GraphUpdate) error {
+	return service.database.UpdateById(id, graphUpdate)
 }
 
 func (service *GraphService) DeleteById(id uint64) error {

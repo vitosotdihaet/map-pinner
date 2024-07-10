@@ -57,21 +57,29 @@ func (handler *Handler) getGraphById(context *gin.Context) {
 }
 
 func (handler *Handler) updateGraphById(context *gin.Context) {
-	var inputGraph entities.Graph
+	graphIdStr := context.Param("graph_id")
+
+	id, err := strconv.ParseUint(graphIdStr, 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	var inputGraph entities.GraphUpdate
 
 	if err := context.BindJSON(&inputGraph); err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	err := handler.service.Graph.UpdateById(inputGraph)
+	err = handler.service.Graph.UpdateById(id, inputGraph)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	context.JSON(http.StatusOK, map[string]interface{} {
-		"id": inputGraph.ID,
+		"id": id,
 	})
 }
 
