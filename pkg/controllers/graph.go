@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
@@ -20,9 +21,8 @@ func NewGraphPostgres(postgres *sqlx.DB) *GraphPostgres {
 
 func (postgres *GraphPostgres) Create(graph entities.Graph) (uint64, error) {
 	postgisPoints := pointsToWKT(graph.Points)
-	if len(postgisPoints) > 0 {
-		postgisPoints = postgisPoints[:len(postgisPoints) - 1]
-	}
+	logrus.Tracef("wkt RAW graph: %v", postgisPoints)
+	logrus.Tracef("wkt graph: %s", strings.Join(postgisPoints, ", "))
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v)) RETURNING id;", 
@@ -55,7 +55,7 @@ func (postgres *GraphPostgres) GetAll() ([]entities.Graph, error) {
 		if err := rows.Scan(&graph.ID, &graph.Name, &wkt); err != nil {
 			return nil, err
 		}
-		graph.Points = parseWKT(wkt)
+		graph.Points = parseWKTGraph(wkt)
 		graphs = append(graphs, graph)
 	}
 
@@ -81,7 +81,7 @@ func (postgres *GraphPostgres) GetById(id uint64) (entities.Graph, error) {
 		return graph, err
 	}
 
-	graph.Points = parseWKT(wkt)
+	graph.Points = parseWKTGraph(wkt)
 
 	return graph, nil
 }
@@ -92,11 +92,7 @@ func (postgres *GraphPostgres) UpdateById(id uint64, graphUpdate entities.GraphU
 	argId := 1
 
 	if graphUpdate.Points != nil {
-		wkt := pointsToWKT(*graphUpdate.Points)
-		if len(wkt) > 0 {
-			wkt = wkt[:len(wkt) - 1]
-		}
-		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(wkt, ", "), WGSSRID))
+		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(pointsToWKT(*graphUpdate.Points), ", "), WGSSRID))
 	}
 
 	if graphUpdate.Name != nil {

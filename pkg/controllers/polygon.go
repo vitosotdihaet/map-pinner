@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
@@ -20,6 +21,11 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 
 func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
 	postgisPoints := pointsToWKT(polygon.Points)
+	if len(postgisPoints) != 0 {
+		postgisPoints = append(postgisPoints, postgisPoints[0])
+	}
+	logrus.Tracef("wkt polygon: %s", strings.Join(postgisPoints, ", "))
+
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
@@ -52,7 +58,7 @@ func (postgres *PolygonPostgres) GetAll() ([]entities.Polygon, error) {
 		if err := rows.Scan(&polygon.ID, &polygon.Name, &wkt); err != nil {
 			return nil, err
 		}
-		polygon.Points = parseWKT(wkt)
+		polygon.Points = parseWKTPolygon(wkt)
 		polygons = append(polygons, polygon)
 	}
 
@@ -78,7 +84,7 @@ func (postgres *PolygonPostgres) GetById(id uint64) (entities.Polygon, error) {
 		return polygon, err
 	}
 
-	polygon.Points = parseWKT(wkt)
+	polygon.Points = parseWKTPolygon(wkt)
 
 	return polygon, nil
 }
@@ -89,7 +95,11 @@ func (postgres *PolygonPostgres) UpdateById(id uint64, polygonUpdate entities.Po
 	argId := 1
 
 	if polygonUpdate.Points != nil {
-		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(pointsToWKT(*polygonUpdate.Points), ", "), WGSSRID))
+		wkt := pointsToWKT(*polygonUpdate.Points)
+		if len(wkt) != 0 {
+			wkt = append(wkt, wkt[0])
+		}
+		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(wkt, ", "), WGSSRID))
 	}
 
 	if polygonUpdate.Name != nil {
