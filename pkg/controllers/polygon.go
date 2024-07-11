@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
@@ -24,8 +23,6 @@ func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error
 	if len(postgisPoints) != 0 {
 		postgisPoints = append(postgisPoints, postgisPoints[0])
 	}
-	logrus.Tracef("wkt polygon: %s", strings.Join(postgisPoints, ", "))
-
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 

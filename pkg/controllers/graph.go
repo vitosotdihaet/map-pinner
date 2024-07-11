@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
@@ -21,8 +20,6 @@ func NewGraphPostgres(postgres *sqlx.DB) *GraphPostgres {
 
 func (postgres *GraphPostgres) Create(graph entities.Graph) (uint64, error) {
 	postgisPoints := pointsToWKT(graph.Points)
-	logrus.Tracef("wkt RAW graph: %v", postgisPoints)
-	logrus.Tracef("wkt graph: %s", strings.Join(postgisPoints, ", "))
 
 	query := fmt.Sprintf(
 		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v)) RETURNING id;", 
