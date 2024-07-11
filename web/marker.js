@@ -62,8 +62,8 @@ class Marker {
                     Latitude: ${this.point.latitude.toFixed(4)}<br/>
                     Longitude: ${this.point.longitude.toFixed(4)}
                 </div>
-                <button class="popupDeleteButton" onclick="deleteMarker(shownMarkers, ${this.point.id})">Delete</button>
-                <button class="popupUpdateButton" onclick="updateMarker(shownMarkers, ${this.point.id})">Update</button>
+                <button class="popupDeleteButton" onclick="shownMarkers.get(${this.point.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownMarkers.get(${this.point.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
@@ -76,7 +76,18 @@ class Marker {
     draw() {
         if (shownMarkers.has(this.point.id)) return
         this.mapMarker.addTo(map)
-        shownMarkers.push(this)
+        shownMarkers.set(this.point.id, this)
+    }
+
+    checkAndUpdate() {
+        let name = document.getElementsByClassName('popupNameInput')[0].value
+
+        let latlng = this.mapMarker.getLatLng()
+        this.update({
+            name: name,
+            latitude: latlng.lat,
+            longitude: latlng.lng
+        })
     }
 
     update(updateInfo) {
@@ -128,10 +139,7 @@ class Marker {
 
     hide() {
         map.removeLayer(this.mapMarker)
-        const index = shownMarkers.indexOf(this)
-        if (index > -1) {
-            shownMarkers.splice(index, 1)
-        }
+        shownMarkers.delete(this.point.id)
     }
 }
 
@@ -155,34 +163,8 @@ function drawMarkers(markers) {
 }
 
 function hideMarkers(markers) {
-    markers.forEach(marker => {
+    markers.forEach((marker, _) => {
         marker.hide()
-    })
-}
-
-
-function deleteMarker(markers, id) {
-    markers.forEach(marker => {
-        if (marker.point.id == id) {
-            marker.delete()
-            return
-        }
-    })
-}
-
-function updateMarker(markers, id) {
-    let name = document.getElementsByClassName('popupNameInput')[0].value
-
-    markers.forEach(marker => {
-        if (marker.point.id == id) {
-            let latlng = marker.mapMarker.getLatLng()
-            marker.update({
-                name: name,
-                latitude: latlng.lat,
-                longitude: latlng.lng
-            })
-            return
-        }
     })
 }
 
@@ -192,11 +174,4 @@ async function drawAllMarkers() {
 }
 
 
-
-let shownMarkers = []
-shownMarkers.has = function (id) {
-    for (let i = 0; i < this.length; i++) {
-        if (this[i].point.id == id) return true
-    }
-    return false
-}
+let shownMarkers = new Map()

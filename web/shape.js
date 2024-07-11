@@ -51,8 +51,8 @@ class Shape {
                     ID: ${this.polygon.id}<br/>
                     Name: <input type="text" class="popupNameInput" id="${this.polygon.id}" maxlength="255" size="10" value="${this.polygon.name}"/><br/>
                 </div>
-                <button class="popupDeleteButton" onclick="deleteShape(shownShapes, ${this.polygon.id})">Delete</button>
-                <button class="popupUpdateButton" onclick="updateShape(shownShapes, ${this.polygon.id})">Update</button>
+                <button class="popupDeleteButton" onclick="shownShapes.get(${this.polygon.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownShapes.get(${this.polygon.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
@@ -62,6 +62,13 @@ class Shape {
         if (shownShapes.has(this.polygon.id)) return
         this.mapShape.addTo(map)
         shownShapes.push(this)
+    }
+
+    checkAndUpdate() {
+        let name = document.getElementsByClassName('popupNameInput')[0].value
+        this.update({
+            name: name,
+        })
     }
 
     update(updateInfo) {
@@ -113,10 +120,7 @@ class Shape {
 
     hide() {
         map.removeLayer(this.mapShape)
-        const index = shownShapes.indexOf(this)
-        if (index > -1) {
-            shownShapes.splice(index, 1)
-        }
+        shownShapes[this.polygon.id].delete()
     }
 }
 
@@ -133,38 +137,17 @@ function polygonsToShapes(polygons) {
 }
 
 function drawShapes(shapes) {
-    shapes.forEach(shape => {
+    shapes.forEach((shape, _) => {
         shape.draw()
     })
 }
 
 function hideShapes(shapes) {
-    shapes.forEach(shape => {
+    shapes.forEach((shape, _) => {
         shape.hide()
     })
 }
 
-function deleteShape(shapes, id) {
-    shapes.forEach(shape => {
-        if (shape.polygon.id == id) {
-            shape.delete()
-            return
-        }
-    })
-}
-
-function updateShape(shapes, id) {
-    let name = document.getElementsByClassName('popupNameInput')[0].value
-
-    shapes.forEach(shape => {
-        if (shape.polygon.id == id) {
-            shape.update({
-                name: name,
-            })
-            return
-        }
-    })
-}
 
 
 async function drawAllPolygons() {
@@ -173,10 +156,4 @@ async function drawAllPolygons() {
 
 
 
-let shownShapes = []
-shownShapes.has = function (id) {
-    for (let i = 0; i < this.length; i++) {
-        if (this[i].polygon.id == id) return true
-    }
-    return false
-}
+let shownShapes = new Map()

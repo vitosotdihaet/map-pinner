@@ -25,7 +25,7 @@ document.getElementById('showAllPoints').addEventListener('click', function(even
 })
 document.getElementById('hideAllPoints').addEventListener('click', function(event) {
     event.preventDefault()
-    hideMarkers([...shownMarkers])
+    hideMarkers(shownMarkers)
 })
 
 // Shapes
@@ -36,7 +36,7 @@ document.getElementById('showAllPolygons').addEventListener('click', function(ev
 
 document.getElementById('hideAllPolygons').addEventListener('click', function(event) {
     event.preventDefault()
-    hideShapes([...shownShapes])
+    hideShapes(shownShapes)
 })
 
 // Directions
@@ -47,5 +47,5 @@ document.getElementById('showAllGraphs').addEventListener('click', function(even
 
 document.getElementById('hideAllGraphs').addEventListener('click', function(event) {
     event.preventDefault()
-    hideShapes([...shownDirections])
+    hideShapes(shownDirections)
 })

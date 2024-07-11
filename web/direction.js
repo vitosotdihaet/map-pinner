@@ -51,8 +51,8 @@ class Direction {
                     ID: ${this.graph.id}<br/>
                     Name: <input type="text" class="popupNameInput" id="${this.graph.id}" maxlength="255" size="10" value="${this.graph.name}"/><br/>
                 </div>
-                <button class="popupDeleteButton" onclick="deleteDirection(shownDirections, ${this.graph.id})">Delete</button>
-                <button class="popupUpdateButton" onclick="updateDirection(shownDirections, ${this.graph.id})">Update</button>
+                <button class="popupDeleteButton" onclick="shownDirections.get(${this.graph.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownDirections.get(${this.graph.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
@@ -62,6 +62,13 @@ class Direction {
         if (shownDirections.has(this.graph.id)) return
         this.mapDirection.addTo(map)
         shownDirections.push(this)
+    }
+
+    checkAndUpdate() {
+        let name = document.getElementsByClassName('popupNameInput')[0].value
+        this.update({
+            name: name,
+        })
     }
 
     update(updateInfo) {
@@ -144,26 +151,9 @@ function hideDirections(directions) {
     })
 }
 
-function deleteDirection(directions, id) {
-    directions.forEach(direction => {
-        if (direction.graph.id == id) {
-            direction.delete()
-            return
-        }
-    })
-}
 
 function updateDirection(directions, id) {
-    let name = document.getElementsByClassName('popupNameInput')[0].value
-
-    directions.forEach(direction => {
-        if (direction.graph.id == id) {
-            direction.update({
-                name: name,
-            })
-            return
-        }
-    })
+    
 }
 
 
@@ -173,10 +163,4 @@ async function drawAllGraphs() {
 
 
 
-let shownDirections = []
-shownDirections.has = function (id) {
-    for (let i = 0; i < this.length; i++) {
-        if (this[i].graph.id == id) return true
-    }
-    return false
-}
+let shownDirections = new Map()
