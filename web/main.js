@@ -5,3 +5,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     // detectRetina: true
 }).addTo(map)
 
+var altIcon = L.icon({
+    iconUrl: '/static/notmarker.png',
+    iconSize: [8, 8]
+})

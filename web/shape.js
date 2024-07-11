@@ -24,24 +24,60 @@ class Polygon {
     }
 }
 
+
 class Shape {
     constructor(polygon) {
         this.polygon = polygon
+        this.color = randomColor({ "luminosity": "bright", "hue": "blue" })
         this.setupMapShape()
+    }
+
+    updateGeodesic() {
+        let newLatLngs = [];
+        let newPolygonPoints = []
+
+        for (let marker of this.mapMarkers) {
+            let latlng = marker.getLatLng()
+            newLatLngs.push(latlng);
+            newPolygonPoints.push(new Point("", 0, latlng.lat, latlng.lng))
+        }
+
+        newLatLngs.push(newLatLngs[0])
+        newPolygonPoints.push(newPolygonPoints[0])
+
+        this.mapShape.setLatLngs(newLatLngs);
+        this.polygon.points = newPolygonPoints
     }
 
     setupMapShape() {
         let coordinates = []
+        let latlngs = []
+        this.mapMarkers = []
 
         this.polygon.points.forEach(point => {
             coordinates.push([point.latitude, point.longitude])
+            let latlng = new L.LatLng(point.latitude, point.longitude)
+            latlngs.push(latlng)
         })
+        latlngs.pop()
 
         this.mapShape = L.geodesic(coordinates, {
-            color: randomColor({ "luminosity": "bright", "hue": "blue" }),
+            color: this.color,
             weight: 5,
             opacity: 0.75,
             fillOpacity: 0.5
+        })
+
+        latlngs.forEach(place => {
+            var marker = L.marker(place, { draggable: true, icon: altIcon });
+
+            marker.on('drag', (_) => {
+                this.updateGeodesic();
+            });
+            marker.on('dragend', (_) => {
+                this.checkAndUpdate()
+            })
+            this.mapMarkers.push(marker);
         })
 
         this.mapShape.bindPopup(
@@ -53,7 +89,6 @@ class Shape {
                 </div>
                 <button class="popupDeleteButton" onclick="shownShapes.get(${this.polygon.id}).delete()">Delete</button>
                 <button class="popupUpdateButton" onclick="shownShapes.get(${this.polygon.id}).checkAndUpdate()">Update</button>
-                <button class="popupChangeButton" onclick="shownShapes.get(${this.polygon.id}).change()">Change</button>
                 `
             )
         ).openPopup()
@@ -61,14 +96,28 @@ class Shape {
 
     draw() {
         if (shownShapes.has(this.polygon.id)) return
+        this.mapMarkers.forEach(marker => { marker.addTo(map) })
         this.mapShape.addTo(map)
         shownShapes.set(this.polygon.id, this)
     }
 
     checkAndUpdate() {
-        let name = document.getElementsByClassName('popupNameInput')[0].value
+        let name = undefined
+        let nameInput = document.getElementsByClassName('popupNameInput')
+
+        for (var i = 0; i < nameInput.length; i++) {
+            let element = nameInput[i]
+            if (element.id == this.polygon.id) {
+                name = element.value
+            }
+        }
+
+        let temp = [...this.polygon.points]
+        temp.pop()
+
         this.update({
             name: name,
+            points: temp
         })
     }
 
@@ -121,7 +170,8 @@ class Shape {
 
     hide() {
         map.removeLayer(this.mapShape)
-        shownShapes[this.polygon.id].delete()
+        this.mapMarkers.forEach(marker => { map.removeLayer(marker) })
+        shownShapes.delete(this.polygon.id)
     }
 }
 

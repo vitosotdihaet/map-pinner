@@ -27,21 +27,52 @@ class Graph {
 class Direction {
     constructor(graph) {
         this.graph = graph
+        this.color = randomColor({ "luminosity": "bright", "hue": "red" })
         this.setupMapDirection()
+    }
+
+    updateGeodesic() {
+        let newLatLngs = [];
+        let newGraphPoints = []
+
+        for (let marker of this.mapMarkers) {
+            let latlng = marker.getLatLng()
+            newLatLngs.push(latlng);
+            newGraphPoints.push(new Point("", 0, latlng.lat, latlng.lng))
+        }
+
+        this.mapDirection.setLatLngs(newLatLngs);
+        this.graph.points = newGraphPoints
     }
 
     setupMapDirection() {
         let coordinates = []
+        let latlngs = []
+        this.mapMarkers = []
 
         this.graph.points.forEach(point => {
             coordinates.push([point.latitude, point.longitude])
+            let latlng = new L.LatLng(point.latitude, point.longitude)
+            latlngs.push(latlng)
         })
 
         this.mapDirection = L.geodesic(coordinates, {
-            color: randomColor({ "luminosity": "bright", "hue": "red" }),
+            color: this.color,
             weight: 5,
             opacity: 0.75,
             fillOpacity: 0.5
+        })
+
+        latlngs.forEach(place => {
+            var marker = L.marker(place, { draggable: true, icon: altIcon });
+
+            marker.on('drag', (_) => {
+                this.updateGeodesic();
+            });
+            marker.on('dragend', (_) => {
+                this.checkAndUpdate()
+            })
+            this.mapMarkers.push(marker);
         })
 
         this.mapDirection.bindPopup(
@@ -60,14 +91,25 @@ class Direction {
 
     draw() {
         if (shownDirections.has(this.graph.id)) return
+        this.mapMarkers.forEach(marker => { marker.addTo(map) })
         this.mapDirection.addTo(map)
         shownDirections.set(this.graph.id, this)
     }
 
     checkAndUpdate() {
-        let name = document.getElementsByClassName('popupNameInput')[0].value
+        let name = undefined
+        let nameInput = document.getElementsByClassName('popupNameInput')
+
+        for (var i = 0; i < nameInput.length; i++) {
+            let element = nameInput[i]
+            if (element.id == this.graph.id) {
+                name = element.value
+            }
+        }
+
         this.update({
             name: name,
+            points: this.graph.points
         })
     }
 
@@ -120,10 +162,8 @@ class Direction {
 
     hide() {
         map.removeLayer(this.mapDirection)
-        const index = shownDirections.indexOf(this)
-        if (index > -1) {
-            shownDirections.splice(index, 1)
-        }
+        this.mapMarkers.forEach(marker => { map.removeLayer(marker) })
+        shownDirections.delete(this.graph.id)
     }
 }
 
