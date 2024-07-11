@@ -186,8 +186,13 @@ function hideShapes(shapes) {
 polygonAccumulatedPoints = []
 polygonAccumulatedMarkers = []
 
+// TODO move main logic to main
 function startNewPolygon(event) {
     event.preventDefault()
+
+    for (var tab of tabs) {
+        tab.removeEventListener('click', openTab)
+    }
 
     newPolygonButton.removeEventListener('click', startNewPolygon)
     newPolygonButton.addEventListener('click', stopPolygon)
@@ -210,7 +215,13 @@ function newPolygonPointOnAMap(event) {
     polygonAccumulatedPoints.push(point)
 }
 
-async function stopPolygon(_) {
+async function stopPolygon(event) {
+    event.preventDefault()
+
+    for (var tab of tabs) {
+        tab.addEventListener('click', openTab)
+    }
+
     newPolygonButton.removeEventListener('click', stopPolygon)
     newPolygonButton.addEventListener('click', startNewPolygon)
     newPolygonButton.innerText = "Start a new polygon"
