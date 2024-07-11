@@ -32,10 +32,9 @@ class Marker {
     }
 
     setupMapMarker() {
-        this.mapMarker = L.marker([this.point.latitude, this.point.longitude])
+        this.mapMarker = L.marker([this.point.latitude, this.point.longitude], { draggable: true })
 
         let point = this.point
-        this.setDraggable(true)
         this.mapMarker.on('drag', function (event) {
             // for some reason this shit works, though it shouldn't (should be event.originalEvent.button)
             if (event.originalEvent.buttons == 1) return
@@ -67,10 +66,6 @@ class Marker {
                 `
             )
         ).openPopup()
-    }
-
-    setDraggable(value) {
-        this.mapMarker.options.draggable = value
     }
 
     draw() {

@@ -1,21 +1,25 @@
-function openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
-
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
+function openTab(event) {
+    var tabcontent = document.getElementsByClassName("tabcontent");
+    for (var i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
 
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
+    document.getElementById(event.currentTarget.id + 's').style.display = "block";
+
+    var tablinks = document.getElementsByClassName("tablinks");
+    for (var i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
 
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
+    event.currentTarget.className += " active";
 }
 
-document.getElementsByClassName("tablinks")[1].click();
+const tabs = document.getElementsByClassName("tablinks")
+for (var tab of tabs) {
+    tab.addEventListener('click', openTab)
+}
+tabs[0].click()
+
 
 // Markers
 map.on('click', Marker.addMarkerOnMapClick);
@@ -39,6 +43,9 @@ document.getElementById('hideAllPolygons').addEventListener('click', function(ev
     hideShapes(shownShapes)
 })
 
+newPolygonButton = document.getElementById('newPolygon')
+newPolygonButton.addEventListener('click', startNewPolygon)
+
 // Directions
 document.getElementById('showAllGraphs').addEventListener('click', function(event) {
     event.preventDefault()
@@ -48,4 +55,8 @@ document.getElementById('showAllGraphs').addEventListener('click', function(even
 document.getElementById('hideAllGraphs').addEventListener('click', function(event) {
     event.preventDefault()
     hideShapes(shownDirections)
+})
+
+document.getElementById('newGraph').addEventListener('click', function(event) {
+    console.log('new graph!')
 })

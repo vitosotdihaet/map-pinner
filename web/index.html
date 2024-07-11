@@ -16,24 +16,24 @@
 <body>
     <div class="sidenav">
         <div class="tab">
-            <button class="tablinks" onclick="openTab(event, 'Points')">Points</button>
-            <button class="tablinks" onclick="openTab(event, 'Polygons')">Polygons</button>
-            <button class="tablinks" onclick="openTab(event, 'Graphs')">Graphs</button>
+            <button class="tablinks" id="point">Points</button>
+            <button class="tablinks" id="polygon">Polygons</button>
+            <button class="tablinks" id="graph">Graphs</button>
         </div>
 
-        <div id="Points" class="tabcontent">
-            <button id="showAllPoints">Show all</button>
-            <button id="hideAllPoints">Hide all</button>
+        <div id="points" class="tabcontent">
+            <button id="showAllPoints">Show all points</button>
+            <button id="hideAllPoints">Hide all points</button>
         </div>
-        <div id="Polygons" class="tabcontent">
-            <button id="showAllPolygons">Show all</button>
-            <button id="hideAllPolygons">Hide all</button>
-            <button id="newPolygonFromPoints">New from points</button>
+        <div id="polygons" class="tabcontent">
+            <button id="showAllPolygons">Show all polygons</button>
+            <button id="hideAllPolygons">Hide all polygons</button>
+            <button id="newPolygon">Start a new polygon</button>
         </div>
-        <div id="Graphs" class="tabcontent">
-            <button id="showAllGraphs">Show all</button>
-            <button id="hideAllGraphs">Hide all</button>
-            <button id="newGraphFromPoints">New from points</button>
+        <div id="graphs" class="tabcontent">
+            <button id="showAllGraphs">Show all graphs</button>
+            <button id="hideAllGraphs">Hide all graphs</button>
+            <button id="newGraph">Start a new graphs</button>
         </div>
     </div>
     <div class="main">

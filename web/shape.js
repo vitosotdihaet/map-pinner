@@ -32,7 +32,7 @@ class Shape {
         this.setupMapShape()
     }
 
-    updateGeodesic() {
+    onPointDrag() {
         let newLatLngs = [];
         let newPolygonPoints = []
 
@@ -72,7 +72,7 @@ class Shape {
             var marker = L.marker(place, { draggable: true, icon: altIcon });
 
             marker.on('drag', (_) => {
-                this.updateGeodesic();
+                this.onPointDrag();
             });
             marker.on('dragend', (_) => {
                 this.checkAndUpdate()
@@ -146,23 +146,6 @@ class Shape {
         this.setupMapShape()
     }
 
-    // static async addShapeOnMapClick(event) {
-    //     // don't add new shape if not left mouse button is pressed
-    //     if (event.originalEvent.button != 0) return
-
-    //     let latlng = event.latlng
-
-    //     let polygon = new Polygon('', 0, latlng.lat, latlng.lng)
-    //     let shape = new Shape(polygon)
-
-    //     let newId = await PolygonFetch.create(polygon)
-
-    //     shape.updateId(newId.id)
-    //     shape.draw()
-
-    //     return shape
-    // }
-
     async delete() {
         PolygonFetch.delete(this.polygon)
         this.hide()
@@ -199,6 +182,59 @@ function hideShapes(shapes) {
     })
 }
 
+
+polygonAccumulatedPoints = []
+polygonAccumulatedMarkers = []
+
+function startNewPolygon(event) {
+    event.preventDefault()
+
+    newPolygonButton.removeEventListener('click', startNewPolygon)
+    newPolygonButton.addEventListener('click', stopPolygon)
+    newPolygonButton.innerText = "Stop"
+
+    map.off('click', Marker.addMarkerOnMapClick)
+    map.on('click', newPolygonPointOnAMap)
+}
+
+function newPolygonPointOnAMap(event) {
+    // don't add new point if not left mouse button is pressed
+    if (event.originalEvent.button != 0) return
+    let latlng = event.latlng
+
+    let marker = L.marker(latlng, { draggable: true, icon: altIcon });
+    marker.addTo(map)
+    polygonAccumulatedMarkers.push(marker)
+    let point = new Point('', 0, latlng.lat, latlng.lng)
+
+    polygonAccumulatedPoints.push(point)
+}
+
+async function stopPolygon(_) {
+    newPolygonButton.removeEventListener('click', stopPolygon)
+    newPolygonButton.addEventListener('click', startNewPolygon)
+    newPolygonButton.innerText = "Start a new polygon"
+
+    map.off('click', newPolygonPointOnAMap)
+    map.on('click', Marker.addMarkerOnMapClick)
+
+    if (polygonAccumulatedPoints.length == 0) return
+
+    polygonAccumulatedPoints.push(polygonAccumulatedPoints[0])
+    let polygon = new Polygon("", 0, polygonAccumulatedPoints)
+    let shape = new Shape(polygon)
+
+    newId = await PolygonFetch.create(polygon)
+    shape.updateId(newId.id)
+    shape.draw()
+    
+    polygonAccumulatedMarkers.forEach(marker => {
+        map.removeLayer(marker)
+    })
+
+    polygonAccumulatedPoints = []
+    polygonAccumulatedMarkers = []
+}
 
 
 async function drawAllPolygons() {
