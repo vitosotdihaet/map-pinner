@@ -61,7 +61,7 @@ class Direction {
     draw() {
         if (shownDirections.has(this.graph.id)) return
         this.mapDirection.addTo(map)
-        shownDirections.push(this)
+        shownDirections.set(this.graph.id, this)
     }
 
     checkAndUpdate() {

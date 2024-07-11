@@ -53,6 +53,7 @@ class Shape {
                 </div>
                 <button class="popupDeleteButton" onclick="shownShapes.get(${this.polygon.id}).delete()">Delete</button>
                 <button class="popupUpdateButton" onclick="shownShapes.get(${this.polygon.id}).checkAndUpdate()">Update</button>
+                <button class="popupChangeButton" onclick="shownShapes.get(${this.polygon.id}).change()">Change</button>
                 `
             )
         ).openPopup()
@@ -61,7 +62,7 @@ class Shape {
     draw() {
         if (shownShapes.has(this.polygon.id)) return
         this.mapShape.addTo(map)
-        shownShapes.push(this)
+        shownShapes.set(this.polygon.id, this)
     }
 
     checkAndUpdate() {
