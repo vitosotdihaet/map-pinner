@@ -92,7 +92,7 @@ func (postgres *GraphPostgres) UpdateById(id uint64, graphUpdate entities.GraphU
 	argId := 1
 
 	if graphUpdate.Points != nil {
-		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(pointsToWKT(*graphUpdate.Points), ", "), WGSSRID))
+		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakeLine(ARRAY[%s]), %d)", strings.Join(pointsToWKT(*graphUpdate.Points), ", "), WGSSRID))
 	}
 
 	if graphUpdate.Name != nil {
