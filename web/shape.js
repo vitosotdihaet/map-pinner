@@ -207,7 +207,7 @@ function newPolygonPointOnAMap(event) {
     if (event.originalEvent.button != 0) return
     let latlng = event.latlng
 
-    let marker = L.marker(latlng, { draggable: true, icon: altIcon });
+    let marker = L.marker(latlng, { icon: altIcon });
     marker.addTo(map)
     polygonAccumulatedMarkers.push(marker)
     let point = new Point('', 0, latlng.lat, latlng.lng)

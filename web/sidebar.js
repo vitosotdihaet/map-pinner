@@ -57,6 +57,6 @@ document.getElementById('hideAllGraphs').addEventListener('click', function(even
     hideShapes(shownDirections)
 })
 
-document.getElementById('newGraph').addEventListener('click', function(event) {
-    console.log('new graph!')
-})
+newGraphButton = document.getElementById('newGraph')
+newGraphButton.addEventListener('click', startNewGraph)
+

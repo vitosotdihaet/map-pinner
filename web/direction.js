@@ -138,23 +138,6 @@ class Direction {
         this.setupMapDirection()
     }
 
-    // static async addDirectionOnMapClick(event) {
-    //     // don't add new direction if not left mouse button is pressed
-    //     if (event.originalEvent.button != 0) return
-
-    //     let latlng = event.latlng
-
-    //     let graph = new Graph('', 0, latlng.lat, latlng.lng)
-    //     let direction = new Direction(graph)
-
-    //     let newId = await GraphFetch.create(graph)
-
-    //     direction.updateId(newId.id)
-    //     direction.draw()
-
-    //     return direction
-    // }
-
     async delete() {
         GraphFetch.delete(this.graph)
         this.hide()
@@ -192,8 +175,67 @@ function hideDirections(directions) {
 }
 
 
-function updateDirection(directions, id) {
+graphAccumulatedPoints = []
+graphAccumulatedMarkers = []
+
+// TODO move main logic to main
+function startNewGraph(event) {
+    event.preventDefault()
+
+    for (var tab of tabs) {
+        tab.removeEventListener('click', openTab)
+    }
+
+    newGraphButton.removeEventListener('click', startNewGraph)
+    newGraphButton.addEventListener('click', stopGraph)
+    newGraphButton.innerText = "Stop"
+
+    map.off('click', Marker.addMarkerOnMapClick)
+    map.on('click', newGraphPointOnAMap)
+}
+
+function newGraphPointOnAMap(event) {
+    // don't add new point if not left mouse button is pressed
+    if (event.originalEvent.button != 0) return
+    let latlng = event.latlng
+
+    let marker = L.marker(latlng, { icon: altIcon });
+    marker.addTo(map)
+    graphAccumulatedMarkers.push(marker)
+
+    let point = new Point('', 0, latlng.lat, latlng.lng)
+    graphAccumulatedPoints.push(point)
+}
+
+async function stopGraph(event) {
+    event.preventDefault()
+
+    for (var tab of tabs) {
+        tab.addEventListener('click', openTab)
+    }
+
+    newGraphButton.removeEventListener('click', stopGraph)
+    newGraphButton.addEventListener('click', startNewGraph)
+    newGraphButton.innerText = "Start a new graph"
+
+    map.off('click', newGraphPointOnAMap)
+    map.on('click', Marker.addMarkerOnMapClick)
+
+    if (graphAccumulatedPoints.length == 0) return
+
+    let graph = new Graph("", 0, graphAccumulatedPoints)
+    let direction = new Direction(graph)
+
+    newId = await GraphFetch.create(graph)
+    direction.updateId(newId.id)
+    direction.draw()
     
+    graphAccumulatedMarkers.forEach(marker => {
+        map.removeLayer(marker)
+    })
+
+    graphAccumulatedPoints = []
+    graphAccumulatedMarkers = []
 }
 
 
