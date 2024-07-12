@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgis/postgis
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./schema/up.sql:/docker-entrypoint-initdb.d/up.sql
+    networks:
+      - backend
+
+  web:
+    build: .
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      - backend
+
+volumes:
+  db_data:
+
+networks:
+  backend:
