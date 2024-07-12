@@ -69,6 +69,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
     router.Use(responseLogger())
 
 	router.Static("/static", "./web")
+	router.StaticFile("/", "./web/index.html")
 
 	api := router.Group("/api")
 	{
