@@ -19,21 +19,15 @@
 - Разместить на localhost
 - Работа со слоями должна быть реализована через API типа REST
 
-# База данных
+# How to use
 Запуск
 
 ```sh
-docker run --name=map-pinner-db -e POSTGRES_PASSWORD='123' -p 5432:5432 -d --rm postgis/postgis
+docker compose up --detach
 ```
 
-## Миграция
+Выключение
 
-Поднятие
 ```sh
-./migrate -path ./schema/ -database 'postgres://postgres:{POSTGRES_PASSWORD}@{POSTGRES_ADDRESS}/postgres?sslmode=disable' up
-```
-
-Попускание
-```sh
-./migrate -path ./schema/ -database 'postgres://postgres:{POSTGRES_PASSWORD}@{POSTGRES_ADDRESS}/postgres?sslmode=disable' down
+docker compose down
 ```
