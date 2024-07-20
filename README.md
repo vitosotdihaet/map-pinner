@@ -1,20 +1,27 @@
 # How to use
-Назначаем переменные среды для настройки сервера (*можно не назначать их, а просто использовать значения по умолчанию, то есть запустить только первую команду*)
-```sh
+```bash
+git clone https://github.com/vitosotdihaet/map-pinner
+cd map-pinner
 mv .env-example .env
-edit .env
-```
-
-Запуск
-```sh
 docker compose up --detach
 ```
 
-Выключение
-```sh
+You can change server's properties by editing the .env file. They will be changed on the next start of the server
+```bash
+edit .env
+```
+
+# Start
+```bash
+docker compose up --detach
+```
+
+# Stop
+```bash
 docker compose down
 ```
 
+<!--
 # Web приложение для отображения электронной карты местности и дополнительных информационных слоёв
 
 # Функциональные требования
@@ -35,3 +42,4 @@ docker compose down
 - Технология отображения 2d
 - Разместить на localhost
 - Работа со слоями должна быть реализована через API типа REST
+-->
