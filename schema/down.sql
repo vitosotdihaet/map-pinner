@@ -1,5 +1,5 @@
-drop table points;
+DROP TABLE points;
 
-drop table polygons;
+DROP TABLE polygons;
 
-drop table directed_graphs;
+DROP TABLE directed_graphs;

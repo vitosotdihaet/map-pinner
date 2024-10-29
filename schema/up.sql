@@ -1,23 +1,21 @@
 -- enable postgis extension
-create extension if not exists postgis;
+CREATE extension IF NOT EXISTS postgis;
 
--- srid 4326 for wgs 84
-
-create table points (
-    id serial primary key not null unique,
-    name varchar(255) not null,
-    geom geometry(point, 4326) not null
+CREATE TABLE points (
+    id SERIAL PRIMARY KEY NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    geom GEOMETRY(POINT) NOT NULL
 );
 
 
-create table polygons (
-    id serial primary key not null unique,
-    name varchar(255) not null,
-    geom geometry(polygon, 4326) not null
+CREATE TABLE polygons (
+    id SERIAL PRIMARY KEY NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    geom GEOMETRY(POLYGON) NOT NULL
 );
 
 create table directed_graphs (
-    id serial primary key not null unique,
-    name varchar(255) not null,
-    geom geometry(linestring, 4326) not null
+    id SERIAL PRIMARY KEY NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
+    geom GEOMETRY(LINESTRING) NOT NULL
 );
