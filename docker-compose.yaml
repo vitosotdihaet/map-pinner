@@ -7,13 +7,13 @@ services:
       POSTGRES_DB: ${DB_NAME}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 1s
-      timeout: 5s
+      interval: 10s
+      timeout: 1m
       retries: 60
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
       - ./schema/up.sql:/docker-entrypoint-initdb.d/up.sql
     networks:
       - backend
@@ -31,7 +31,7 @@ services:
       - backend
 
 volumes:
-  db_data:
+  db-data:
 
 networks:
   backend:
