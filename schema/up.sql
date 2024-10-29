@@ -14,7 +14,7 @@ CREATE TABLE polygons (
     geom GEOMETRY(POLYGON) NOT NULL
 );
 
-create table directed_graphs (
+CREATE TABLE directed_graphs (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     geom GEOMETRY(LINESTRING) NOT NULL
