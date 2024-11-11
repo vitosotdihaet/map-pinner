@@ -5,7 +5,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
 type Point interface {
 	GetAll() ([]entities.Point, error)
 	Create(point entities.Point) (uint64, error)
@@ -22,24 +21,24 @@ type Polygon interface {
 	DeleteById(id uint64) error
 }
 
-type Graph interface {
-	GetAll() ([]entities.Graph, error)
-	Create(graph entities.Graph) (uint64, error)
-	GetById(id uint64) (entities.Graph, error)
-	UpdateById(id uint64, graphUpdate entities.GraphUpdate) error
+type Line interface {
+	GetAll() ([]entities.Line, error)
+	Create(line entities.Line) (uint64, error)
+	GetById(id uint64) (entities.Line, error)
+	UpdateById(id uint64, lineUpdate entities.LineUpdate) error
 	DeleteById(id uint64) error
 }
 
 type Service struct {
 	Point
 	Polygon
-	Graph
+	Line
 }
 
 func NewService(database *controllers.Database) *Service {
 	return &Service{
-		Point: NewPointService(database.Point),
+		Point:   NewPointService(database.Point),
 		Polygon: NewPolygonService(database.Polygon),
-		Graph: NewGraphService(database.Graph),
+		Line:    NewLineService(database.Line),
 	}
 }

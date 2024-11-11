@@ -6,21 +6,20 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-
 const (
-	WGSSRID = 4326
-	pointsTable = "points"
-	polygonsTable = "polygons"
-	graphsTable = "directed_graphs"
+	WGSSRID       = 4326
+	pointsTable   = "markerspace.points"
+	polygonsTable = "markerspace.polygons"
+	linesTable    = "markerspace.lines"
 )
 
 type Config struct {
-	Host string
-	Port string
+	Host     string
+	Port     string
 	Username string
 	Password string
-	DBName string
-	SSLMode string
+	DBName   string
+	SSLMode  string
 }
 
 func NewPostgresDB(config Config) (*sqlx.DB, error) {

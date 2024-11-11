@@ -1,18 +1,18 @@
 class PointFetch {
     static async getAll() {
-        return getData('/api/points')
+        return getData('/api/markers/points')
     }
 
     static async create(point) {
-        return postData("/api/points", JSON.stringify(point))
+        return postData("/api/markers/points", JSON.stringify(point))
     }
 
     static async delete(point) {
-        return deleteData(`/api/points/${point.id}`, "")
+        return deleteData(`/api/markers/points/${point.id}`, "")
     }
 
     static async update(point) {
-        return putData(`/api/points/${point.id}`, JSON.stringify(point))
+        return putData(`/api/markers/points/${point.id}`, JSON.stringify(point))
     }
 }
 

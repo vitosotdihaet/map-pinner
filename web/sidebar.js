@@ -47,16 +47,16 @@ newPolygonButton = document.getElementById('newPolygon')
 newPolygonButton.addEventListener('click', startNewPolygon)
 
 // Directions
-document.getElementById('showAllGraphs').addEventListener('click', function(event) {
+document.getElementById('showAllLines').addEventListener('click', function(event) {
     event.preventDefault()
-    drawAllGraphs()
+    drawAllLines()
 })
 
-document.getElementById('hideAllGraphs').addEventListener('click', function(event) {
+document.getElementById('hideAllLines').addEventListener('click', function(event) {
     event.preventDefault()
     hideShapes(shownDirections)
 })
 
-newGraphButton = document.getElementById('newGraph')
-newGraphButton.addEventListener('click', startNewGraph)
+newLineButton = document.getElementById('newLine')
+newLineButton.addEventListener('click', startNewLine)
 

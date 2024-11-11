@@ -1,22 +1,22 @@
-class GraphFetch {
+class LineFetch {
     static async getAll() {
-        return getData('/api/graphs')
+        return getData('/api/markers/lines')
     }
 
-    static async create(graph) {
-        return postData("/api/graphs", JSON.stringify(graph))
+    static async create(line) {
+        return postData("/api/markers/lines", JSON.stringify(line))
     }
 
-    static async delete(graph) {
-        return deleteData(`/api/graphs/${graph.id}`, "")
+    static async delete(line) {
+        return deleteData(`/api/markers/lines/${line.id}`, "")
     }
 
-    static async update(graph) {
-        return putData(`/api/graphs/${graph.id}`, JSON.stringify(graph))
+    static async update(line) {
+        return putData(`/api/markers/lines/${line.id}`, JSON.stringify(line))
     }
 }
 
-class Graph {
+class Line {
     constructor(name, id, points) {
         this.name = name
         this.id = id
@@ -25,24 +25,24 @@ class Graph {
 }
 
 class Direction {
-    constructor(graph) {
-        this.graph = graph
+    constructor(line) {
+        this.line = line
         this.color = randomColor({ "luminosity": "bright", "hue": "red" })
         this.setupMapDirection()
     }
 
     updateGeodesic() {
         let newLatLngs = [];
-        let newGraphPoints = []
+        let newLinePoints = []
 
         for (let marker of this.mapMarkers) {
             let latlng = marker.getLatLng()
             newLatLngs.push(latlng);
-            newGraphPoints.push(new Point("", 0, latlng.lat, latlng.lng))
+            newLinePoints.push(new Point("", 0, latlng.lat, latlng.lng))
         }
 
         this.mapDirection.setLatLngs(newLatLngs);
-        this.graph.points = newGraphPoints
+        this.line.points = newLinePoints
     }
 
     setupMapDirection() {
@@ -50,7 +50,7 @@ class Direction {
         let latlngs = []
         this.mapMarkers = []
 
-        this.graph.points.forEach(point => {
+        this.line.points.forEach(point => {
             coordinates.push([point.latitude, point.longitude])
             let latlng = new L.LatLng(point.latitude, point.longitude)
             latlngs.push(latlng)
@@ -79,21 +79,21 @@ class Direction {
             L.popup().setContent(
                 `
                 <div class="popup">
-                    ID: ${this.graph.id}<br/>
-                    Name: <input type="text" class="popupNameInput" id="${this.graph.id}" maxlength="255" size="10" value="${this.graph.name}"/><br/>
+                    ID: ${this.line.id}<br/>
+                    Name: <input type="text" class="popupNameInput" id="${this.line.id}" maxlength="255" size="10" value="${this.line.name}"/><br/>
                 </div>
-                <button class="popupDeleteButton" onclick="shownDirections.get(${this.graph.id}).delete()">Delete</button>
-                <button class="popupUpdateButton" onclick="shownDirections.get(${this.graph.id}).checkAndUpdate()">Update</button>
+                <button class="popupDeleteButton" onclick="shownDirections.get(${this.line.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownDirections.get(${this.line.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
     }
 
     draw() {
-        if (shownDirections.has(this.graph.id)) return
+        if (shownDirections.has(this.line.id)) return
         this.mapMarkers.forEach(marker => { marker.addTo(map) })
         this.mapDirection.addTo(map)
-        shownDirections.set(this.graph.id, this)
+        shownDirections.set(this.line.id, this)
     }
 
     checkAndUpdate() {
@@ -102,61 +102,61 @@ class Direction {
 
         for (var i = 0; i < nameInput.length; i++) {
             let element = nameInput[i]
-            if (element.id == this.graph.id) {
+            if (element.id == this.line.id) {
                 name = element.value
             }
         }
 
         this.update({
             name: name,
-            points: this.graph.points
+            points: this.line.points
         })
     }
 
     update(updateInfo) {
         if (updateInfo.name !== undefined) {
-            this.graph.name = updateInfo.name
+            this.line.name = updateInfo.name
         }
         if (updateInfo.latitude !== undefined) {
-            this.graph.latitude = updateInfo.latitude
+            this.line.latitude = updateInfo.latitude
         }
         if (updateInfo.longitude !== undefined) {
-            this.graph.longitude = updateInfo.longitude
+            this.line.longitude = updateInfo.longitude
         }
 
-        updateInfo.id = this.graph.id
+        updateInfo.id = this.line.id
 
         this.hide()
         this.setupMapDirection()
         this.draw()
 
-        GraphFetch.update(updateInfo)
+        LineFetch.update(updateInfo)
     }
 
     updateId(newId) {
-        this.graph.id = newId
+        this.line.id = newId
         this.setupMapDirection()
     }
 
     async delete() {
-        GraphFetch.delete(this.graph)
+        LineFetch.delete(this.line)
         this.hide()
     }
 
     hide() {
         map.removeLayer(this.mapDirection)
         this.mapMarkers.forEach(marker => { map.removeLayer(marker) })
-        shownDirections.delete(this.graph.id)
+        shownDirections.delete(this.line.id)
     }
 }
 
 
-function graphsToDirections(graphs) {
-    if (graphs == null) { return [] }
+function linesToDirections(lines) {
+    if (lines == null) { return [] }
 
     let directions = []
-    graphs.forEach(graph => {
-        directions.push(new Direction(graph))
+    lines.forEach(line => {
+        directions.push(new Direction(line))
     })
 
     return directions
@@ -175,72 +175,72 @@ function hideDirections(directions) {
 }
 
 
-graphAccumulatedPoints = []
-graphAccumulatedMarkers = []
+lineAccumulatedPoints = []
+lineAccumulatedMarkers = []
 
 // TODO move main logic to main
-function startNewGraph(event) {
+function startNewLine(event) {
     event.preventDefault()
 
     for (var tab of tabs) {
         tab.removeEventListener('click', openTab)
     }
 
-    newGraphButton.removeEventListener('click', startNewGraph)
-    newGraphButton.addEventListener('click', stopGraph)
-    newGraphButton.innerText = "Stop"
+    newLineButton.removeEventListener('click', startNewLine)
+    newLineButton.addEventListener('click', stopLine)
+    newLineButton.innerText = "Stop"
 
     map.off('click', Marker.addMarkerOnMapClick)
-    map.on('click', newGraphPointOnAMap)
+    map.on('click', newLinePointOnAMap)
 }
 
-function newGraphPointOnAMap(event) {
+function newLinePointOnAMap(event) {
     // don't add new point if not left mouse button is pressed
     if (event.originalEvent.button != 0) return
     let latlng = event.latlng
 
     let marker = L.marker(latlng, { icon: altIcon });
     marker.addTo(map)
-    graphAccumulatedMarkers.push(marker)
+    lineAccumulatedMarkers.push(marker)
 
     let point = new Point('', 0, latlng.lat, latlng.lng)
-    graphAccumulatedPoints.push(point)
+    lineAccumulatedPoints.push(point)
 }
 
-async function stopGraph(event) {
+async function stopLine(event) {
     event.preventDefault()
 
     for (var tab of tabs) {
         tab.addEventListener('click', openTab)
     }
 
-    newGraphButton.removeEventListener('click', stopGraph)
-    newGraphButton.addEventListener('click', startNewGraph)
-    newGraphButton.innerText = "Start a new graph"
+    newLineButton.removeEventListener('click', stopLine)
+    newLineButton.addEventListener('click', startNewLine)
+    newLineButton.innerText = "Start a new line"
 
-    map.off('click', newGraphPointOnAMap)
+    map.off('click', newLinePointOnAMap)
     map.on('click', Marker.addMarkerOnMapClick)
 
-    if (graphAccumulatedPoints.length == 0) return
+    if (lineAccumulatedPoints.length == 0) return
 
-    let graph = new Graph("", 0, graphAccumulatedPoints)
-    let direction = new Direction(graph)
+    let line = new Line("", 0, lineAccumulatedPoints)
+    let direction = new Direction(line)
 
-    newId = await GraphFetch.create(graph)
+    newId = await LineFetch.create(line)
     direction.updateId(newId.id)
     direction.draw()
     
-    graphAccumulatedMarkers.forEach(marker => {
+    lineAccumulatedMarkers.forEach(marker => {
         map.removeLayer(marker)
     })
 
-    graphAccumulatedPoints = []
-    graphAccumulatedMarkers = []
+    lineAccumulatedPoints = []
+    lineAccumulatedMarkers = []
 }
 
 
-async function drawAllGraphs() {
-    drawDirections(graphsToDirections(await GraphFetch.getAll()));
+async function drawAllLines() {
+    drawDirections(linesToDirections(await LineFetch.getAll()));
 }
 
 

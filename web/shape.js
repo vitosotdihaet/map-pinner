@@ -1,18 +1,18 @@
 class PolygonFetch {
     static async getAll() {
-        return getData('/api/polygons')
+        return getData('/api/markers/polygons')
     }
 
     static async create(polygon) {
-        return postData("/api/polygons", JSON.stringify(polygon))
+        return postData("/api/markers/polygons", JSON.stringify(polygon))
     }
 
     static async delete(polygon) {
-        return deleteData(`/api/polygons/${polygon.id}`, "")
+        return deleteData(`/api/markers/polygons/${polygon.id}`, "")
     }
 
     static async update(polygon) {
-        return putData(`/api/polygons/${polygon.id}`, JSON.stringify(polygon))
+        return putData(`/api/markers/polygons/${polygon.id}`, JSON.stringify(polygon))
     }
 }
 

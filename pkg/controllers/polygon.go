@@ -8,8 +8,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
-
 type PolygonPostgres struct {
 	postgres *sqlx.DB
 }
@@ -25,7 +23,7 @@ func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error
 	}
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;", 
+		"INSERT INTO %s (name, geometry) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;",
 		polygonsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
 	row := postgres.postgres.QueryRow(query, polygon.Name)
@@ -40,7 +38,7 @@ func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error
 
 func (postgres *PolygonPostgres) GetAll() ([]entities.Polygon, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_AsText(geom) AS geom FROM %s;", polygonsTable,
+		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s;", polygonsTable,
 	)
 
 	rows, err := postgres.postgres.Query(query)
@@ -68,7 +66,7 @@ func (postgres *PolygonPostgres) GetAll() ([]entities.Polygon, error) {
 
 func (postgres *PolygonPostgres) GetById(id uint64) (entities.Polygon, error) {
 	query := fmt.Sprintf(
-		"SELECT name, ST_AsText(geom) AS geom FROM %s WHERE id = $1;", polygonsTable,
+		"SELECT name, ST_AsText(geometry) AS geometry FROM %s WHERE id = $1;", polygonsTable,
 	)
 	row := postgres.postgres.QueryRow(query, id)
 
@@ -96,7 +94,7 @@ func (postgres *PolygonPostgres) UpdateById(id uint64, polygonUpdate entities.Po
 		if len(wkt) != 0 {
 			wkt = append(wkt, wkt[0])
 		}
-		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(wkt, ", "), WGSSRID))
+		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %d)", strings.Join(wkt, ", "), WGSSRID))
 	}
 
 	if polygonUpdate.Name != nil {

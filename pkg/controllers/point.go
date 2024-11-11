@@ -8,7 +8,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
 type PointPostgres struct {
 	postgres *sqlx.DB
 }
@@ -19,7 +18,7 @@ func NewPointPostgres(postgres *sqlx.DB) *PointPostgres {
 
 func (postgres *PointPostgres) Create(point entities.Point) (uint64, error) {
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geom) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v)) RETURNING id;",
+		"INSERT INTO %s (name, geometry) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v)) RETURNING id;",
 		pointsTable, WGSSRID,
 	)
 	row := postgres.postgres.QueryRow(query, point.Name, point.Longitude, point.Latitude)
@@ -34,7 +33,7 @@ func (postgres *PointPostgres) Create(point entities.Point) (uint64, error) {
 
 func (postgres *PointPostgres) GetAll() ([]entities.Point, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_X(geom) AS longtitude, ST_Y(geom) AS lattitude FROM %s;", pointsTable,
+		"SELECT id, name, ST_X(geometry) AS longtitude, ST_Y(geometry) AS lattitude FROM %s;", pointsTable,
 	)
 	rows, err := postgres.postgres.Query(query)
 
@@ -60,7 +59,7 @@ func (postgres *PointPostgres) GetAll() ([]entities.Point, error) {
 
 func (postgres *PointPostgres) GetById(id uint64) (entities.Point, error) {
 	query := fmt.Sprintf(
-		"SELECT name, ST_X(geom) AS longtitude, ST_Y(geom) AS lattitude FROM %s WHERE id = $1;", pointsTable,
+		"SELECT name, ST_X(geometry) AS longtitude, ST_Y(geometry) AS lattitude FROM %s WHERE id = $1;", pointsTable,
 	)
 	row := postgres.postgres.QueryRow(query, id)
 
@@ -85,17 +84,17 @@ func (postgres *PointPostgres) UpdateById(id uint64, pointUpdate entities.PointU
 	}
 
 	if pointUpdate.Latitude != nil && pointUpdate.Longitude != nil {
-		setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePoint($%d, $%d), %d)", argId, argId + 1, WGSSRID))
+		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakePoint($%d, $%d), %d)", argId, argId+1, WGSSRID))
 		args = append(args, *pointUpdate.Longitude)
 		args = append(args, *pointUpdate.Latitude)
 		argId += 2
 	} else {
 		if pointUpdate.Latitude != nil {
-			setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePoint(ST_X(geom), $%d), %d)", argId, WGSSRID))
+			setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakePoint(ST_X(geometry), $%d), %d)", argId, WGSSRID))
 			args = append(args, *pointUpdate.Latitude)
 			argId++
 		} else {
-			setValues = append(setValues, fmt.Sprintf("geom=ST_SetSRID(ST_MakePoint($%d, ST_Y(geom)), %d)", argId, WGSSRID))
+			setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakePoint($%d, ST_Y(geometry)), %d)", argId, WGSSRID))
 			args = append(args, *pointUpdate.Longitude)
 			argId++
 

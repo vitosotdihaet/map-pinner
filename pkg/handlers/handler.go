@@ -8,7 +8,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/services"
 )
 
-
 func requestLogger() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		now := time.Now()
@@ -40,7 +39,6 @@ func responseLogger() gin.HandlerFunc {
 	}
 }
 
-
 type Handler struct {
 	service *services.Service
 }
@@ -66,37 +64,50 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	router := gin.New()
 
 	router.Use(requestLogger())
-    router.Use(responseLogger())
+	router.Use(responseLogger())
 
 	router.Static("/static", "./web")
 	router.StaticFile("/", "./web/index.html")
 
 	api := router.Group("/api")
+
 	{
-		handler.pointOperations(api)
-
-		polygons := api.Group("/polygons")
+		markers := api.Group("/markers")
 		{
-			polygons.POST("/", handler.createPolygons)
-			polygons.GET("/", handler.getPolygons)
-			// polygons.DELETE("/")
+			points := markers.Group("/points")
+			{
+				points.POST("/", handler.createPoints)
+				points.GET("/", handler.getPoints)
+				// points.DELETE("/")
 
-			polygons.GET("/:polygon_id", handler.getPolygonById)
-			polygons.PUT("/:polygon_id", handler.updatePolygonById)
-			polygons.DELETE("/:polygon_id", handler.deletePolygonById)
-		}
+				points.GET("/:point_id", handler.getPointById)
+				points.PUT("/:point_id", handler.updatePointById)
+				points.DELETE("/:point_id", handler.deletePointById)
+			}
 
-		graphs := api.Group("/graphs")
-		{
-			graphs.POST("/", handler.createGraphs)
-			graphs.GET("/", handler.getGraphs)
-			// graphs.DELETE("/")
+			polygons := markers.Group("/polygons")
+			{
+				polygons.POST("/", handler.createPolygons)
+				polygons.GET("/", handler.getPolygons)
+				// polygons.DELETE("/")
 
-			graphs.GET("/:graph_id", handler.getGraphById)
-			graphs.PUT("/:graph_id", handler.updateGraphById)
-			graphs.DELETE("/:graph_id", handler.deleteGraphById)
+				polygons.GET("/:polygon_id", handler.getPolygonById)
+				polygons.PUT("/:polygon_id", handler.updatePolygonById)
+				polygons.DELETE("/:polygon_id", handler.deletePolygonById)
+			}
 
-			handler.pointOperations(graphs)
+			lines := markers.Group("/lines")
+			{
+				lines.POST("/", handler.createLines)
+				lines.GET("/", handler.getLines)
+				// lines.DELETE("/")
+
+				lines.GET("/:line_id", handler.getLineById)
+				lines.PUT("/:line_id", handler.updateLineById)
+				lines.DELETE("/:line_id", handler.deleteLineById)
+
+				handler.pointOperations(lines)
+			}
 		}
 	}
 

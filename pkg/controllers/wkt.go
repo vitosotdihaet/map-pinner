@@ -7,7 +7,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
 func pointsToWKT(points []entities.Point) []string {
 	length := len(points)
 	if length == 0 {
@@ -43,7 +42,7 @@ func parseWKTPolygon(wkt string) []entities.Point {
 	return parsedWKTToPoints(strings.Split(wkt, ","))
 }
 
-func parseWKTGraph(wkt string) []entities.Point {
+func parseWKTLine(wkt string) []entities.Point {
 	wkt = strings.TrimPrefix(wkt, "LINESTRING(")
 	wkt = strings.TrimSuffix(wkt, ")")
 	return parsedWKTToPoints(strings.Split(wkt, ","))
