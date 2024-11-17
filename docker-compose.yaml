@@ -27,6 +27,8 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    volumes:
+      - ./web:/app/web
     networks:
       - backend
 
