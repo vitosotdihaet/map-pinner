@@ -8,7 +8,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
 func (handler *Handler) getPoints(context *gin.Context) {
 	points, err := handler.service.Point.GetAll()
 	if err != nil {
@@ -19,7 +18,7 @@ func (handler *Handler) getPoints(context *gin.Context) {
 	context.JSON(http.StatusOK, points)
 }
 
-func (handler *Handler) createPoints(context *gin.Context) {
+func (handler *Handler) createPoint(context *gin.Context) {
 	var inputPoint entities.Point
 
 	if err := context.BindJSON(&inputPoint); err != nil {
@@ -33,7 +32,7 @@ func (handler *Handler) createPoints(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, map[string]interface{} {
+	context.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
@@ -78,7 +77,7 @@ func (handler *Handler) updatePointById(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, map[string]interface{} {
+	context.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
@@ -98,7 +97,7 @@ func (handler *Handler) deletePointById(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, map[string]interface{} {
+	context.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }

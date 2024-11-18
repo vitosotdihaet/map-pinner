@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map Pinner</title>
+
+    <link rel="icon" type="image/png" href="/static/icon.png">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.6.1/randomColor.js"></script>
+
+    <link rel="stylesheet" href="/static/style.css"></style>
+</head>
+<body>
+    <div class="sidenav">
+        <label for="groupSelect">Select Group:</label>
+        <select id="groupSelect">
+            <option value="">Choose a group</option>
+        </select>
+
+        <!-- <label for="regionSelect">Select Region:</label>
+        <select id="regionSelect" disabled>
+            <option value="">Choose a region</option>
+        </select> -->
+
+        <button id="createNewGroup">Create a new group</button>
+
+        <div class="tab">
+            <button class="tablinks" id="point">Points</button>
+            <button class="tablinks" id="polygon">Polygons</button>
+            <button class="tablinks" id="line">Lines</button>
+        </div>
+
+        <div id="points" class="tabcontent">
+            <button id="showAllPoints">Show all points</button>
+            <button id="hideAllPoints">Hide all points</button>
+        </div>
+        <div id="polygons" class="tabcontent">
+            <button id="showAllPolygons">Show all polygons</button>
+            <button id="hideAllPolygons">Hide all polygons</button>
+            <button id="newPolygon">Start a new polygon</button>
+        </div>
+        <div id="lines" class="tabcontent">
+            <button id="showAllLines">Show all lines</button>
+            <button id="hideAllLines">Hide all lines</button>
+            <button id="newLine">Start a new line</button>
+        </div>
+    </div>
+    <div class="main">
+        <div id="map"></div>
+        <script src="/static/main.js"></script>
+        <script src="/static/requests.js"></script>
+        <script src="/static/point.js"></script>
+        <script src="/static/polygon.js"></script>
+        <script src="/static/line.js"></script>
+        <script src="/static/group.js"></script>
+        <script src="/static/sidebar.js"></script>
+    </div>
+</body>
+<div href="https://www.flaticon.com/free-icons/map-pin" title="map pin icons"></div>
+</html>

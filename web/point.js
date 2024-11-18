@@ -25,13 +25,13 @@ class Point {
     }
 }
 
-class Marker {
+class MapPoint {
     constructor(point) {
         this.point = point
-        this.setupMapMarker()
+        this.setupMapPoint()
     }
 
-    setupMapMarker() {
+    setupMapPoint() {
         this.mapMarker = L.marker([this.point.latitude, this.point.longitude], { draggable: true })
 
         let point = this.point
@@ -43,10 +43,10 @@ class Marker {
             setTimeout(() => event.target.dragging.enable());
         })
 
-        let marker = this
+        let mapPoint = this
         this.mapMarker.on('dragend', function (event) {
             let latlng = event.target.getLatLng()
-            marker.update({
+            mapPoint.update({
                 latitude: latlng.lat,
                 longitude: latlng.lng
             })
@@ -56,22 +56,21 @@ class Marker {
             L.popup().setContent(
                 `
                 <div class="popup">
-                    ID: ${this.point.id}<br/>
                     Name: <input type="text" class="popupNameInput" id="${this.point.id}" maxlength="255" size="10" value="${this.point.name}"/><br/>
                     Latitude: ${this.point.latitude.toFixed(4)}<br/>
                     Longitude: ${this.point.longitude.toFixed(4)}
                 </div>
-                <button class="popupDeleteButton" onclick="shownMarkers.get(${this.point.id}).delete()">Delete</button>
-                <button class="popupUpdateButton" onclick="shownMarkers.get(${this.point.id}).checkAndUpdate()">Update</button>
+                <button class="popupDeleteButton" onclick="shownMapPoints.get(${this.point.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownMapPoints.get(${this.point.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
     }
 
     draw() {
-        if (shownMarkers.has(this.point.id)) return
+        if (shownMapPoints.has(this.point.id)) return
         this.mapMarker.addTo(map)
-        shownMarkers.set(this.point.id, this)
+        shownMapPoints.set(this.point.id, this)
     }
 
     checkAndUpdate() {
@@ -99,7 +98,7 @@ class Marker {
         updateInfo.id = this.point.id
 
         this.hide()
-        this.setupMapMarker()
+        this.setupMapPoint()
         this.draw()
 
         PointFetch.update(updateInfo)
@@ -107,24 +106,24 @@ class Marker {
 
     updateId(newId) {
         this.point.id = newId
-        this.setupMapMarker()
+        this.setupMapPoint()
     }
 
-    static async addMarkerOnMapClick(event) {
-        // don't add new marker if not left mouse button is pressed
+    static async addMapPointOnMapClick(event) {
+        // don't add new mapPoint if not left mouse button is pressed
         if (event.originalEvent.button != 0) return
 
         let latlng = event.latlng
 
         let point = new Point('', 0, latlng.lat, latlng.lng)
-        let marker = new Marker(point)
+        let mapPoint = new MapPoint(point)
 
         let newId = await PointFetch.create(point)
 
-        marker.updateId(newId.id)
-        marker.draw()
+        mapPoint.updateId(newId.id)
+        mapPoint.draw()
 
-        return marker
+        return mapPoint
     }
 
     async delete() {
@@ -134,39 +133,39 @@ class Marker {
 
     hide() {
         map.removeLayer(this.mapMarker)
-        shownMarkers.delete(this.point.id)
+        shownMapPoints.delete(this.point.id)
     }
 }
 
-// other marker related functions
-function pointsToMarkers(points) {
+// other mapPoint related functions
+function pointsToMapPoints(points) {
     if (points == null) { return [] }
 
-    let markers = []
+    let mapPoints = []
     points.forEach(point => {
-        markers.push(new Marker(point))
+        mapPoints.push(new MapPoint(point))
     })
 
-    return markers
+    return mapPoints
 }
 
 
-function drawMarkers(markers) {
-    markers.forEach(marker => {
-        marker.draw()
-    })
-}
-
-function hideMarkers(markers) {
-    markers.forEach((marker, _) => {
-        marker.hide()
+function drawMapPoints(mapPoints) {
+    mapPoints.forEach(mapPoint => {
+        mapPoint.draw()
     })
 }
 
-
-async function drawAllMarkers() {
-    drawMarkers(pointsToMarkers(await PointFetch.getAll()))
+function hideMapPoints(mapPoints) {
+    mapPoints.forEach((mapPoint, _) => {
+        mapPoint.hide()
+    })
 }
 
 
-let shownMarkers = new Map()
+async function drawAllPoints() {
+    drawMapPoints(pointsToMapPoints(await PointFetch.getAll()))
+}
+
+
+let shownMapPoints = new Map()

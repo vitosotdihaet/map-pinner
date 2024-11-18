@@ -5,13 +5,12 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
 type PolygonService struct {
 	database controllers.Polygon
 }
 
 func NewPolygonService(database controllers.Polygon) *PolygonService {
-	return &PolygonService {
+	return &PolygonService{
 		database: database,
 	}
 }

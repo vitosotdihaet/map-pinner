@@ -18,7 +18,7 @@ func (handler *Handler) getLines(context *gin.Context) {
 	context.JSON(http.StatusOK, lines)
 }
 
-func (handler *Handler) createLines(context *gin.Context) {
+func (handler *Handler) createLine(context *gin.Context) {
 	var inputLine entities.Line
 
 	if err := context.BindJSON(&inputLine); err != nil {

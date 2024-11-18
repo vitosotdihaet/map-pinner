@@ -8,7 +8,6 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-
 func (handler *Handler) getPolygons(context *gin.Context) {
 	polygons, err := handler.service.Polygon.GetAll()
 	if err != nil {
@@ -19,7 +18,7 @@ func (handler *Handler) getPolygons(context *gin.Context) {
 	context.JSON(http.StatusOK, polygons)
 }
 
-func (handler *Handler) createPolygons(context *gin.Context) {
+func (handler *Handler) createPolygon(context *gin.Context) {
 	var inputPolygon entities.Polygon
 
 	if err := context.BindJSON(&inputPolygon); err != nil {
@@ -33,7 +32,7 @@ func (handler *Handler) createPolygons(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, map[string]interface{} {
+	context.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
@@ -78,7 +77,7 @@ func (handler *Handler) updatePolygonById(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, map[string]interface{} {
+	context.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }
@@ -98,7 +97,7 @@ func (handler *Handler) deletePolygonById(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, map[string]interface{} {
+	context.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
 	})
 }

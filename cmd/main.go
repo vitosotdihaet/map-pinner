@@ -22,11 +22,11 @@ func main() {
 	}
 
 	postgres, err := controllers.NewPostgresDB(controllers.Config{
-		Host: os.Getenv("DB_HOST"),
-		Port: os.Getenv("DB_PORT"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
 		Username: os.Getenv("DB_USER"),
-		DBName: os.Getenv("DB_NAME"),
-		SSLMode: os.Getenv("DB_SSLMODE"),
+		DBName:   os.Getenv("DB_NAME"),
+		SSLMode:  os.Getenv("DB_SSLMODE"),
 		Password: os.Getenv("DB_PASSWORD"),
 	})
 

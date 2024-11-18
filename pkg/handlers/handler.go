@@ -47,19 +47,6 @@ func NewHandler(service *services.Service) *Handler {
 	return &Handler{service: service}
 }
 
-func (handler *Handler) pointOperations(group *gin.RouterGroup) {
-	points := group.Group("/points")
-	{
-		points.POST("/", handler.createPoints)
-		points.GET("/", handler.getPoints)
-		// points.DELETE("/")
-
-		points.GET("/:point_id", handler.getPointById)
-		points.PUT("/:point_id", handler.updatePointById)
-		points.DELETE("/:point_id", handler.deletePointById)
-	}
-}
-
 func (handler *Handler) InitEndpoints() *gin.Engine {
 	router := gin.New()
 
@@ -70,44 +57,45 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	router.StaticFile("/", "./web/index.html")
 
 	api := router.Group("/api")
-
 	{
 		markers := api.Group("/markers")
 		{
 			points := markers.Group("/points")
-			{
-				points.POST("/", handler.createPoints)
-				points.GET("/", handler.getPoints)
-				// points.DELETE("/")
+			points.POST("/", handler.createPoint)
+			points.GET("/", handler.getPoints)
 
-				points.GET("/:point_id", handler.getPointById)
-				points.PUT("/:point_id", handler.updatePointById)
-				points.DELETE("/:point_id", handler.deletePointById)
-			}
+			points.GET("/:point_id", handler.getPointById)
+			points.PUT("/:point_id", handler.updatePointById)
+			points.DELETE("/:point_id", handler.deletePointById)
 
 			polygons := markers.Group("/polygons")
-			{
-				polygons.POST("/", handler.createPolygons)
-				polygons.GET("/", handler.getPolygons)
-				// polygons.DELETE("/")
+			polygons.POST("/", handler.createPolygon)
+			polygons.GET("/", handler.getPolygons)
 
-				polygons.GET("/:polygon_id", handler.getPolygonById)
-				polygons.PUT("/:polygon_id", handler.updatePolygonById)
-				polygons.DELETE("/:polygon_id", handler.deletePolygonById)
-			}
+			polygons.GET("/:polygon_id", handler.getPolygonById)
+			polygons.PUT("/:polygon_id", handler.updatePolygonById)
+			polygons.DELETE("/:polygon_id", handler.deletePolygonById)
 
 			lines := markers.Group("/lines")
-			{
-				lines.POST("/", handler.createLines)
-				lines.GET("/", handler.getLines)
-				// lines.DELETE("/")
+			lines.POST("/", handler.createLine)
+			lines.GET("/", handler.getLines)
 
-				lines.GET("/:line_id", handler.getLineById)
-				lines.PUT("/:line_id", handler.updateLineById)
-				lines.DELETE("/:line_id", handler.deleteLineById)
+			lines.GET("/:line_id", handler.getLineById)
+			lines.PUT("/:line_id", handler.updateLineById)
+			lines.DELETE("/:line_id", handler.deleteLineById)
+		}
 
-				handler.pointOperations(lines)
-			}
+		users := api.Group("/users")
+		users.GET("/", handler.GetUsers)
+		users.POST("/", handler.CreateUser)
+		users.GET("/bynamepassword", handler.GetUserByNamePassword)
+
+		groups := api.Group("/groups")
+		groups.POST("/", handler.createGroup)
+		groups.GET("/", handler.getGroups)
+		{
+			regions := groups.Group("/regions")
+			regions.GET("/", handler.getRegions)
 		}
 	}
 

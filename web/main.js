@@ -17,6 +17,6 @@ map.on('drag', function() {
 
 
 var altIcon = L.icon({
-    iconUrl: '/static/notmarker.png',
+    iconUrl: '/static/linemarker.png',
     iconSize: [8, 8]
 })

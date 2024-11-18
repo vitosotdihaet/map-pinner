@@ -25,11 +25,11 @@ class Polygon {
 }
 
 
-class Shape {
+class MapPolygon {
     constructor(polygon) {
         this.polygon = polygon
         this.color = randomColor({ "luminosity": "bright", "hue": "blue" })
-        this.setupMapShape()
+        this.setupMapPolygon()
     }
 
     onPointDrag() {
@@ -45,11 +45,11 @@ class Shape {
         newLatLngs.push(newLatLngs[0])
         newPolygonPoints.push(newPolygonPoints[0])
 
-        this.mapShape.setLatLngs(newLatLngs);
+        this.mapPolygon.setLatLngs(newLatLngs);
         this.polygon.points = newPolygonPoints
     }
 
-    setupMapShape() {
+    setupMapPolygon() {
         let coordinates = []
         let latlngs = []
         this.mapMarkers = []
@@ -61,7 +61,7 @@ class Shape {
         })
         latlngs.pop()
 
-        this.mapShape = L.geodesic(coordinates, {
+        this.mapPolygon = L.geodesic(coordinates, {
             color: this.color,
             weight: 5,
             opacity: 0.75,
@@ -80,25 +80,25 @@ class Shape {
             this.mapMarkers.push(marker);
         })
 
-        this.mapShape.bindPopup(
+        this.mapPolygon.bindPopup(
             L.popup().setContent(
                 `
                 <div class="popup">
                     ID: ${this.polygon.id}<br/>
                     Name: <input type="text" class="popupNameInput" id="${this.polygon.id}" maxlength="255" size="10" value="${this.polygon.name}"/><br/>
                 </div>
-                <button class="popupDeleteButton" onclick="shownShapes.get(${this.polygon.id}).delete()">Delete</button>
-                <button class="popupUpdateButton" onclick="shownShapes.get(${this.polygon.id}).checkAndUpdate()">Update</button>
+                <button class="popupDeleteButton" onclick="shownMapPolygons.get(${this.polygon.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownMapPolygons.get(${this.polygon.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
     }
 
     draw() {
-        if (shownShapes.has(this.polygon.id)) return
+        if (shownMapPolygons.has(this.polygon.id)) return
         this.mapMarkers.forEach(marker => { marker.addTo(map) })
-        this.mapShape.addTo(map)
-        shownShapes.set(this.polygon.id, this)
+        this.mapPolygon.addTo(map)
+        shownMapPolygons.set(this.polygon.id, this)
     }
 
     checkAndUpdate() {
@@ -135,7 +135,7 @@ class Shape {
         updateInfo.id = this.polygon.id
 
         this.hide()
-        this.setupMapShape()
+        this.setupMapPolygon()
         this.draw()
 
         PolygonFetch.update(updateInfo)
@@ -143,7 +143,7 @@ class Shape {
 
     updateId(newId) {
         this.polygon.id = newId
-        this.setupMapShape()
+        this.setupMapPolygon()
     }
 
     async delete() {
@@ -152,33 +152,33 @@ class Shape {
     }
 
     hide() {
-        map.removeLayer(this.mapShape)
+        map.removeLayer(this.mapPolygon)
         this.mapMarkers.forEach(marker => { map.removeLayer(marker) })
-        shownShapes.delete(this.polygon.id)
+        shownMapPolygons.delete(this.polygon.id)
     }
 }
 
 
-function polygonsToShapes(polygons) {
+function polygonsToMapPolygons(polygons) {
     if (polygons == null) { return [] }
 
-    let shapes = []
+    let mapPolygons = []
     polygons.forEach(polygon => {
-        shapes.push(new Shape(polygon))
+        mapPolygons.push(new MapPolygon(polygon))
     })
 
-    return shapes
+    return mapPolygons
 }
 
-function drawShapes(shapes) {
-    shapes.forEach((shape, _) => {
-        shape.draw()
+function drawMapPolygons(mapPolygons) {
+    mapPolygons.forEach((mapPolygon, _) => {
+        mapPolygon.draw()
     })
 }
 
-function hideShapes(shapes) {
-    shapes.forEach((shape, _) => {
-        shape.hide()
+function hideMapPolygons(mapPolygons) {
+    mapPolygons.forEach((mapPolygon, _) => {
+        mapPolygon.hide()
     })
 }
 
@@ -198,7 +198,7 @@ function startNewPolygon(event) {
     newPolygonButton.addEventListener('click', stopPolygon)
     newPolygonButton.innerText = "Stop"
 
-    map.off('click', Marker.addMarkerOnMapClick)
+    map.off('click', MapPoint.addMapPointOnMapClick)
     map.on('click', newPolygonPointOnAMap)
 }
 
@@ -227,31 +227,37 @@ async function stopPolygon(event) {
     newPolygonButton.innerText = "Start a new polygon"
 
     map.off('click', newPolygonPointOnAMap)
-    map.on('click', Marker.addMarkerOnMapClick)
+    map.on('click', MapPoint.addMarkerOnMapClick)
 
-    if (polygonAccumulatedPoints.length == 0) return
+    if (polygonAccumulatedPoints.length < 3) {
+        polygonAccumulatedMarkers.forEach(marker => {
+            map.removeLayer(marker)
+        })
+        polygonAccumulatedPoints = []
+        polygonAccumulatedMarkers = []
+        return
+    }
 
     polygonAccumulatedPoints.push(polygonAccumulatedPoints[0])
     let polygon = new Polygon("", 0, polygonAccumulatedPoints)
-    let shape = new Shape(polygon)
+    let mapPolygon = new MapPolygon(polygon)
 
     newId = await PolygonFetch.create(polygon)
-    shape.updateId(newId.id)
-    shape.draw()
+    mapPolygon.updateId(newId.id)
+    mapPolygon.draw()
     
     polygonAccumulatedMarkers.forEach(marker => {
         map.removeLayer(marker)
     })
-
     polygonAccumulatedPoints = []
     polygonAccumulatedMarkers = []
 }
 
 
 async function drawAllPolygons() {
-    drawShapes(polygonsToShapes(await PolygonFetch.getAll()));
+    drawMapPolygons(polygonsToMapPolygons(await PolygonFetch.getAll()));
 }
 
 
 
-let shownShapes = new Map()
+let shownMapPolygons = new Map()

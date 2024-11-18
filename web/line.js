@@ -24,11 +24,11 @@ class Line {
     }
 }
 
-class Direction {
+class MapLine {
     constructor(line) {
         this.line = line
         this.color = randomColor({ "luminosity": "bright", "hue": "red" })
-        this.setupMapDirection()
+        this.setupMapLine()
     }
 
     updateGeodesic() {
@@ -41,11 +41,11 @@ class Direction {
             newLinePoints.push(new Point("", 0, latlng.lat, latlng.lng))
         }
 
-        this.mapDirection.setLatLngs(newLatLngs);
+        this.mapLine.setLatLngs(newLatLngs);
         this.line.points = newLinePoints
     }
 
-    setupMapDirection() {
+    setupMapLine() {
         let coordinates = []
         let latlngs = []
         this.mapMarkers = []
@@ -56,7 +56,7 @@ class Direction {
             latlngs.push(latlng)
         })
 
-        this.mapDirection = L.geodesic(coordinates, {
+        this.mapLine = L.geodesic(coordinates, {
             color: this.color,
             weight: 5,
             opacity: 0.75,
@@ -75,25 +75,24 @@ class Direction {
             this.mapMarkers.push(marker);
         })
 
-        this.mapDirection.bindPopup(
+        this.mapLine.bindPopup(
             L.popup().setContent(
                 `
                 <div class="popup">
-                    ID: ${this.line.id}<br/>
                     Name: <input type="text" class="popupNameInput" id="${this.line.id}" maxlength="255" size="10" value="${this.line.name}"/><br/>
                 </div>
-                <button class="popupDeleteButton" onclick="shownDirections.get(${this.line.id}).delete()">Delete</button>
-                <button class="popupUpdateButton" onclick="shownDirections.get(${this.line.id}).checkAndUpdate()">Update</button>
+                <button class="popupDeleteButton" onclick="shownMapLines.get(${this.line.id}).delete()">Delete</button>
+                <button class="popupUpdateButton" onclick="shownMapLines.get(${this.line.id}).checkAndUpdate()">Update</button>
                 `
             )
         ).openPopup()
     }
 
     draw() {
-        if (shownDirections.has(this.line.id)) return
+        if (shownMapLines.has(this.line.id)) return
         this.mapMarkers.forEach(marker => { marker.addTo(map) })
-        this.mapDirection.addTo(map)
-        shownDirections.set(this.line.id, this)
+        this.mapLine.addTo(map)
+        shownMapLines.set(this.line.id, this)
     }
 
     checkAndUpdate() {
@@ -127,7 +126,7 @@ class Direction {
         updateInfo.id = this.line.id
 
         this.hide()
-        this.setupMapDirection()
+        this.setupMapLine()
         this.draw()
 
         LineFetch.update(updateInfo)
@@ -135,7 +134,7 @@ class Direction {
 
     updateId(newId) {
         this.line.id = newId
-        this.setupMapDirection()
+        this.setupMapLine()
     }
 
     async delete() {
@@ -144,33 +143,33 @@ class Direction {
     }
 
     hide() {
-        map.removeLayer(this.mapDirection)
+        map.removeLayer(this.mapLine)
         this.mapMarkers.forEach(marker => { map.removeLayer(marker) })
-        shownDirections.delete(this.line.id)
+        shownMapLines.delete(this.line.id)
     }
 }
 
 
-function linesToDirections(lines) {
+function linesToMapLines(lines) {
     if (lines == null) { return [] }
 
-    let directions = []
+    let mapLines = []
     lines.forEach(line => {
-        directions.push(new Direction(line))
+        mapLines.push(new MapLine(line))
     })
 
-    return directions
+    return mapLines
 }
 
-function drawDirections(directions) {
-    directions.forEach(direction => {
-        direction.draw()
+function drawMapLines(mapLines) {
+    mapLines.forEach(mapLine => {
+        mapLine.draw()
     })
 }
 
-function hideDirections(directions) {
-    directions.forEach(direction => {
-        direction.hide()
+function hideMapLines(mapLines) {
+    mapLines.forEach(mapLine => {
+        mapLine.hide()
     })
 }
 
@@ -190,7 +189,7 @@ function startNewLine(event) {
     newLineButton.addEventListener('click', stopLine)
     newLineButton.innerText = "Stop"
 
-    map.off('click', Marker.addMarkerOnMapClick)
+    map.off('click', MapPoint.addMapPointOnMapClick)
     map.on('click', newLinePointOnAMap)
 }
 
@@ -219,30 +218,36 @@ async function stopLine(event) {
     newLineButton.innerText = "Start a new line"
 
     map.off('click', newLinePointOnAMap)
-    map.on('click', Marker.addMarkerOnMapClick)
+    map.on('click', MapPoint.addMarkerOnMapClick)
 
-    if (lineAccumulatedPoints.length == 0) return
+    if (lineAccumulatedPoints.length < 2) {
+        lineAccumulatedMarkers.forEach(marker => {
+            map.removeLayer(marker)
+        })
+        lineAccumulatedPoints = []
+        lineAccumulatedMarkers = []
+        return
+    }
 
     let line = new Line("", 0, lineAccumulatedPoints)
-    let direction = new Direction(line)
+    let mapLine = new MapLine(line)
 
     newId = await LineFetch.create(line)
-    direction.updateId(newId.id)
-    direction.draw()
+    mapLine.updateId(newId.id)
+    mapLine.draw()
     
     lineAccumulatedMarkers.forEach(marker => {
         map.removeLayer(marker)
     })
-
     lineAccumulatedPoints = []
     lineAccumulatedMarkers = []
 }
 
 
 async function drawAllLines() {
-    drawDirections(linesToDirections(await LineFetch.getAll()));
+    drawMapLines(linesToMapLines(await LineFetch.getAll()));
 }
 
 
 
-let shownDirections = new Map()
+let shownMapLines = new Map()

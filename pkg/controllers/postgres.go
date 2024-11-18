@@ -11,6 +11,9 @@ const (
 	pointsTable   = "markerspace.points"
 	polygonsTable = "markerspace.polygons"
 	linesTable    = "markerspace.lines"
+	groupsTable   = "userspace.groups"
+	usersTable    = "userspace.users"
+	regionsTable  = "markerspace.regions"
 )
 
 type Config struct {
