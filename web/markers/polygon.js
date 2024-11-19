@@ -52,7 +52,6 @@ class Polygon {
     
         latlngs.forEach(place => {
             var marker = L.marker(place, { draggable: true, icon: altIcon });
-    
             marker.on('drag', (_) => { this.onPointDrag() })
             marker.on('dragend', (_) => { this.pullUpdate() })
             this.pointMarkers.push(marker);
