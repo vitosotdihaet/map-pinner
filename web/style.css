@@ -10,7 +10,7 @@ html, body {
 }
 
 /* The sidebar */
-.sidenav {
+.sidebar {
     width: var(--navbar-width);
     position: fixed;
     z-index: 1;
@@ -20,13 +20,8 @@ html, body {
     background-color: #fbfeff;
 }
 
-.tab {
-    display: flex;
-    background-color: #f1f1f1;
-}
-
-.tab button {
-    background-color: #dddddd;
+.sidebar button {
+    background-color: #ececec;
     border: none;
     outline: none;
     cursor: pointer;
@@ -36,11 +31,11 @@ html, body {
     width: 100%;
 }
 
-.tab button:hover {
+.sidebar button:hover {
     background-color: #d4d4d4;
 }
 
-.tab button.active {
+.sidebar button.active {
     background-color: #d4d4d4;
 }
 

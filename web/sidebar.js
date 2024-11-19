@@ -1,64 +1,91 @@
-function openTab(event) {
-    var tabcontent = document.getElementsByClassName("tabcontent");
-    for (var i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-
-    document.getElementById(event.currentTarget.id + 's').style.display = "block";
-
-    var tablinks = document.getElementsByClassName("tablinks");
-    for (var i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    event.currentTarget.className += " active";
-}
-
-const tabs = document.getElementsByClassName("tablinks")
-for (var tab of tabs) {
-    tab.addEventListener('click', openTab)
-}
-tabs[0].click()
-
-
 // Markers
-map.on('click', MapPoint.addMapPointOnMapClick);
-document.getElementById('showAllPoints').addEventListener('click', function(event) {
+document.getElementById('showAllMarkers').addEventListener('click', function(event) {
     event.preventDefault()
-    drawAllPoints()
-})
-document.getElementById('hideAllPoints').addEventListener('click', function(event) {
-    event.preventDefault()
-    hideMapPoints(shownMapPoints)
+    Marker.drawAll()
 })
 
-// Shapes
-document.getElementById('showAllPolygons').addEventListener('click', function(event) {
+document.getElementById('hideAllMarkers').addEventListener('click', function(event) {
     event.preventDefault()
-    drawAllPolygons()
+    Marker.hideAll()
 })
 
-document.getElementById('hideAllPolygons').addEventListener('click', function(event) {
-    event.preventDefault()
-    hideMapPolygons(shownMapPolygons)
-})
 
 newPolygonButton = document.getElementById('newPolygon')
 newPolygonButton.addEventListener('click', startNewPolygon)
 
-// Directions
-document.getElementById('showAllLines').addEventListener('click', function(event) {
-    event.preventDefault()
-    drawAllLines()
-})
+polygonAccumulatedPoints = []
+polygonAccumulatedMarkers = []
 
-document.getElementById('hideAllLines').addEventListener('click', function(event) {
+function startNewPolygon(event) {
     event.preventDefault()
-    hideMapPolygons(shownMapLines)
-})
 
-newLineButton = document.getElementById('newLine')
-newLineButton.addEventListener('click', startNewLine)
+    newPolygonButton.removeEventListener('click', startNewPolygon)
+    newPolygonButton.addEventListener('click', stopPolygon)
+    newPolygonButton.innerText = 'Stop'
+
+    MapCallback.set(newPolygonPointOnAMap)
+}
+
+function newPolygonPointOnAMap(event) {
+    // don't add new point if not left mouse button is pressed
+    if (event.originalEvent.button != 0) return
+    let latlng = event.latlng
+
+    let accumulatedPoint = L.marker(latlng, { icon: altIcon });
+    accumulatedPoint.addTo(map)
+    polygonAccumulatedMarkers.push(accumulatedPoint)
+    let point = new Point({ id: 0, name: '', latitude: latlng.lat, longitude: latlng.lng})
+
+    polygonAccumulatedPoints.push(point)
+}
+
+async function stopPolygon(event) {
+    event.preventDefault()
+
+    newPolygonButton.removeEventListener('click', stopPolygon)
+    newPolygonButton.addEventListener('click', startNewPolygon)
+    newPolygonButton.innerText = 'Start a new polygon'
+
+    MapCallback.setDefault()
+
+    if (polygonAccumulatedPoints.length < 3) {
+        polygonAccumulatedMarkers.forEach(marker => {
+            map.removeLayer(marker)
+        })
+        polygonAccumulatedPoints = []
+        polygonAccumulatedMarkers = []
+        return
+    }
+
+    polygonAccumulatedPoints.push(polygonAccumulatedPoints[0])
+    let marker = new Marker(MarkerableTypes.Polygon, new Polygon({ id: 0, name: '', points: polygonAccumulatedPoints }))
+
+    newId = await MarkerFetch.create(marker)
+    marker.updateId(newId.id)
+    marker.draw()
+
+    polygonAccumulatedMarkers.forEach(marker => {
+        map.removeLayer(marker)
+    })
+    polygonAccumulatedPoints = []
+    polygonAccumulatedMarkers = []
+}
+
+
+
+// // Directions
+// document.getElementById('showAllLines').addEventListener('click', function(event) {
+//     event.preventDefault()
+//     drawAllLines()
+// })
+
+// document.getElementById('hideAllLines').addEventListener('click', function(event) {
+//     event.preventDefault()
+//     hidepolygonMarkers(shownMapLines)
+// })
+
+// newLineButton = document.getElementById('newLine')
+// newLineButton.addEventListener('click', startNewLine)
 
 
 //// Fetch and populate regions based on selected group

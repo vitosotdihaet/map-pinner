@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/static/style.css"></style>
 </head>
 <body>
-    <div class="sidenav">
+    <div class="sidebar">
         <label for="groupSelect">Select Group:</label>
         <select id="groupSelect">
             <option value="">Choose a group</option>
@@ -27,34 +27,19 @@
 
         <button id="createNewGroup">Create a new group</button>
 
-        <div class="tab">
-            <button class="tablinks" id="point">Points</button>
-            <button class="tablinks" id="polygon">Polygons</button>
-            <button class="tablinks" id="line">Lines</button>
-        </div>
-
-        <div id="points" class="tabcontent">
-            <button id="showAllPoints">Show all points</button>
-            <button id="hideAllPoints">Hide all points</button>
-        </div>
-        <div id="polygons" class="tabcontent">
-            <button id="showAllPolygons">Show all polygons</button>
-            <button id="hideAllPolygons">Hide all polygons</button>
-            <button id="newPolygon">Start a new polygon</button>
-        </div>
-        <div id="lines" class="tabcontent">
-            <button id="showAllLines">Show all lines</button>
-            <button id="hideAllLines">Hide all lines</button>
-            <button id="newLine">Start a new line</button>
-        </div>
+        <button id="showAllMarkers">Show all markers</button>
+        <button id="hideAllMarkers">Hide all markers</button>
+        <button id="newPolygon">Start a new polygon</button>
+        <button id="newLine">Start a new line</button>
     </div>
     <div class="main">
         <div id="map"></div>
-        <script src="/static/main.js"></script>
         <script src="/static/requests.js"></script>
-        <script src="/static/point.js"></script>
-        <script src="/static/polygon.js"></script>
-        <script src="/static/line.js"></script>
+        <script src="/static/markers/point.js"></script>
+        <script src="/static/markers/polygon.js"></script>
+        <script src="/static/markers/line.js"></script>
+        <script src="/static/marker.js"></script>
+        <script src="/static/map.js"></script>
         <script src="/static/group.js"></script>
         <script src="/static/sidebar.js"></script>
     </div>

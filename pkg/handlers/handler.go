@@ -60,7 +60,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	{
 		markers := api.Group("/markers")
 		{
-			points := markers.Group("/points")
+			points := markers.Group("/point")
 			points.POST("/", handler.createPoint)
 			points.GET("/", handler.getPoints)
 
@@ -68,7 +68,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 			points.PUT("/:point_id", handler.updatePointById)
 			points.DELETE("/:point_id", handler.deletePointById)
 
-			polygons := markers.Group("/polygons")
+			polygons := markers.Group("/polygon")
 			polygons.POST("/", handler.createPolygon)
 			polygons.GET("/", handler.getPolygons)
 
@@ -76,7 +76,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 			polygons.PUT("/:polygon_id", handler.updatePolygonById)
 			polygons.DELETE("/:polygon_id", handler.deletePolygonById)
 
-			lines := markers.Group("/lines")
+			lines := markers.Group("/line")
 			lines.POST("/", handler.createLine)
 			lines.GET("/", handler.getLines)
 
