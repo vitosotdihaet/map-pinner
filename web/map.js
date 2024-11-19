@@ -62,4 +62,30 @@ async function addPointOnMapClick(event) {
     return marker
 }
 
+
+function addPolygonPointOnAMapClick(event) {
+    if (event.originalEvent.button != 0) return
+
+    let latlng = event.latlng
+    let accumulatedPoint = L.marker(latlng, { icon: altIcon });
+    accumulatedPoint.addTo(map)
+    polygonAccumulatedMarkers.push(accumulatedPoint)
+
+    polygonAccumulatedPoints.push(new Point({ id: 0, name: '', latitude: latlng.lat, longitude: latlng.lng}))
+}
+
+
+function addLinePointOnMapClick(event) {
+    if (event.originalEvent.button != 0) return
+
+    let latlng = event.latlng
+    let accumulatedPoint = L.marker(latlng, { icon: altIcon });
+    accumulatedPoint.addTo(map)
+    lineAccumulatedMarkers.push(accumulatedPoint)
+
+    lineAccumulatedPoints.push(new Point({ id: 0, name: '', latitude: latlng.lat, longitude: latlng.lng}))
+}
+
+
 MapCallback.assignDefault(addPointOnMapClick)
+

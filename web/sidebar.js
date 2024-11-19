@@ -23,21 +23,9 @@ function startNewPolygon(event) {
     newPolygonButton.addEventListener('click', stopPolygon)
     newPolygonButton.innerText = 'Stop'
 
-    MapCallback.set(newPolygonPointOnAMap)
+    MapCallback.set(addPolygonPointOnAMapClick)
 }
 
-function newPolygonPointOnAMap(event) {
-    // don't add new point if not left mouse button is pressed
-    if (event.originalEvent.button != 0) return
-    let latlng = event.latlng
-
-    let accumulatedPoint = L.marker(latlng, { icon: altIcon });
-    accumulatedPoint.addTo(map)
-    polygonAccumulatedMarkers.push(accumulatedPoint)
-    let point = new Point({ id: 0, name: '', latitude: latlng.lat, longitude: latlng.lng})
-
-    polygonAccumulatedPoints.push(point)
-}
 
 async function stopPolygon(event) {
     event.preventDefault()
@@ -49,9 +37,7 @@ async function stopPolygon(event) {
     MapCallback.setDefault()
 
     if (polygonAccumulatedPoints.length < 3) {
-        polygonAccumulatedMarkers.forEach(marker => {
-            map.removeLayer(marker)
-        })
+        polygonAccumulatedMarkers.forEach(marker => { map.removeLayer(marker) })
         polygonAccumulatedPoints = []
         polygonAccumulatedMarkers = []
         return
@@ -64,36 +50,61 @@ async function stopPolygon(event) {
     marker.updateId(newId.id)
     marker.draw()
 
-    polygonAccumulatedMarkers.forEach(marker => {
-        map.removeLayer(marker)
-    })
+    polygonAccumulatedMarkers.forEach(marker => { map.removeLayer(marker) })
     polygonAccumulatedPoints = []
     polygonAccumulatedMarkers = []
 }
 
 
+newLineButton = document.getElementById('newLine')
+newLineButton.addEventListener('click', startNewLine)
 
-// // Directions
-// document.getElementById('showAllLines').addEventListener('click', function(event) {
-//     event.preventDefault()
-//     drawAllLines()
-// })
+lineAccumulatedPoints = []
+lineAccumulatedMarkers = []
 
-// document.getElementById('hideAllLines').addEventListener('click', function(event) {
-//     event.preventDefault()
-//     hidepolygonMarkers(shownMapLines)
-// })
+function startNewLine(event) {
+    event.preventDefault()
 
-// newLineButton = document.getElementById('newLine')
-// newLineButton.addEventListener('click', startNewLine)
+    newLineButton.removeEventListener('click', startNewLine)
+    newLineButton.addEventListener('click', stopLine)
+    newLineButton.innerText = 'Stop'
 
+    MapCallback.set(addLinePointOnMapClick)
+}
+
+async function stopLine(event) {
+    event.preventDefault()
+
+    newLineButton.removeEventListener('click', stopLine)
+    newLineButton.addEventListener('click', startNewLine)
+    newLineButton.innerText = 'Start a new line'
+
+    MapCallback.setDefault()
+
+    if (lineAccumulatedPoints.length < 2) {
+        lineAccumulatedMarkers.forEach(marker => { map.removeLayer(marker) })
+        lineAccumulatedPoints = []
+        lineAccumulatedMarkers = []
+        return
+    }
+
+    let marker = new Marker(MarkerableTypes.Line, new Line({ id: 0, name: '', points: lineAccumulatedPoints }))
+
+    newId = await MarkerFetch.create(marker)
+    marker.updateId(newId.id)
+    marker.draw()
+    
+    lineAccumulatedMarkers.forEach(marker => { map.removeLayer(marker) })
+    lineAccumulatedPoints = []
+    lineAccumulatedMarkers = []
+}
 
 //// Fetch and populate regions based on selected group
 // async function loadRegions(groupId) {
 //     const response = await fetch(`/api/groups/${groupId}/regions`); // Assuming an API endpoint to get regions by group ID
 //     const regions = await response.json();
 //     const regionSelect = document.getElementById('regionSelect');
-//     regionSelect.innerHTML = '<option value="">Choose a region</option>';
+//     regionSelect.innerHTML = '<option value=''>Choose a region</option>';
 
 //     regions.forEach(region => {
 //         const option = document.createElement('option');
@@ -111,7 +122,7 @@ async function stopPolygon(event) {
 //     if (groupId) {
 //         await loadRegions(groupId);
 //     } else {
-//         document.getElementById('regionSelect').innerHTML = '<option value="">Choose a region</option>';
+//         document.getElementById('regionSelect').innerHTML = '<option value=''>Choose a region</option>';
 //         document.getElementById('regionSelect').disabled = true;
 //     }
 // });
