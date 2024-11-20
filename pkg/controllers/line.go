@@ -16,14 +16,15 @@ func NewLinePostgres(postgres *sqlx.DB) *LinePostgres {
 	return &LinePostgres{postgres: postgres}
 }
 
-func (postgres *LinePostgres) Create(line entities.Line) (uint64, error) {
+func (postgres *LinePostgres) Create(regionId uint64, line entities.Line) (uint64, error) {
 	postgisPoints := pointsToWKT(line.Points)
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geometry) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v)) RETURNING id;",
+		"INSERT INTO %s (name, geometry, regionId) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v), $2) RETURNING id;",
 		linesTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
-	row := postgres.postgres.QueryRow(query, line.Name)
+
+	row := postgres.postgres.QueryRow(query, line.Name, regionId)
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
@@ -33,12 +34,12 @@ func (postgres *LinePostgres) Create(line entities.Line) (uint64, error) {
 	return id, nil
 }
 
-func (postgres *LinePostgres) GetAll() ([]entities.Line, error) {
+func (postgres *LinePostgres) GetAll(regionId uint64) ([]entities.Line, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s;", linesTable,
+		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s WHERE regionId = $1;", linesTable,
 	)
 
-	rows, err := postgres.postgres.Query(query)
+	rows, err := postgres.postgres.Query(query, regionId)
 	if err != nil {
 		return nil, err
 	}

@@ -6,24 +6,24 @@ import (
 )
 
 type Point interface {
-	GetAll() ([]entities.Point, error)
-	Create(point entities.Point) (uint64, error)
+	GetAll(regionId uint64) ([]entities.Point, error)
+	Create(regionId uint64, point entities.Point) (uint64, error)
 	GetById(id uint64) (entities.Point, error)
 	UpdateById(id uint64, pointUpdate entities.PointUpdate) error
 	DeleteById(id uint64) error
 }
 
 type Polygon interface {
-	GetAll() ([]entities.Polygon, error)
-	Create(polygon entities.Polygon) (uint64, error)
+	GetAll(regionId uint64) ([]entities.Polygon, error)
+	Create(regionId uint64, polygon entities.Polygon) (uint64, error)
 	GetById(id uint64) (entities.Polygon, error)
 	UpdateById(id uint64, newPolygon entities.PolygonUpdate) error
 	DeleteById(id uint64) error
 }
 
 type Line interface {
-	GetAll() ([]entities.Line, error)
-	Create(line entities.Line) (uint64, error)
+	GetAll(regionId uint64) ([]entities.Line, error)
+	Create(regionId uint64, line entities.Line) (uint64, error)
 	GetById(id uint64) (entities.Line, error)
 	UpdateById(id uint64, lineUpdate entities.LineUpdate) error
 	DeleteById(id uint64) error

@@ -16,17 +16,18 @@ func NewPolygonPostgres(postgres *sqlx.DB) *PolygonPostgres {
 	return &PolygonPostgres{postgres: postgres}
 }
 
-func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error) {
+func (postgres *PolygonPostgres) Create(regionId uint64, polygon entities.Polygon) (uint64, error) {
 	postgisPoints := pointsToWKT(polygon.Points)
 	if len(postgisPoints) != 0 {
 		postgisPoints = append(postgisPoints, postgisPoints[0])
 	}
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geometry) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v)) RETURNING id;",
+		"INSERT INTO %s (name, geometry, regionId) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v), $2) RETURNING id;",
 		polygonsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
-	row := postgres.postgres.QueryRow(query, polygon.Name)
+
+	row := postgres.postgres.QueryRow(query, polygon.Name, regionId)
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
@@ -36,12 +37,12 @@ func (postgres *PolygonPostgres) Create(polygon entities.Polygon) (uint64, error
 	return id, nil
 }
 
-func (postgres *PolygonPostgres) GetAll() ([]entities.Polygon, error) {
+func (postgres *PolygonPostgres) GetAll(regionId uint64) ([]entities.Polygon, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s;", polygonsTable,
+		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s WHERE regionId = $1;", polygonsTable,
 	)
 
-	rows, err := postgres.postgres.Query(query)
+	rows, err := postgres.postgres.Query(query, regionId)
 	if err != nil {
 		return nil, err
 	}

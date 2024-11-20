@@ -59,31 +59,11 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	api := router.Group("/api")
 	{
 		markers := api.Group("/markers")
-		{
-			points := markers.Group("/point")
-			points.POST("/", handler.createPoint)
-			points.GET("/", handler.getPoints)
-
-			points.GET("/:point_id", handler.getPointById)
-			points.PUT("/:point_id", handler.updatePointById)
-			points.DELETE("/:point_id", handler.deletePointById)
-
-			polygons := markers.Group("/polygon")
-			polygons.POST("/", handler.createPolygon)
-			polygons.GET("/", handler.getPolygons)
-
-			polygons.GET("/:polygon_id", handler.getPolygonById)
-			polygons.PUT("/:polygon_id", handler.updatePolygonById)
-			polygons.DELETE("/:polygon_id", handler.deletePolygonById)
-
-			lines := markers.Group("/line")
-			lines.POST("/", handler.createLine)
-			lines.GET("/", handler.getLines)
-
-			lines.GET("/:line_id", handler.getLineById)
-			lines.PUT("/:line_id", handler.updateLineById)
-			lines.DELETE("/:line_id", handler.deleteLineById)
-		}
+		markers.POST("/:type", handler.createMarker)
+		markers.GET("/", handler.getMarkers)
+		markers.GET("/:type/:id", handler.getMarkerById)
+		markers.PUT("/:type/:id", handler.updateMarkerById)
+		markers.DELETE("/:type/:id", handler.deleteMarkerById)
 
 		users := api.Group("/users")
 		users.GET("/", handler.GetUsers)

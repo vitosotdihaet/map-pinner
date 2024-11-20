@@ -16,12 +16,13 @@ func NewPointPostgres(postgres *sqlx.DB) *PointPostgres {
 	return &PointPostgres{postgres: postgres}
 }
 
-func (postgres *PointPostgres) Create(point entities.Point) (uint64, error) {
+func (postgres *PointPostgres) Create(regionId uint64, point entities.Point) (uint64, error) {
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geometry) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v)) RETURNING id;",
+		"INSERT INTO %s (name, geometry, regionId) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v), $4) RETURNING id;",
 		pointsTable, WGSSRID,
 	)
-	row := postgres.postgres.QueryRow(query, point.Name, point.Longitude, point.Latitude)
+
+	row := postgres.postgres.QueryRow(query, point.Name, point.Longitude, point.Latitude, regionId)
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
@@ -31,11 +32,11 @@ func (postgres *PointPostgres) Create(point entities.Point) (uint64, error) {
 	return id, nil
 }
 
-func (postgres *PointPostgres) GetAll() ([]entities.Point, error) {
+func (postgres *PointPostgres) GetAll(regionId uint64) ([]entities.Point, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_X(geometry) AS longtitude, ST_Y(geometry) AS lattitude FROM %s;", pointsTable,
+		"SELECT id, name, ST_X(geometry) AS longtitude, ST_Y(geometry) AS lattitude FROM %s WHERE regionId = $1;", pointsTable,
 	)
-	rows, err := postgres.postgres.Query(query)
+	rows, err := postgres.postgres.Query(query, regionId)
 
 	if err != nil {
 		return nil, err

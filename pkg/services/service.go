@@ -5,37 +5,13 @@ import (
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
-type Point interface {
-	GetAll() ([]entities.Point, error)
-	Create(point entities.Point) (uint64, error)
-	GetById(id uint64) (entities.Point, error)
-	UpdateById(id uint64, pointUpdate entities.PointUpdate) error
-	DeleteById(id uint64) error
+type Marker interface {
+	GetAll(regionId uint64) ([]entities.Marker, error)
+	Create(regionId uint64, marker entities.Marker) (uint64, error)
+	GetById(markerType entities.MarkerType, id uint64) (entities.Marker, error)
+	UpdateById(id uint64, markerUpdate entities.Marker) error
+	DeleteById(markerType entities.MarkerType, id uint64) error
 }
-
-type Polygon interface {
-	GetAll() ([]entities.Polygon, error)
-	Create(polygon entities.Polygon) (uint64, error)
-	GetById(id uint64) (entities.Polygon, error)
-	UpdateById(id uint64, polygonUpdate entities.PolygonUpdate) error
-	DeleteById(id uint64) error
-}
-
-type Line interface {
-	GetAll() ([]entities.Line, error)
-	Create(line entities.Line) (uint64, error)
-	GetById(id uint64) (entities.Line, error)
-	UpdateById(id uint64, lineUpdate entities.LineUpdate) error
-	DeleteById(id uint64) error
-}
-
-// type Marker interface {
-// 	GetAll() ([]entities.Line, error)
-// 	Create(line interface {entities.Marker}) (uint64, error)
-// 	GetById(id uint64) (entities.Line, error)
-// 	UpdateById(id uint64, lineUpdate entities.LineUpdate) error
-// 	DeleteById(id uint64) error
-// }
 
 type User interface {
 	GetAll() ([]entities.User, error)
@@ -63,9 +39,7 @@ type Region interface {
 }
 
 type Service struct {
-	Point
-	Polygon
-	Line
+	Marker
 	User
 	Group
 	Region
@@ -73,11 +47,9 @@ type Service struct {
 
 func NewService(database *controllers.Database) *Service {
 	return &Service{
-		Point:   NewPointService(database.Point),
-		Polygon: NewPolygonService(database.Polygon),
-		Line:    NewLineService(database.Line),
-		User:    NewUserService(database.User),
-		Group:   NewGroupService(database.Group),
-		Region:  NewRegionService(database.Region),
+		Marker: NewMarkerService(database.Point, database.Polygon, database.Line),
+		User:   NewUserService(database.User),
+		Group:  NewGroupService(database.Group),
+		Region: NewRegionService(database.Region),
 	}
 }

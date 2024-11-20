@@ -10,6 +10,10 @@ type Polygon struct {
 	Points []Point `json:"points"`
 }
 
+func (p *Polygon) GetType() MarkerType {
+	return PolygonType
+}
+
 func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 	var raw struct {
 		Name   string            `json:"name"`
@@ -37,4 +41,8 @@ func (polygon *Polygon) UnmarshalJSON(data []byte) error {
 type PolygonUpdate struct {
 	Name   *string  `json:"name"`
 	Points *[]Point `json:"points"`
+}
+
+func (p *PolygonUpdate) GetType() MarkerType {
+	return PolygonType
 }

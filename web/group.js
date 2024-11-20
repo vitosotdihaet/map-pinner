@@ -18,7 +18,7 @@ class GroupFetch {
 
 
 class Group {
-    static loaded = new Map()
+    static loaded = []
 
     static async createNewGroup() {
         let group = new Group('', 0)
@@ -33,8 +33,10 @@ class Group {
 
     static async reloadAll() {
         const groupsData = await GroupFetch.getAll();
+        Group.loaded = []
 
-        Group.loaded = new Map()
+        if (groupsData === null) { return }
+
         groupsData.forEach(groupData => {
             Group.loaded.push(new Group(groupData))
         })
@@ -53,9 +55,10 @@ class Group {
         });
     }
 
-    constructor(id, name) {
-        this.id = id
-        this.name = name
+    constructor(data) {
+        this.id = data.id
+        this.name = data.name
+        this.users = data.users
     }
 }
 

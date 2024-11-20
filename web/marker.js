@@ -1,19 +1,21 @@
+const currentRegionId = 1
+
 class MarkerFetch {
     static async getAllType(type) {
-        return getData(`/api/markers/${type}`)
+        return getData(`/api/markers/${type}?regionId=${currentRegionId}`)
     }
 
     static async getAll() {
-        return getData('/api/markers')
+        return getData(`/api/markers?regionId=${currentRegionId}`)
     }
 
 
     static async createType(type, value) {
-        return postData(`/api/markers/${type}`, value.JSONify())
+        return postData(`/api/markers/${type}?regionId=${currentRegionId}`, value.JSONify())
     }
 
     static async create(marker) {
-        return postData(`/api/markers/${marker.type}`, marker.value.JSONify())
+        return postData(`/api/markers/${marker.type}?regionId=${currentRegionId}`, marker.value.JSONify())
     }
 
 
@@ -60,19 +62,28 @@ class Marker {
     // list of shown markers 
     static shown = new Map(Object.values(MarkerableTypes).map(type => [type, new Map()]))
 
-    static async drawType(type) {
-        const markerablesData = await MarkerFetch.getAllType(type)
-        markerablesData.forEach(markerableData => {
-            const markerable = new (MarkerableClasses.get(type))(markerableData)
+    // static async drawType(type) {
+    //     const markerablesData = await MarkerFetch.getAllType(type)
+    //     if (markerablesData === null) { return }
+    //     markerablesData.forEach(markerableData => {
+    //         const markerable = new (MarkerableClasses.get(type))(markerableData)
+    //         let marker = new Marker(type, markerable)
+    //         marker.draw()
+    //     });
+    // }
+
+    static async drawAll() {
+        const markerablesData = await MarkerFetch.getAll()
+        if (markerablesData === null) { return }
+
+        // every first value is a type, every second is the JSON of a markerable
+        for (let i = 0; i < markerablesData.length; i += 2) {
+            const type = markerablesData[i]
+            const data = markerablesData[i + 1]
+            const markerable = new (MarkerableClasses.get(type))(data)
             let marker = new Marker(type, markerable)
             marker.draw()
-        });
-    }
-
-    static drawAll() {
-        Object.values(MarkerableTypes).forEach(type => {
-            Marker.drawType(type)
-        })
+        }
     }
 
     static hideType(type) {

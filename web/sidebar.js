@@ -133,5 +133,3 @@ async function stopLine(event) {
 //         openMapForRegion(regionId); // Function to display the map for the selected region
 //     }
 // });
-
-loadGroups();
