@@ -1,8 +1,11 @@
 package entities
 
+import "github.com/golang-jwt/jwt/v5"
+
 type User struct {
 	ID   uint64 `json:"id"`
 	Name string `json:"name"`
+	jwt.RegisteredClaims
 }
 
 type Password struct {

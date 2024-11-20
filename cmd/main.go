@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/controllers"
 	"github.com/vitosotdihaet/map-pinner/pkg/handlers"
+	"github.com/vitosotdihaet/map-pinner/pkg/misc"
 	"github.com/vitosotdihaet/map-pinner/pkg/server"
 	"github.com/vitosotdihaet/map-pinner/pkg/services"
 
@@ -29,6 +30,8 @@ func main() {
 		SSLMode:  os.Getenv("DB_SSLMODE"),
 		Password: os.Getenv("DB_PASSWORD"),
 	})
+
+	misc.JWTKey = os.Getenv("JWT_KEY")
 
 	if err != nil {
 		logrus.Fatalf("error while connecting to the database: %s", err.Error())
