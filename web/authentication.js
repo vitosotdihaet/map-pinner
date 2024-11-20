@@ -5,7 +5,6 @@ document.getElementById("loginButton").addEventListener("click", async () => {
     try {
         // Send credentials to the server
         const response = await UserFetch.getByUsernamePassword(userName, password);
-        console.log(response)
 
         if (response.id) {
             // const data = await response.json();

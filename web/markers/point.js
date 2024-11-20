@@ -80,7 +80,6 @@ class Point {
         this.setupMarker()
         this.draw()
 
-        console.log(updateInfo)
         MarkerFetch.updateType(MarkerableTypes.Point, updateInfo)
     }
 
