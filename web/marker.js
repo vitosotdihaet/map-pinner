@@ -2,20 +2,20 @@ const currentRegionId = 1
 
 class MarkerFetch {
     static async getAllType(type) {
-        return getData(`/api/markers/${type}?regionId=${currentRegionId}`)
+        return getData(`/api/markers/${type}?region_id=${currentRegionId}`)
     }
 
     static async getAll() {
-        return getData(`/api/markers?regionId=${currentRegionId}`)
+        return getData(`/api/markers?region_id=${currentRegionId}`)
     }
 
 
     static async createType(type, value) {
-        return postData(`/api/markers/${type}?regionId=${currentRegionId}`, value.JSONify())
+        return postData(`/api/markers/${type}?region_id=${currentRegionId}`, value.JSONify())
     }
 
     static async create(marker) {
-        return postData(`/api/markers/${marker.type}?regionId=${currentRegionId}`, marker.value.JSONify())
+        return postData(`/api/markers/${marker.type}?region_id=${currentRegionId}`, marker.value.JSONify())
     }
 
 
