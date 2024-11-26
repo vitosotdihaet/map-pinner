@@ -1,28 +1,57 @@
-async function getData(url) {
-    const response = await fetch(url)
-    return await response.json()
+async function getJSON(url) {
+    const response = await getFetch(url)
+    // console.log(response)
+    if (!response.ok) { throw "invalid get request" }
+    return response.json()
 }
 
-async function postData(url, body) {
-    const response = await fetch(url, {
+async function postJSON(url, body) {
+    const response = await postFetch(url, body)
+    // console.log(response)
+    if (!response.ok) { throw "invalid post request" }
+    return response.json()
+}
+
+async function deleteJSON(url, body) {
+    const response = await deleteFetch(url, body)
+    // console.log(response)
+    if (!response.ok) { throw "invalid delete request" }
+    return response.json()
+}
+
+async function putJSON(url, body) {
+    const response = await putFetch(url, body)
+    // console.log(response)
+    if (!response.ok) { throw "invalid put request" }
+    return response.json()
+}
+
+async function getFetch(url) {
+    return await fetch(url, {
+        headers: { "Authorization": `Bearer ${userToken}` },
+    })
+}
+
+async function postFetch(url, body) {
+    return await fetch(url, {
         method: "POST",
         body: body,
-    });
-    return await response.json()
+        headers: { "Authorization": `Bearer ${userToken}` },
+    })
 }
 
-async function deleteData(url, body) {
-    const response = await fetch(url, {
+async function deleteFetch(url, body) {
+    return await fetch(url, {
         method: "DELETE",
         body: body,
-    });
-    return await response.json()
+        headers: { "Authorization": `Bearer ${userToken}` },
+    })
 }
 
-async function putData(url, body) {
-    const response = await fetch(url, {
+async function putFetch(url, body) {
+    return await fetch(url, {
         method: "PUT",
         body: body,
-    });
-    return await response.json()
+        headers: { "Authorization": `Bearer ${userToken}` },
+    })
 }

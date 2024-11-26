@@ -2,9 +2,13 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
+	"github.com/vitosotdihaet/map-pinner/pkg/middleware"
 	"github.com/vitosotdihaet/map-pinner/pkg/misc"
 )
 
@@ -64,11 +68,29 @@ func (handler *Handler) GetUserByNamePassword(context *gin.Context) {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 	if user == nil {
 		newErrorResponse(context, http.StatusForbidden, "User not found")
 		return
 	}
 
-	context.JSON(http.StatusOK, user)
+	claims := &entities.UserClaim{
+		ID:   user.ID,
+		Name: user.Name,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(15 * time.Minute)),
+		},
+	}
+
+	logrus.Tracef("CLAIM: %v", claims)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(middleware.JWTKey)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, "Failed to create a JWT token")
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+	})
 }

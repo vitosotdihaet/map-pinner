@@ -9,7 +9,7 @@ import (
 )
 
 func (handler *Handler) getMarkers(context *gin.Context) {
-	regionId, err := strconv.ParseUint(context.Query("regionId"), 10, 64)
+	regionId, err := strconv.ParseUint(context.Query("region_id"), 10, 64)
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
@@ -31,7 +31,7 @@ func (handler *Handler) createMarker(context *gin.Context) {
 		return
 	}
 
-	regionId, err := strconv.ParseUint(context.Query("regionId"), 10, 64)
+	regionId, err := strconv.ParseUint(context.Query("region_id"), 10, 64)
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return

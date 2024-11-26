@@ -1,22 +1,26 @@
 class UserFetch {
     static async getAll() {
-        return getData('/api/users')
+        return getJSON('/users')
     }
 
     static async createWithNamePassword(username, password) {
-        return postData(`/api/users?username=${username}&password=${password}`)
+        return postJSON(`/users?username=${username}&password=${password}`)
     }
 
     static async delete(user) {
-        return deleteData(`/api/users/${user.id}`, '')
+        return deleteJSON(`/users/${user.id}`)
     }
 
     static async update(user) {
-        return putData(`/api/users/${user.id}`, JSON.stringify(user))
+        return putJSON(`/users/${user.id}`, JSON.stringify(user))
     }
 
     static async getByUsernamePassword(username, password) {
-        return getData(`/api/users/bynamepassword?username=${username}&password=${password}`);
+        return getJSON(`/users/bynamepassword?username=${username}&password=${password}`);
+    }
+
+    static async validateToken() {
+        return postFetch('/users/validate-token')
     }
 }
 

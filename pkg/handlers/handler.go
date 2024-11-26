@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/vitosotdihaet/map-pinner/pkg/middleware"
 	"github.com/vitosotdihaet/map-pinner/pkg/services"
 )
 
@@ -54,9 +55,17 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	router.Use(responseLogger())
 
 	router.Static("/static", "./web")
-	router.StaticFile("/", "./web/index.html")
+	router.StaticFile("/", "./web/auth.html")
 
-	api := router.Group("/api")
+	users := router.Group("/users")
+	{
+		users.GET("/", handler.GetUsers)
+		users.POST("/", handler.CreateUser)
+		users.GET("/bynamepassword", handler.GetUserByNamePassword)
+		users.POST("/validate-token", handler.validateToken)
+	}
+
+	api := router.Group("/api", middleware.JWTAuthMiddleware)
 	{
 		markers := api.Group("/markers")
 		markers.POST("/:type", handler.createMarker)
@@ -64,11 +73,6 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 		markers.GET("/:type/:id", handler.getMarkerById)
 		markers.PUT("/:type/:id", handler.updateMarkerById)
 		markers.DELETE("/:type/:id", handler.deleteMarkerById)
-
-		users := api.Group("/users")
-		users.GET("/", handler.GetUsers)
-		users.POST("/", handler.CreateUser)
-		users.GET("/bynamepassword", handler.GetUserByNamePassword)
 
 		groups := api.Group("/groups")
 		groups.POST("/", handler.createGroup)

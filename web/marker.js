@@ -2,34 +2,34 @@ const currentRegionId = 1
 
 class MarkerFetch {
     static async getAllType(type) {
-        return getData(`/api/markers/${type}?region_id=${currentRegionId}`)
+        return getJSON(`/api/markers/${type}?region_id=${currentRegionId}`)
     }
 
     static async getAll() {
-        return getData(`/api/markers?region_id=${currentRegionId}`)
+        return getJSON(`/api/markers?region_id=${currentRegionId}`)
     }
 
 
     static async createType(type, value) {
-        return postData(`/api/markers/${type}?region_id=${currentRegionId}`, value.JSONify())
+        return postJSON(`/api/markers/${type}?region_id=${currentRegionId}`, value.JSONify())
     }
 
     static async create(marker) {
-        return postData(`/api/markers/${marker.type}?region_id=${currentRegionId}`, marker.value.JSONify())
+        return postJSON(`/api/markers/${marker.type}?region_id=${currentRegionId}`, marker.value.JSONify())
     }
 
 
     static async deleteType(type, value) {
-        return deleteData(`/api/markers/${type}/${value.id}`, "")
+        return deleteJSON(`/api/markers/${type}/${value.id}`, "")
     }
 
     static async delete(marker) {
-        return deleteData(`/api/markers/${marker.type}/${marker.id}`, "")
+        return deleteJSON(`/api/markers/${marker.type}/${marker.id}`, "")
     }
 
 
     static async updateType(type, updateInfo) {
-        return putData(`/api/markers/${type}/${updateInfo.id}`, JSON.stringify(updateInfo))
+        return putJSON(`/api/markers/${type}/${updateInfo.id}`, JSON.stringify(updateInfo))
     }
 }
 
@@ -122,7 +122,7 @@ class Marker {
     }
 
     draw() {
-        if (Marker.shown.get(this.type).has(this.id)) return
+        if (Marker.shown.get(this.type).has(this.id)) { return }
         this.value.draw()
         Marker.shown.get(this.type).set(this.id, this)
     }

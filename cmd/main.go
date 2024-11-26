@@ -7,7 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/controllers"
 	"github.com/vitosotdihaet/map-pinner/pkg/handlers"
-	"github.com/vitosotdihaet/map-pinner/pkg/misc"
+	"github.com/vitosotdihaet/map-pinner/pkg/middleware"
 	"github.com/vitosotdihaet/map-pinner/pkg/server"
 	"github.com/vitosotdihaet/map-pinner/pkg/services"
 
@@ -31,11 +31,11 @@ func main() {
 		Password: os.Getenv("DB_PASSWORD"),
 	})
 
-	misc.JWTKey = os.Getenv("JWT_KEY")
-
 	if err != nil {
 		logrus.Fatalf("error while connecting to the database: %s", err.Error())
 	}
+
+	middleware.JWTKey = []byte(os.Getenv("JWT_KEY"))
 
 	database := controllers.NewDatabase(postgres)
 	service := services.NewService(database)
