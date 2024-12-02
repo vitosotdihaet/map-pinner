@@ -59,10 +59,10 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 
 	users := router.Group("/users")
 	{
-		users.GET("/", handler.GetUsers)
-		users.POST("/", handler.CreateUser)
-		users.GET("/bynamepassword", handler.GetUserByNamePassword)
-		users.POST("/validate-token", handler.validateToken)
+		users.GET("/", handler.getUsers)
+		users.POST("/", handler.createUser)
+		users.GET("/bynamepassword", handler.getUserByNamePassword)
+		users.GET("/current-user", middleware.JWTAuthMiddleware, handler.getAuthenticatedUser)
 	}
 
 	api := router.Group("/api", middleware.JWTAuthMiddleware)
@@ -77,10 +77,9 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 		groups := api.Group("/groups")
 		groups.POST("/", handler.createGroup)
 		groups.GET("/", handler.getGroups)
-		{
-			regions := groups.Group("/regions")
-			regions.GET("/", handler.getRegions)
-		}
+
+		regions := groups.Group("/regions")
+		regions.GET("/", handler.getRegions)
 	}
 
 	return router

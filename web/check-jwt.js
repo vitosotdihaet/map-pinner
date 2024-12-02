@@ -1,21 +1,28 @@
-notInAuth = !window.location.href.includes('auth')
-notInMap = !window.location.href.includes('map')
+inAuth = window.location.href.includes('auth.html')
 
 const userToken = localStorage.getItem("jwt")
 
 document.addEventListener("DOMContentLoaded", async () => {
-    if (userToken === null && notInAuth) {
+    if (userToken === null && !inAuth) {
         window.location.href = "/static/auth.html"
         return
-    } 
+    }
 
     try {
-        const response = await UserFetch.validateToken()
+        response = await UserFetch.getCurrent()
 
-        if (!response.ok && notInAuth) {
+        if (!response.ok && !inAuth) {
             window.location.href = "/static/auth.html"
-        } else if (response.ok && notInMap) {
-            window.location.href = "/static/map.html"
+        }
+        
+        if (response.ok) {
+            response = await response.json()
+            localStorage.setItem("jwt", response.token)
+            localStorage.setItem("user", JSON.stringify(response.user))
+
+            if (inAuth) {
+                window.location.href = "/static/group.html"
+            }
         }
     } catch (error) {
         console.error("Error:", error)

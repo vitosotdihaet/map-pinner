@@ -6,13 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 	"github.com/vitosotdihaet/map-pinner/pkg/middleware"
 	"github.com/vitosotdihaet/map-pinner/pkg/misc"
 )
 
-func (handler *Handler) GetUsers(context *gin.Context) {
+func (handler *Handler) getUsers(context *gin.Context) {
 	users, err := handler.service.User.GetAll()
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
@@ -22,7 +21,7 @@ func (handler *Handler) GetUsers(context *gin.Context) {
 	context.JSON(http.StatusOK, users)
 }
 
-func (handler *Handler) CreateUser(context *gin.Context) {
+func (handler *Handler) createUser(context *gin.Context) {
 	var inputPassword entities.Password
 	var inputUser entities.User
 
@@ -48,7 +47,7 @@ func (handler *Handler) CreateUser(context *gin.Context) {
 	})
 }
 
-func (handler *Handler) GetUserByNamePassword(context *gin.Context) {
+func (handler *Handler) getUserByNamePassword(context *gin.Context) {
 	var inputPassword entities.Password
 	var inputUser entities.User
 
@@ -81,8 +80,6 @@ func (handler *Handler) GetUserByNamePassword(context *gin.Context) {
 		},
 	}
 
-	logrus.Tracef("CLAIM: %v", claims)
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString(middleware.JWTKey)
 	if err != nil {
@@ -91,6 +88,26 @@ func (handler *Handler) GetUserByNamePassword(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{
+		"user":  user,
 		"token": tokenString,
+	})
+}
+
+func (handler *Handler) getAuthenticatedUser(context *gin.Context) {
+	user, exists := context.Get("user")
+	if !exists {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		return
+	}
+
+	token, exists := context.Get("token")
+	if !exists {
+		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"user":  user,
+		"token": token,
 	})
 }

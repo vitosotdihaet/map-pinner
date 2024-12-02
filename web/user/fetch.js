@@ -16,18 +16,10 @@ class UserFetch {
     }
 
     static async getByUsernamePassword(username, password) {
-        return getJSON(`/users/bynamepassword?username=${username}&password=${password}`);
+        return getFetch(`/users/bynamepassword?username=${username}&password=${password}`);
     }
 
-    static async validateToken() {
-        return postFetch('/users/validate-token')
-    }
-}
-
-class User {
-    constructor(id, name, hashedPassword) {
-        this.id = id
-        this.name = name
-        this.hashedPassword = hashedPassword
+    static async getCurrent() {
+        return getFetch('/users/current-user')
     }
 }

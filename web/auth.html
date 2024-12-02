@@ -5,25 +5,8 @@
     
     <link rel="icon" type="image/png" href="/static/icon.png">
     
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        .login-container {
-            width: 300px;
-            margin: 100px auto;
-            text-align: center;
-        }
-        input {
-            display: block;
-            margin: 10px auto;
-            padding: 10px;
-            width: 90%;
-        }
-        button {
-            padding: 10px 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/styles/auth.css">
+    <link rel="stylesheet" href="/static/styles/common.css">
 </head>
 <body>
     <div class="login-container">
@@ -35,7 +18,8 @@
         <p id="errorMessage" style="color: red; display: none;">Invalid login, please try again.</p>
     </div>
     <script src="/static/requests.js"></script>
-    <script src="/static/user.js"></script>
+    <script src="/static/user/fetch.js"></script>
+    <script src="/static/user/main.js"></script>
     <script src="/static/check-jwt.js"></script>
     <script src="/static/authentication.js"></script>
 </body>

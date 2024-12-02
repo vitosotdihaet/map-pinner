@@ -31,11 +31,12 @@ func JWTAuthMiddleware(context *gin.Context) {
 		return
 	}
 
-	// Attach user data to context
 	context.Set("user", entities.User{
 		ID:   claims.ID,
 		Name: claims.Name,
 	})
+
+	context.Set("token", token)
 
 	context.Next()
 }

@@ -3,11 +3,13 @@ document.getElementById("loginButton").addEventListener("click", async () => {
     const password = document.getElementById("password").value
 
     try {
-        const response = await UserFetch.getByUsernamePassword(userName, password);
+        response = await UserFetch.getByUsernamePassword(userName, password);
 
-        if (response.token) {
+        if (response.ok) {
+            response = await response.json()
             localStorage.setItem("jwt", response.token)
-            window.location.href = "/static/map.html"
+            localStorage.setItem("user", JSON.stringify(response.user))
+            window.location.href = "/static/group.html"
         } else {
             document.getElementById("errorMessage").style.display = "block"
         }
