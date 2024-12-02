@@ -1,27 +1,23 @@
 async function getJSON(url) {
     const response = await getFetch(url)
-    // console.log(response)
     if (!response.ok) { throw "invalid get request" }
     return response.json()
 }
 
 async function postJSON(url, body) {
     const response = await postFetch(url, body)
-    // console.log(response)
     if (!response.ok) { throw "invalid post request" }
     return response.json()
 }
 
 async function deleteJSON(url, body) {
     const response = await deleteFetch(url, body)
-    // console.log(response)
     if (!response.ok) { throw "invalid delete request" }
     return response.json()
 }
 
 async function putJSON(url, body) {
     const response = await putFetch(url, body)
-    // console.log(response)
     if (!response.ok) { throw "invalid put request" }
     return response.json()
 }
