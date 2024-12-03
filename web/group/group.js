@@ -59,8 +59,6 @@ newGroupButton.addEventListener('click', function(event) {
     if (inputLength > 2 && inputLength < 256) {
         Group.createNewGroup(newGroupNameInput.value)
         newGroupNameInput.value = ''
-    } else {
-        throw "you little bastard..."
     }
 })
 

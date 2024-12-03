@@ -69,8 +69,6 @@ newRegionButton.addEventListener('click', function(event) {
     if (inputLength > 2 && inputLength < 256) {
         Region.createNewRegion(newRegionNameInput.value)
         newRegionNameInput.value = ''
-    } else {
-        throw "you little bastard..."
     }
 })
 

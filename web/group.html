@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/static/styles/group.css"></link>
 </head>
 <body>
-    <div class="sidebar">
+    <div class="main">
         <h1>Account info</h1>
         <label for="userName">Your Name: </label>
         <label id="userName"></label>
@@ -22,6 +22,7 @@
         <select id="groupSelect">
             <option value="">Choose a group</option>
         </select>
+
         <div id="region">
             <h1>Regions in a selected group</h1>
             <label>New region:</label>
@@ -31,8 +32,11 @@
             <label for="regionButtons">Select a region:</label>
             <div id="regionButtons"></div>
         </div>
-    </div>
-    <div class="main">
+
+        <div class="quit-button">
+            <button id="quitButton" onclick="quit()">Quit</button>
+        </div>
+
         <script src="/static/requests.js"></script>
         <script src="/static/user/fetch.js"></script>
         <script src="/static/user/main.js"></script>
@@ -44,6 +48,7 @@
         <script src="/static/region/fetch.js"></script>
         <script src="/static/region/main.js"></script>
         <script src="/static/region/group.js"></script>
+        <script src="/static/quit.js"></script>
     </div>
 </body>
 <div href="https://www.flaticon.com/free-icons/map-pin" title="map pin icons"></div>

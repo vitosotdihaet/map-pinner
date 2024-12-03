@@ -14,11 +14,11 @@ html, body {
     width: var(--navbar-width);
     position: fixed;
     overflow-x: hidden;
-    background-color: #fbfeff;
+    background-color: #fefefe;
 }
 
 .sidebar button {
-    background-color: #eeeeee;
+    background-color: var(--back);
     cursor: pointer;
     padding: 10px 0px;
     transition: 0.25s;
@@ -27,7 +27,7 @@ html, body {
 }
 
 .sidebar div {
-    background-color: #eeeeee;
+    background-color: var(--back);
     text-align: center;
     padding: 10px 0px;
     width: 100%;
@@ -35,11 +35,11 @@ html, body {
 }
 
 .sidebar button:hover {
-    background-color: #d4d4d4;
+    background-color: var(--back-hover);
 }
 
 .sidebar button.active {
-    background-color: #d4d4d4;
+    background-color: var(--back-hover);
 }
 
 .sidebar button:disabled {
@@ -56,6 +56,11 @@ html, body {
 }
 
 #map {
+    z-index: 0;
     height: 100%;
     width: 100%;
+}
+
+.leaflet-control-attribution.leaflet-control {
+    display: none;
 }

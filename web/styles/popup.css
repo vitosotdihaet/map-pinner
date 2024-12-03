@@ -8,7 +8,7 @@
     border-radius: 5px;
     margin: 3px 0px 0px 0px;
     color: #ffffff;
-    background: #474747;
+    background: var(--red);
     padding: 5px 10px;
     text-decoration: none;
     width: 49%;
@@ -17,7 +17,7 @@
 }
 
 .popupDeleteButton:hover {
-    background: #7a7a7a;
+    background: var(--red-hover);
     text-decoration: none;
 }
 
@@ -27,7 +27,7 @@
     border-radius: 5px;
     margin: 3px 0px 0px 0px;
     color: #ffffff;
-    background: #4193cf;
+    background: var(--green);
     padding: 5px 10px;
     text-decoration: none;
     width: 48%;
@@ -36,7 +36,7 @@
 }
 
 .popupUpdateButton:hover {
-    background: #3b84b8;
+    background: var(--green-hover);
     text-decoration: none;
 }
 
