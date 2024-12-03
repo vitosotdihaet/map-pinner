@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	WGSSRID       = 4326
-	pointsTable   = "markerspace.points"
-	polygonsTable = "markerspace.polygons"
-	linesTable    = "markerspace.lines"
-	groupsTable   = "userspace.groups"
-	usersTable    = "userspace.users"
-	regionsTable  = "userspace.regions"
+	WGSSRID                  = 4326
+	pointsTable              = "markerspace.points"
+	polygonsTable            = "markerspace.polygons"
+	linesTable               = "markerspace.lines"
+	groupsTable              = "userspace.groups"
+	usersTable               = "userspace.users"
+	usersGroupsRelationTable = "userspace.users_groups_relation"
+	regionsTable             = "userspace.regions"
 )
 
 type Config struct {

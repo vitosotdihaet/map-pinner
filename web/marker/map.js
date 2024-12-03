@@ -96,3 +96,8 @@ class Marker {
         this.value.hide()
     }
 }
+
+if (Region.currentRegion != null) {
+    // TODO: check if a region is still in the db
+    Marker.drawAll()
+}

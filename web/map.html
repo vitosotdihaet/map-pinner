@@ -12,17 +12,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.6.1/randomColor.js"></script>
 
     <link rel="stylesheet" href="/static/styles/map.css">
+    <link rel="stylesheet" href="/static/styles/popup.css">
     <link rel="stylesheet" href="/static/styles/common.css">
 </head>
 <body>
     <div class="sidebar">
-        <!-- <label for="regionSelect">Select Region:</label>
-        <select id="regionSelect" disabled>
-            <option value="">Choose a region</option>
-        </select> -->
-
+        <div>
+            <label>Current region:</label>
+            <label id="region"></label>
+        </div>
+        
         <button id="toGroups" onclick="window.location.href='/static/group.html'">Back to groups</button>
-
         <button id="showAllMarkers">Show all markers</button>
         <button id="hideAllMarkers">Hide all markers</button>
         <button id="newPolygon">Start a new polygon</button>
@@ -31,6 +31,10 @@
     <div class="main">
         <div id="map"></div>
         <script src="/static/requests.js"></script>
+        <script src="/static/group/fetch.js"></script>
+        <script src="/static/region/fetch.js"></script>
+        <script src="/static/region/main.js"></script>
+        <script src="/static/region/map.js"></script>
         <script src="/static/user/fetch.js"></script>
         <script src="/static/user/main.js"></script>
         <script src="/static/check-jwt.js"></script>
@@ -40,10 +44,6 @@
         <script src="/static/marker/fetch.js"></script>
         <script src="/static/marker/map.js"></script>
         <script src="/static/map.js"></script>
-        <script src="/static/region/fetch.js"></script>
-        <script src="/static/region/main.js"></script>
-        <script src="/static/region/map.js"></script>
-        <script src="/static/group/fetch.js"></script>
         <script src="/static/sidebar.js"></script>
     </div>
 </body>

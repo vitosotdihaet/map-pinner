@@ -1,0 +1,42 @@
+.popup {
+    font-size: 15px
+}
+
+.popupDeleteButton {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    margin: 3px 0px 0px 0px;
+    color: #ffffff;
+    background: #474747;
+    padding: 5px 10px;
+    text-decoration: none;
+    width: 49%;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+.popupDeleteButton:hover {
+    background: #7a7a7a;
+    text-decoration: none;
+}
+
+.popupUpdateButton {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    margin: 3px 0px 0px 0px;
+    color: #ffffff;
+    background: #4193cf;
+    padding: 5px 10px;
+    text-decoration: none;
+    width: 48%;
+    box-sizing: border-box;
+    display: inline-block;
+}
+
+.popupUpdateButton:hover {
+    background: #3b84b8;
+    text-decoration: none;
+}
+

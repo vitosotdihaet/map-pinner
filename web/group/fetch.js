@@ -1,6 +1,6 @@
 class GroupFetch {
     static async getAll() {
-        return getJSON('/api/groups')
+        return getJSON(`/api/groups`)
     }
 
     static async getById(groupId) {
@@ -8,7 +8,7 @@ class GroupFetch {
     }
 
     static async create(group) {
-        return postJSON(`/api/groups?author_id=${User.currentUser.id}`, JSON.stringify(group))
+        return postJSON(`/api/groups`, JSON.stringify(group))
     }
 
     static async delete(group) {

@@ -26,12 +26,20 @@ func (postgres *GroupPostgres) Create(group entities.Group, authorId uint64) (ui
 	return id, nil
 }
 
-func (postgres *GroupPostgres) GetAll() ([]entities.Group, error) {
+func (postgres *GroupPostgres) GetAll(userId uint64) ([]entities.Group, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name FROM %s;", groupsTable,
+		`
+		SELECT id, name
+		FROM %s
+		WHERE id IN (
+			SELECT group_id
+			FROM %s
+			WHERE user_id = $1
+		);
+		`, groupsTable, usersGroupsRelationTable,
 	)
-	rows, err := postgres.postgres.Query(query)
 
+	rows, err := postgres.postgres.Query(query, userId)
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +61,7 @@ func (postgres *GroupPostgres) GetAll() ([]entities.Group, error) {
 }
 
 func (postgres *GroupPostgres) GetById(id uint64) (entities.Group, error) {
+	// TODO: check if user has permission to view this
 	query := fmt.Sprintf(
 		"SELECT name FROM %s WHERE id = $1;", groupsTable,
 	)

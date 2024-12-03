@@ -7,7 +7,9 @@ class User {
     }
 }
 
-User.currentUser = new User(JSON.parse(localStorage.getItem("user")))
 
-const userNameLabel = document.getElementById('userName')
-userNameLabel.innerHTML = User.currentUser.name
+userInfo = localStorage.getItem('user')
+if (userInfo != null) {
+    // TODO: check if user is still in the db
+    User.currentUser = new User(JSON.parse(userInfo))
+}

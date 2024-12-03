@@ -39,7 +39,7 @@ type User interface {
 }
 
 type Group interface {
-	GetAll() ([]entities.Group, error)
+	GetAll(userId uint64) ([]entities.Group, error)
 	Create(group entities.Group, authorId uint64) (uint64, error)
 	GetById(id uint64) (entities.Group, error)
 	UpdateById(id uint64, lineUpdate entities.GroupUpdate) error

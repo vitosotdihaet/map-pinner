@@ -11,5 +11,6 @@ class Group {
 
 groupInfo = localStorage.getItem('group')
 if (groupInfo) {
+    // TODO: check if group is still in the db
     Group.currentGroup = new Group(JSON.parse(groupInfo))
 }

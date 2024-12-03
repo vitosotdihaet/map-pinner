@@ -17,8 +17,8 @@ func (service *GroupService) Create(group entities.Group, authorId uint64) (uint
 	return service.database.Create(group, authorId)
 }
 
-func (service *GroupService) GetAll() ([]entities.Group, error) {
-	return service.database.GetAll()
+func (service *GroupService) GetAll(userId uint64) ([]entities.Group, error) {
+	return service.database.GetAll(userId)
 }
 
 func (service *GroupService) GetById(id uint64) (entities.Group, error) {

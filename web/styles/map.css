@@ -13,22 +13,25 @@ html, body {
 .sidebar {
     width: var(--navbar-width);
     position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
     overflow-x: hidden;
     background-color: #fbfeff;
 }
 
 .sidebar button {
-    background-color: #ececec;
-    border: none;
-    outline: none;
+    background-color: #eeeeee;
     cursor: pointer;
     padding: 10px 0px;
     transition: 0.25s;
-    font-size: 20px;
     width: 100%;
+    font-size: 20px;
+}
+
+.sidebar div {
+    background-color: #eeeeee;
+    text-align: center;
+    padding: 10px 0px;
+    width: 100%;
+    font-size: 20px;
 }
 
 .sidebar button:hover {
@@ -44,24 +47,6 @@ html, body {
     cursor: not-allowed;
 }
 
-.tabcontent {
-    display: none;
-    border-top: none;
-}
-
-.tabcontent button {
-    width: 100%;
-    height: 40px;
-    display: center;
-    font-size: 20px;
-    color: #000000;
-    display: block;
-}
-
-.tabcontent a:hover {
-    color: #7a7a7a;
-}
-
 
 /* Style page content */
 .main {
@@ -69,50 +54,6 @@ html, body {
     width: 100% - var(--navbar-width);
     height: 100%;
 }
-
-/* Popup realted stuff */
-.popup {
-    font-size: 15px
-}
-
-.popupDeleteButton {
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    margin: 3px 0px 0px 0px;
-    color: #ffffff;
-    background: #474747;
-    padding: 5px 10px;
-    text-decoration: none;
-    width: 49%;
-    box-sizing: border-box;
-    display: inline-block;
-}
-
-.popupDeleteButton:hover {
-    background: #7a7a7a;
-    text-decoration: none;
-}
-
-.popupUpdateButton {
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    margin: 3px 0px 0px 0px;
-    color: #ffffff;
-    background: #4193cf;
-    padding: 5px 10px;
-    text-decoration: none;
-    width: 48%;
-    box-sizing: border-box;
-    display: inline-block;
-}
-
-.popupUpdateButton:hover {
-    background: #3b84b8;
-    text-decoration: none;
-}
-
 
 #map {
     height: 100%;

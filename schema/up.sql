@@ -96,10 +96,9 @@ CREATE TABLE markerspace.lines (
 );
 
 
--- TODO: add roles
+-- TODO: populate roles
 INSERT INTO rbac.roles (name) VALUES ('admin');
 
--- TODO: add a function for creating a group
 CREATE FUNCTION new_group(group_name VARCHAR(255), user_id INT)
 RETURNS INT AS $$
 DECLARE
@@ -110,7 +109,7 @@ BEGIN
     RETURNING id INTO group_id;
     
     INSERT INTO userspace.users_groups_relation (group_id, user_id, user_role_id)
-    VALUES (group_id, user_id, 1);
+    VALUES (group_id, user_id, 1); -- 1 = 'admin'
 
     RETURN group_id;
 END;

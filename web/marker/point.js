@@ -27,10 +27,15 @@ class Point {
             setTimeout(() => event.target.dragging.enable());
         })
 
+        let point = this
         let marker = this.marker
         this.marker.on('dragend', function (event) {
             let latlng = event.target.getLatLng()
             marker.update({
+                latitude: latlng.lat,
+                longitude: latlng.lng
+            })
+            point.update({
                 latitude: latlng.lat,
                 longitude: latlng.lng
             })

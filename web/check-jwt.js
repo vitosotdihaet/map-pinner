@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!response.ok && !inAuth) {
             window.location.href = "/static/auth.html"
         }
-        
+
         if (response.ok) {
             response = await response.json()
             localStorage.setItem("jwt", response.token)

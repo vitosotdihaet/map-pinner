@@ -5,12 +5,23 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
 )
 
 func (handler *Handler) getGroups(context *gin.Context) {
-	groups, err := handler.service.Group.GetAll()
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
+	groups, err := handler.service.Group.GetAll(user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
@@ -20,20 +31,25 @@ func (handler *Handler) getGroups(context *gin.Context) {
 }
 
 func (handler *Handler) createGroup(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	var inputGroup entities.Group
 	if err := context.BindJSON(&inputGroup); err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	logrus.Trace(context.Query("author_id"))
-	authorId, err := strconv.ParseUint(context.Query("author_id"), 10, 64)
-	if err != nil {
-		newErrorResponse(context, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	id, err := handler.service.Group.Create(inputGroup, authorId)
+	id, err := handler.service.Group.Create(inputGroup, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
