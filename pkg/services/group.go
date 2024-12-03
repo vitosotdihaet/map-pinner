@@ -13,8 +13,8 @@ func NewGroupService(database controllers.Group) *GroupService {
 	return &GroupService{database: database}
 }
 
-func (service *GroupService) Create(group entities.Group) (uint64, error) {
-	return service.database.Create(group)
+func (service *GroupService) Create(group entities.Group, authorId uint64) (uint64, error) {
+	return service.database.Create(group, authorId)
 }
 
 func (service *GroupService) GetAll() ([]entities.Group, error) {

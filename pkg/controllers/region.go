@@ -15,12 +15,12 @@ func NewRegionPostgres(postgres *sqlx.DB) *RegionPostgres {
 	return &RegionPostgres{postgres: postgres}
 }
 
-func (postgres *RegionPostgres) Create(region entities.Region) (uint64, error) {
+func (postgres *RegionPostgres) Create(region entities.Region, groupId uint64) (uint64, error) {
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name) VALUES ($1) RETURNING id;",
+		"INSERT INTO %s (name, group_id) VALUES ($1, $2) RETURNING id;",
 		regionsTable,
 	)
-	row := postgres.postgres.QueryRow(query, region.Name)
+	row := postgres.postgres.QueryRow(query, region.Name, groupId)
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
@@ -30,11 +30,11 @@ func (postgres *RegionPostgres) Create(region entities.Region) (uint64, error) {
 	return id, nil
 }
 
-func (postgres *RegionPostgres) GetAll() ([]entities.Region, error) {
+func (postgres *RegionPostgres) GetAll(groupId uint64) ([]entities.Region, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name FROM %s;", regionsTable,
+		"SELECT id, name FROM %s WHERE group_id = $1;", regionsTable,
 	)
-	rows, err := postgres.postgres.Query(query)
+	rows, err := postgres.postgres.Query(query, groupId)
 
 	if err != nil {
 		return nil, err

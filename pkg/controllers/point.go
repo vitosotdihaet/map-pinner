@@ -18,7 +18,7 @@ func NewPointPostgres(postgres *sqlx.DB) *PointPostgres {
 
 func (postgres *PointPostgres) Create(regionId uint64, point entities.Point) (uint64, error) {
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geometry, regionId) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v), $4) RETURNING id;",
+		"INSERT INTO %s (name, geometry, region_id) VALUES ($1, ST_SetSRID(ST_MakePoint($2, $3), %v), $4) RETURNING id;",
 		pointsTable, WGSSRID,
 	)
 
@@ -34,7 +34,7 @@ func (postgres *PointPostgres) Create(regionId uint64, point entities.Point) (ui
 
 func (postgres *PointPostgres) GetAll(regionId uint64) ([]entities.Point, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_X(geometry) AS longtitude, ST_Y(geometry) AS lattitude FROM %s WHERE regionId = $1;", pointsTable,
+		"SELECT id, name, ST_X(geometry) AS longtitude, ST_Y(geometry) AS lattitude FROM %s WHERE region_id = $1;", pointsTable,
 	)
 	rows, err := postgres.postgres.Query(query, regionId)
 

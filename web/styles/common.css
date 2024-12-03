@@ -9,3 +9,7 @@ select {
 input {
     padding: 10px 20px;
 }
+
+label {
+    padding: 0px 20px;
+}

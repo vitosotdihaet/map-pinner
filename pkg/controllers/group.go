@@ -15,12 +15,8 @@ func NewGroupPostgres(postgres *sqlx.DB) *GroupPostgres {
 	return &GroupPostgres{postgres: postgres}
 }
 
-func (postgres *GroupPostgres) Create(group entities.Group) (uint64, error) {
-	query := fmt.Sprintf(
-		"INSERT INTO %s (name) VALUES ($1) RETURNING id;",
-		groupsTable,
-	)
-	row := postgres.postgres.QueryRow(query, group.Name)
+func (postgres *GroupPostgres) Create(group entities.Group, authorId uint64) (uint64, error) {
+	row := postgres.postgres.QueryRow("SELECT new_group($1, $2) AS group_id;", group.Name, authorId)
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {

@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/vitosotdihaet/map-pinner/pkg/entities"
-	"github.com/vitosotdihaet/map-pinner/pkg/middleware"
 	"github.com/vitosotdihaet/map-pinner/pkg/misc"
 )
 
@@ -81,7 +80,7 @@ func (handler *Handler) getUserByNamePassword(context *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(middleware.JWTKey)
+	tokenString, err := token.SignedString(JWTKey)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, "Failed to create a JWT token")
 		return
@@ -100,7 +99,7 @@ func (handler *Handler) getAuthenticatedUser(context *gin.Context) {
 		return
 	}
 
-	token, exists := context.Get("token")
+	tokenString, exists := context.Get("token")
 	if !exists {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Token not found"})
 		return
@@ -108,6 +107,6 @@ func (handler *Handler) getAuthenticatedUser(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{
 		"user":  user,
-		"token": token,
+		"token": tokenString,
 	})
 }

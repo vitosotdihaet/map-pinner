@@ -1,17 +1,17 @@
 class RegionFetch {
     static async getAll() {
-        return getJSON('/api/regions')
+        return getJSON(`/api/regions?group_id=${Group.currentGroup.id}`)
     }
 
-    static async create(group) {
-        return postJSON('/api/groups', JSON.stringify(group))
+    static async create(region) {
+        return postJSON(`/api/regions?group_id=${Group.currentGroup.id}`, JSON.stringify(region))
     }
 
-    static async delete(group) {
-        return deleteJSON(`/api/groups/${group.id}`, '')
+    static async delete(region) {
+        // return deleteJSON(`/api/groups/${region.id}`, '')
     }
 
-    static async update(group) {
-        return putJSON(`/api/groups/${group.id}`, JSON.stringify(group))
+    static async update(region) {
+        // return putJSON(`/api/groups/${region.id}`, JSON.stringify(region))
     }
 }

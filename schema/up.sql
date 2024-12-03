@@ -74,7 +74,7 @@ CREATE TABLE markerspace.points (
     name VARCHAR(255) NOT NULL,
     geometry GEOMETRY(POINT, 4326) NOT NULL,
     -- image_id INT REFERENCES media.images(id),
-    regionId INT NOT NULL REFERENCES userspace.regions(id)
+    region_id INT NOT NULL REFERENCES userspace.regions(id)
 );
 
 -- a polygons table
@@ -83,7 +83,7 @@ CREATE TABLE markerspace.polygons (
     type markerspace.marker_type NOT NULL DEFAULT 'polygon' CHECK (type = 'polygon'),
     name VARCHAR(255) NOT NULL,
     geometry GEOMETRY(POLYGON, 4326) NOT NULL,
-    regionId INT NOT NULL REFERENCES userspace.regions(id)
+    region_id INT NOT NULL REFERENCES userspace.regions(id)
 );
 
 -- a lines table
@@ -92,9 +92,26 @@ CREATE TABLE markerspace.lines (
     type markerspace.marker_type NOT NULL DEFAULT 'line' CHECK (type = 'line'),
     name VARCHAR(255) NOT NULL,
     geometry GEOMETRY(LINESTRING, 4326) NOT NULL,
-    regionId INT NOT NULL REFERENCES userspace.regions(id)
+    region_id INT NOT NULL REFERENCES userspace.regions(id)
 );
 
 
-INSERT INTO userspace.groups (name) VALUES ('test-group');
-INSERT INTO userspace.regions (name, group_id) VALUES ('test-region', 1);
+-- TODO: add roles
+INSERT INTO rbac.roles (name) VALUES ('admin');
+
+-- TODO: add a function for creating a group
+CREATE FUNCTION new_group(group_name VARCHAR(255), user_id INT)
+RETURNS INT AS $$
+DECLARE
+    group_id INT;
+BEGIN
+    INSERT INTO userspace.groups (name)
+    VALUES (group_name)
+    RETURNING id INTO group_id;
+    
+    INSERT INTO userspace.users_groups_relation (group_id, user_id, user_role_id)
+    VALUES (group_id, user_id, 1);
+
+    RETURN group_id;
+END;
+$$ LANGUAGE plpgsql

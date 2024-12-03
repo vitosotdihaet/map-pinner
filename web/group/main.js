@@ -8,3 +8,8 @@ class Group {
         this.users = data.users
     }
 }
+
+groupInfo = localStorage.getItem('group')
+if (groupInfo) {
+    Group.currentGroup = new Group(JSON.parse(groupInfo))
+}

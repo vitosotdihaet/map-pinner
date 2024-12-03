@@ -3,8 +3,12 @@ class GroupFetch {
         return getJSON('/api/groups')
     }
 
+    static async getById(groupId) {
+        return getJSON(`/api/groups/${groupId}`)
+    }
+
     static async create(group) {
-        return postJSON('/api/groups', JSON.stringify(group))
+        return postJSON(`/api/groups?author_id=${User.currentUser.id}`, JSON.stringify(group))
     }
 
     static async delete(group) {

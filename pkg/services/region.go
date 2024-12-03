@@ -15,12 +15,12 @@ func NewRegionService(database controllers.Region) *RegionService {
 	}
 }
 
-func (service *RegionService) Create(region entities.Region) (uint64, error) {
-	return service.database.Create(region)
+func (service *RegionService) Create(region entities.Region, groupId uint64) (uint64, error) {
+	return service.database.Create(region, groupId)
 }
 
-func (service *RegionService) GetAll() ([]entities.Region, error) {
-	return service.database.GetAll()
+func (service *RegionService) GetAll(groupId uint64) ([]entities.Region, error) {
+	return service.database.GetAll(groupId)
 }
 
 func (service *RegionService) GetById(id uint64) (entities.Region, error) {

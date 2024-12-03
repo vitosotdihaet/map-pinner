@@ -5,32 +5,34 @@
 
     <link rel="icon" type="image/png" href="/static/icon.png">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet.geodesic"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.6.1/randomColor.js"></script>
-
     <link rel="stylesheet" href="/static/styles/common.css"></link>
     <link rel="stylesheet" href="/static/styles/group.css"></link>
 </head>
 <body>
     <div class="sidebar">
+        <h1>Account info</h1>
         <label for="userName">Your Name: </label>
         <label id="userName"></label>
+        <h1>Your groups</h1>
+        <label>New group:</label>
+        <input type="text" id="groupName" placeholder="New group name"/>
+        <button id="createNewGroup">Create</button>
         <br>
-        <br>
-        <label for="groupSelect">Select group:</label>
+        <label>Select a group:</label>
         <select id="groupSelect">
             <option value="">Choose a group</option>
         </select>
-        <br>
-        <label for="groupSelect">Create a new group: </label>
-        <input type="text" id="groupName" placeholder="New group name"/>
-        <button id="createNewGroup">Create</button>
+        <div id="region">
+            <h1>Regions in a selected group</h1>
+            <label>New region:</label>
+            <input type="text" id="regionName" placeholder="New region name"/>
+            <button id="createNewRegion">Create</button>
+            <br>
+            <label for="regionButtons">Select a region:</label>
+            <div id="regionButtons"></div>
+        </div>
     </div>
     <div class="main">
-        <div id="map"></div>
         <script src="/static/requests.js"></script>
         <script src="/static/user/fetch.js"></script>
         <script src="/static/user/main.js"></script>
@@ -38,6 +40,9 @@
         <script src="/static/group/fetch.js"></script>
         <script src="/static/group/main.js"></script>
         <script src="/static/group/group.js"></script>
+        <script src="/static/region/fetch.js"></script>
+        <script src="/static/region/main.js"></script>
+        <script src="/static/region/group.js"></script>
     </div>
 </body>
 <div href="https://www.flaticon.com/free-icons/map-pin" title="map pin icons"></div>

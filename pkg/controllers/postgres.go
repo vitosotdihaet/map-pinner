@@ -13,7 +13,7 @@ const (
 	linesTable    = "markerspace.lines"
 	groupsTable   = "userspace.groups"
 	usersTable    = "userspace.users"
-	regionsTable  = "markerspace.regions"
+	regionsTable  = "userspace.regions"
 )
 
 type Config struct {

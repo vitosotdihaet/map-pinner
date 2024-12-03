@@ -20,7 +20,7 @@ func (postgres *LinePostgres) Create(regionId uint64, line entities.Line) (uint6
 	postgisPoints := pointsToWKT(line.Points)
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geometry, regionId) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v), $2) RETURNING id;",
+		"INSERT INTO %s (name, geometry, region_id) VALUES ($1, ST_SetSRID(ST_MakeLine(ARRAY[%s]), %v), $2) RETURNING id;",
 		linesTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
 
@@ -36,7 +36,7 @@ func (postgres *LinePostgres) Create(regionId uint64, line entities.Line) (uint6
 
 func (postgres *LinePostgres) GetAll(regionId uint64) ([]entities.Line, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s WHERE regionId = $1;", linesTable,
+		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s WHERE region_id = $1;", linesTable,
 	)
 
 	rows, err := postgres.postgres.Query(query, regionId)

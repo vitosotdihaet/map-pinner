@@ -24,15 +24,15 @@ type User interface {
 
 type Group interface {
 	GetAll() ([]entities.Group, error)
-	Create(group entities.Group) (uint64, error)
+	Create(group entities.Group, authorId uint64) (uint64, error)
 	GetById(id uint64) (entities.Group, error)
 	UpdateById(id uint64, groupUpdate entities.GroupUpdate) error
 	DeleteById(id uint64) error
 }
 
 type Region interface {
-	GetAll() ([]entities.Region, error)
-	Create(region entities.Region) (uint64, error)
+	GetAll(groupId uint64) ([]entities.Region, error)
+	Create(region entities.Region, groupId uint64) (uint64, error)
 	GetById(id uint64) (entities.Region, error)
 	UpdateById(id uint64, regionUpdate entities.RegionUpdate) error
 	DeleteById(id uint64) error

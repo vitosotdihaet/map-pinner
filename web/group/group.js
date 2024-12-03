@@ -2,10 +2,10 @@ Group.createNewGroup = async (name) => {
     let group = new Group({ name:name })
 
     let newId = await GroupFetch.create(group)
-    group.id = newId
+    group.id = newId.id
 
     Group.loaded.push(group)
-    Group.populateOptions()
+    Group.addButton(group)
 
     return group
 }
@@ -21,16 +21,20 @@ Group.reloadAll = async () => {
             Group.loaded.push(new Group(groupData))
         })
     } catch (error) {}
-    Group.populateOptions()
+    Group.populateButtons()
 }
 
-Group.populateOptions = () => {
-    groupSelect.options.length = 0
+Group.addButton = (group) => {
+    const option = document.createElement('option');
+    option.value = group.id;
+    option.text = group.name;
+    groupSelect.appendChild(option);
+}
+
+Group.populateButtons = () => {
+    groupSelect.options.length = 1
     Group.loaded.forEach(group => {
-        const option = document.createElement('option');
-        option.value = group.id;
-        option.text = group.name;
-        groupSelect.appendChild(option);
+        Group.addButton(group) 
     });
 }
 
@@ -50,9 +54,11 @@ newGroupNameInput.addEventListener('input', () => {
 });
 
 newGroupButton.addEventListener('click', function(event) {
+    event.preventDefault()
     const inputLength = newGroupNameInput.value.length;
     if (inputLength > 2 && inputLength < 256) {
         Group.createNewGroup(newGroupNameInput.value)
+        newGroupNameInput.value = ''
     } else {
         throw "you little bastard..."
     }
@@ -60,9 +66,17 @@ newGroupButton.addEventListener('click', function(event) {
 
 
 const groupSelect = document.getElementById("groupSelect");
-groupSelect.addEventListener("change", () => {
-    const selectedValue = groupSelect.value;
-    console.log(selectedValue);
+groupSelect.addEventListener("change", async () => {
+    const groupId = groupSelect.value;
+
+    if (groupId == '') {
+        Group.currentGroup = null
+        deactivateRegions()
+    } else {
+        Group.currentGroup = new Group(await GroupFetch.getById(groupId))
+        activateRegions()
+        Region.reloadAll()
+    }
 });
 
 Group.reloadAll()

@@ -23,7 +23,7 @@ func (postgres *PolygonPostgres) Create(regionId uint64, polygon entities.Polygo
 	}
 
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, geometry, regionId) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v), $2) RETURNING id;",
+		"INSERT INTO %s (name, geometry, region_id) VALUES ($1, ST_SetSRID(ST_MakePolygon(ST_MakeLine(ARRAY[%s])), %v), $2) RETURNING id;",
 		polygonsTable, strings.Join(postgisPoints, ", "), WGSSRID,
 	)
 
@@ -39,7 +39,7 @@ func (postgres *PolygonPostgres) Create(regionId uint64, polygon entities.Polygo
 
 func (postgres *PolygonPostgres) GetAll(regionId uint64) ([]entities.Polygon, error) {
 	query := fmt.Sprintf(
-		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s WHERE regionId = $1;", polygonsTable,
+		"SELECT id, name, ST_AsText(geometry) AS geometry FROM %s WHERE region_id = $1;", polygonsTable,
 	)
 
 	rows, err := postgres.postgres.Query(query, regionId)

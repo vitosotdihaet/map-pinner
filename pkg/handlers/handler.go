@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/vitosotdihaet/map-pinner/pkg/middleware"
 	"github.com/vitosotdihaet/map-pinner/pkg/services"
 )
 
@@ -62,10 +61,10 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 		users.GET("/", handler.getUsers)
 		users.POST("/", handler.createUser)
 		users.GET("/bynamepassword", handler.getUserByNamePassword)
-		users.GET("/current-user", middleware.JWTAuthMiddleware, handler.getAuthenticatedUser)
+		users.GET("/current-user", handler.JWTAuthMiddleware, handler.getAuthenticatedUser)
 	}
 
-	api := router.Group("/api", middleware.JWTAuthMiddleware)
+	api := router.Group("/api", handler.JWTAuthMiddleware)
 	{
 		markers := api.Group("/markers")
 		markers.POST("/:type", handler.createMarker)
@@ -76,10 +75,12 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 
 		groups := api.Group("/groups")
 		groups.POST("/", handler.createGroup)
+		groups.GET("/:id", handler.getGroupById)
 		groups.GET("/", handler.getGroups)
 
-		regions := groups.Group("/regions")
+		regions := api.Group("/regions")
 		regions.GET("/", handler.getRegions)
+		regions.POST("/", handler.createRegion)
 	}
 
 	return router
