@@ -4,6 +4,9 @@ Region.createNewRegion = async (name) => {
     let newId = await RegionFetch.create(region)
     region.id = newId.id
 
+    if (Region.loaded.length == 0) {
+        regionButtons.innerHTML = ''
+    }
     Region.loaded.push(region)
     Region.addButton(region)
 
@@ -11,20 +14,27 @@ Region.createNewRegion = async (name) => {
 }
 
 Region.reloadAll = async () => {
-    try {
-        const regionData = await RegionFetch.getAll();
-        if (regionData === null) { return }
-        
-        Region.loaded = []
+    Region.loaded = []
 
+    regionData = null
+    try {
+        regionData = await RegionFetch.getAll();
+    } catch (error) {
+        console.error(`could not fetch regions: ${error}`)
+    }
+
+    if (regionData !== null) {
         regionData.forEach(regionData => {
             Region.loaded.push(new Region(regionData))
         })
-    } catch (error) {
-        console.error('epic fail')
     }
+
     Region.populateButtons()
 }
+
+
+const regionButtons = document.getElementById('regionButtons')
+const noMapsLabel = document.getElementById('noMapsLabel')
 
 Region.addButton = (region) => {
     const button = document.createElement('button');
@@ -38,15 +48,23 @@ Region.addButton = (region) => {
         window.location.href = '/static/map.html'
     });
 
-    regionButtonsContainer.appendChild(button);
-    regionButtonsContainer.appendChild(document.createElement('br'));
+    regionButtons.appendChild(button);
+    regionButtons.appendChild(document.createElement('br'));
 }
 
 Region.populateButtons = async () => {
-    regionButtonsContainer.innerHTML = ''
-    Region.loaded.forEach((region) => {
-        Region.addButton(region)
-    });
+    regionButtons.innerHTML = ''
+
+    if (Region.loaded.length == 0) {
+        const noMapsLabel = document.createElement('p')
+        noMapsLabel.id = 'noMaps'
+        noMapsLabel.textContent = 'No maps in this group'
+        regionButtons.appendChild(noMapsLabel)
+    } else {
+        Region.loaded.forEach((region) => {
+            Region.addButton(region)
+        });
+    }
 }
 
 
@@ -73,8 +91,6 @@ newRegionButton.addEventListener('click', function(event) {
 })
 
 
-const regionButtonsContainer = document.getElementById('regionButtons');
-
 regionsDiv = document.getElementById('region')
 function deactivateRegions() {
     regionsDiv.style.pointerEvents = 'none'
@@ -89,10 +105,6 @@ function activateRegions() {
 }
 
 
-deactivateRegions()
-if (Region.currentGroup != null) {
-    activateRegions()
-    Region.reloadAll()
-}
+groupSelect.dispatchEvent(new Event('change'))
 
 

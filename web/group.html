@@ -19,37 +19,37 @@
         <button id="createNewGroup">Create</button>
         <br>
         <label>Select a group:</label>
-        <select id="groupSelect">
-            <option value="">Choose a group</option>
+        <select id="groupSelect" placeholder="New map name">
+            <!-- <option value="">Choose a group</option> -->
         </select>
 
         <div id="region">
-            <h1>Regions in a selected group</h1>
-            <label>New region:</label>
-            <input type="text" id="regionName" placeholder="New region name"/>
+            <h1>Maps in a selected group</h1>
+            <label>New map:</label>
+            <input type="text" id="regionName" placeholder="New map name"/>
             <button id="createNewRegion">Create</button>
             <br>
-            <label for="regionButtons">Select a region:</label>
+            <label for="regionButtons">Select a map:</label>
             <div id="regionButtons"></div>
         </div>
 
         <div class="quit-button">
             <button id="quitButton" onclick="quit()">Quit</button>
         </div>
-
-        <script src="/static/requests.js"></script>
-        <script src="/static/user/fetch.js"></script>
-        <script src="/static/user/main.js"></script>
-        <script src="/static/user/group.js"></script>
-        <script src="/static/check-jwt.js"></script>
-        <script src="/static/group/fetch.js"></script>
-        <script src="/static/group/main.js"></script>
-        <script src="/static/group/group.js"></script>
-        <script src="/static/region/fetch.js"></script>
-        <script src="/static/region/main.js"></script>
-        <script src="/static/region/group.js"></script>
-        <script src="/static/quit.js"></script>
     </div>
+
+    <script src="/static/requests.js"></script>
+    <script src="/static/user/fetch.js"></script>
+    <script src="/static/user/main.js"></script>
+    <script src="/static/user/group.js"></script>
+    <script src="/static/check-jwt.js"></script>
+    <script src="/static/group/fetch.js"></script>
+    <script src="/static/group/main.js"></script>
+    <script src="/static/group/group.js"></script>
+    <script src="/static/region/fetch.js"></script>
+    <script src="/static/region/main.js"></script>
+    <script src="/static/region/group.js"></script>
+    <script src="/static/quit.js"></script>
 </body>
 <div href="https://www.flaticon.com/free-icons/map-pin" title="map pin icons"></div>
 </html>
