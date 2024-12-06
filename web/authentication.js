@@ -1,6 +1,28 @@
-document.getElementById("loginButton").addEventListener("click", async () => {
-    const userName = document.getElementById("userName").value
-    const password = document.getElementById("password").value
+const userNameInput = document.getElementById("userName")
+const passwordInput = document.getElementById("password")
+
+function inputsAreOk() {
+    // TODO: change to 8
+    return userNameInput.value.length >= 3 && passwordInput.value.length >= 3
+}
+
+function toggleButtons() {
+    if (inputsAreOk()) {
+        loginButton.disabled = false
+        registerButton.disabled = false
+    } else {
+        loginButton.disabled = true
+        registerButton.disabled = true
+    }
+}
+
+userNameInput.addEventListener('input', toggleButtons)
+passwordInput.addEventListener('input', toggleButtons)
+
+const loginButton = document.getElementById("loginButton")
+loginButton.addEventListener("click", async () => {
+    const userName = userNameInput.value
+    const password = passwordInput.value
 
     try {
         response = await UserFetch.getByUsernamePassword(userName, password);
@@ -18,9 +40,11 @@ document.getElementById("loginButton").addEventListener("click", async () => {
     }
 });
 
-document.getElementById("registerButton").addEventListener("click", async () => {
-    const userName = document.getElementById("userName").value
-    const password = document.getElementById("password").value
+
+const registerButton = document.getElementById("registerButton")
+registerButton.addEventListener("click", async () => {
+    const userName = userNameInput.value
+    const password = passwordInput.value
 
     try {
         const response = await UserFetch.createWithNamePassword(userName, password);
@@ -34,3 +58,7 @@ document.getElementById("registerButton").addEventListener("click", async () => 
         console.error("Error during registration:", error)
     }
 });
+
+
+loginButton.disabled = true
+registerButton.disabled = true

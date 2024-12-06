@@ -27,8 +27,8 @@ func (handler *Handler) createUser(context *gin.Context) {
 	inputPassword.Value = context.Query("password")
 	inputUser.Name = context.Query("username")
 
-	// TODO: min length is 8
-	if len(inputPassword.Value) < 1 || len(inputUser.Name) < 1 {
+	// TODO: change to 8
+	if len(inputPassword.Value) < 3 || len(inputUser.Name) < 3 {
 		newErrorResponse(context, http.StatusBadRequest, "Input data is too small")
 		return
 	}
@@ -53,8 +53,8 @@ func (handler *Handler) getUserByNamePassword(context *gin.Context) {
 	inputPassword.Value = context.Query("password")
 	inputUser.Name = context.Query("username")
 
-	// TODO: min length is 8
-	if len(inputPassword.Value) < 1 || len(inputUser.Name) < 1 {
+	// TODO: change to 8
+	if len(inputPassword.Value) < 3 || len(inputUser.Name) < 3 {
 		newErrorResponse(context, http.StatusBadRequest, "Input data is too small")
 		return
 	}
