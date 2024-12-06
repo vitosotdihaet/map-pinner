@@ -84,6 +84,7 @@ class Line {
     }
     
     update(updateInfo) {
+        // TODO: prevent updating if not enough rights
         if (updateInfo.name !== undefined) {
             this.name = updateInfo.name
         }

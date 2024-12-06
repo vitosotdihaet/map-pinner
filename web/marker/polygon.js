@@ -91,6 +91,7 @@ class Polygon {
     }
 
     update(updateInfo) {
+        // TODO: prevent updating if not enough rights
         try {
             MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
             
