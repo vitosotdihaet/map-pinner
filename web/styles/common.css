@@ -1,5 +1,5 @@
 :root {
-    --back: #efefef;
+    --back: #ececec;
     --back-hover: #e2e2e2;
     --back-disabled: #dadada;
     --border-radius: 5px;
@@ -24,6 +24,7 @@ button:hover {
 button:disabled,
 button[disabled]{
     background-color: var(--back-disabled);
+    cursor: not-allowed;
 }
 
 select {
