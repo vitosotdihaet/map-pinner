@@ -4,6 +4,7 @@ class Point {
         this.name = data.name
         this.latitude = data.latitude
         this.longitude = data.longitude
+        this.latestPosition = [this.latitude, this.longitude]
     }
 
     JSONify() {
@@ -29,16 +30,17 @@ class Point {
 
         let point = this
         let marker = this.marker
-        this.marker.on('dragend', function (event) {
+        this.marker.on('dragend', async function (event) {
             let latlng = event.target.getLatLng()
             marker.update({
                 latitude: latlng.lat,
                 longitude: latlng.lng
             })
-            point.update({
+            await point.update({
                 latitude: latlng.lat,
                 longitude: latlng.lng
             })
+            this.latestPosition = [latlng.lat, latlng.lng]
         })
 
         this.marker.bindPopup(
@@ -67,25 +69,30 @@ class Point {
         })
     }
 
-    update(updateInfo) {
-        if (updateInfo.name !== undefined) {
-            this.name = updateInfo.name
-        }
-        if (updateInfo.latitude !== undefined) {
-            this.latitude = updateInfo.latitude
-        }
-        if (updateInfo.longitude !== undefined) {
-            this.longitude = updateInfo.longitude
-        }
+    async update(updateInfo) {
+        updateInfo.id = this.id        
 
-        updateInfo.id = this.id
+        try {
+            await MarkerFetch.updateType(MarkerableTypes.Point, updateInfo)
 
-        this.hide()
-        // update the popup with new info
-        this.setupMarker()
-        this.draw()
+            if (updateInfo.name !== undefined) {
+                this.name = updateInfo.name
+            }
+            if (updateInfo.latitude !== undefined) {
+                this.latitude = updateInfo.latitude
+            }
+            if (updateInfo.longitude !== undefined) {
+                this.longitude = updateInfo.longitude
+            }
 
-        MarkerFetch.updateType(MarkerableTypes.Point, updateInfo)
+            this.latestPosition = [this.latitude, this.longitude]
+            this.hide()
+            // update the popup with new info
+            this.setupMarker()
+            this.draw()
+        } catch (error) {
+            this.marker.setLatLng(this.latestPosition)
+        }
     }
 
     updateId(newId) {

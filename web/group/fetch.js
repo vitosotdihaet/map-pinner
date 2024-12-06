@@ -15,7 +15,11 @@ class GroupFetch {
         return deleteJSON(`/api/groups/${group.id}`, '')
     }
 
-    static async update(group) {
-        return putJSON(`/api/groups/${group.id}`, JSON.stringify(group))
+    // static async update(group) {
+    //     return putJSON(`/api/groups/${group.id}`, JSON.stringify(group))
+    // }
+
+    static async addUserToGroup(groupId, userName, roleId) {
+        return postFetch(`/api/groups/${groupId}/${userName}/${roleId}`)
     }
 }

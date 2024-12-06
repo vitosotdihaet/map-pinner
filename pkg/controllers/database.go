@@ -41,9 +41,10 @@ type User interface {
 type Group interface {
 	GetAll(userId uint64) ([]entities.Group, error)
 	Create(group entities.Group, authorId uint64) (uint64, error)
-	GetById(id uint64) (entities.Group, error)
-	UpdateById(id uint64, lineUpdate entities.GroupUpdate) error
+	GetById(id uint64) (*entities.Group, error)
+	// UpdateById(id uint64, lineUpdate entities.GroupUpdate) error
 	DeleteById(id uint64) error
+	AddUserToGroup(id uint64, userName string, roleId uint64) error
 }
 
 type Region interface {
@@ -54,6 +55,14 @@ type Region interface {
 	DeleteById(id uint64) error
 }
 
+type Role interface {
+	GetAll() (map[uint64]string, error)
+	HasAtLeastRoleInGroup(groupId uint64, userId uint64, role string) (bool, error)
+	HasAtLeastRoleInRegion(regionId uint64, userId uint64, role string) (bool, error)
+	HasAtLeastRoleForMarker(markerType entities.MarkerType, markerId uint64, userId uint64, role string) (bool, error)
+	ThereIsARoleWithId(roleId uint64) (bool, error)
+}
+
 type Database struct {
 	Point
 	Polygon
@@ -61,6 +70,7 @@ type Database struct {
 	User
 	Group
 	Region
+	Role
 }
 
 func NewDatabase(postgres *sqlx.DB) *Database {
@@ -71,5 +81,6 @@ func NewDatabase(postgres *sqlx.DB) *Database {
 		User:    NewUserPostgres(postgres),
 		Group:   NewGroupPostgres(postgres),
 		Region:  NewRegionPostgres(postgres),
+		Role:    NewRolePostgres(postgres),
 	}
 }

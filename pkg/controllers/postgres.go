@@ -15,6 +15,7 @@ const (
 	usersTable               = "userspace.users"
 	usersGroupsRelationTable = "userspace.users_groups_relation"
 	regionsTable             = "userspace.regions"
+	rolesTable               = "rbac.roles"
 )
 
 type Config struct {

@@ -9,13 +9,25 @@ import (
 )
 
 func (handler *Handler) getMarkers(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	regionId, err := strconv.ParseUint(context.Query("region_id"), 10, 64)
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	markers, err := handler.service.Marker.GetAll(regionId)
+	markers, err := handler.service.Marker.GetAll(regionId, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
@@ -25,6 +37,18 @@ func (handler *Handler) getMarkers(context *gin.Context) {
 }
 
 func (handler *Handler) createMarker(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	entityType, err := entities.TypeFromString(context.Param("type"))
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
@@ -52,7 +76,7 @@ func (handler *Handler) createMarker(context *gin.Context) {
 		return
 	}
 
-	id, err := handler.service.Marker.Create(regionId, inputMarker)
+	id, err := handler.service.Marker.Create(regionId, user.ID, inputMarker)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
@@ -64,6 +88,18 @@ func (handler *Handler) createMarker(context *gin.Context) {
 }
 
 func (handler *Handler) getMarkerById(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	entityType, err := entities.TypeFromString(context.Param("type"))
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
@@ -76,7 +112,7 @@ func (handler *Handler) getMarkerById(context *gin.Context) {
 		return
 	}
 
-	marker, err := handler.service.Marker.GetById(entityType, id)
+	marker, err := handler.service.Marker.GetById(entityType, id, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
@@ -86,6 +122,18 @@ func (handler *Handler) getMarkerById(context *gin.Context) {
 }
 
 func (handler *Handler) updateMarkerById(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	entityType, err := entities.TypeFromString(context.Param("type"))
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
@@ -113,7 +161,7 @@ func (handler *Handler) updateMarkerById(context *gin.Context) {
 		return
 	}
 
-	err = handler.service.Marker.UpdateById(id, inputMarkerUpdate)
+	err = handler.service.Marker.UpdateById(id, inputMarkerUpdate, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
@@ -125,6 +173,18 @@ func (handler *Handler) updateMarkerById(context *gin.Context) {
 }
 
 func (handler *Handler) deleteMarkerById(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	entityType, err := entities.TypeFromString(context.Param("type"))
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
@@ -137,7 +197,7 @@ func (handler *Handler) deleteMarkerById(context *gin.Context) {
 		return
 	}
 
-	err = handler.service.Marker.DeleteById(entityType, id)
+	err = handler.service.Marker.DeleteById(entityType, id, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return

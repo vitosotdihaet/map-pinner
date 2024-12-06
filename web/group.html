@@ -13,13 +13,22 @@
         <h1>Account info</h1>
         <label for="userName">Your Name: </label>
         <label id="userName"></label>
-        <h1>Your groups</h1>
-        <label>New group:</label>
-        <input type="text" id="groupName" placeholder="New group name"/>
-        <button id="createNewGroup">Create</button>
-        <br>
-        <label>Select a group:</label>
-        <select id="groupSelect" placeholder="New map name"></select>
+
+        <div id="group">
+            <h1>Your groups</h1>
+            <label>New group:</label>
+            <input type="text" id="groupName" placeholder="New group name"/>
+            <button id="createNewGroup">Create</button>
+            <br>
+            <label>Select a group:</label>
+            <select id="groupSelect"></select>
+            <br>
+            <label>Add user to this group:</label>
+            <input type="text" id="addUserToGroupInput" placeholder="Username"/>
+            <label>with role</label>
+            <select id="addUserToGroupRoleSelect"></select>
+            <button id="addUserToGroupButton">Add</button>
+        </div>
 
         <div id="region">
             <h1>Maps in a selected group</h1>
@@ -37,6 +46,7 @@
     </div>
 
     <script src="/static/requests.js"></script>
+    <script src="/static/role/fetch.js"></script>
     <script src="/static/user/fetch.js"></script>
     <script src="/static/user/main.js"></script>
     <script src="/static/user/group.js"></script>

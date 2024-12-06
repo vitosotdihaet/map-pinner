@@ -60,61 +60,61 @@ func (postgres *GroupPostgres) GetAll(userId uint64) ([]entities.Group, error) {
 	return groups, nil
 }
 
-func (postgres *GroupPostgres) GetById(id uint64) (entities.Group, error) {
-	// TODO: check if user has permission to view this
+func (postgres *GroupPostgres) GetById(id uint64) (*entities.Group, error) {
 	query := fmt.Sprintf(
 		"SELECT name FROM %s WHERE id = $1;", groupsTable,
 	)
 	row := postgres.postgres.QueryRow(query, id)
 
 	var group entities.Group
-	group.ID = id
 	if err := row.Scan(&group.Name); err != nil {
-		return group, err
+		return nil, err
 	}
 
-	return group, nil
+	group.ID = id
+
+	return &group, nil
 }
 
-func (postgres *GroupPostgres) UpdateById(id uint64, groupUpdate entities.GroupUpdate) error {
-	// setValues := make([]string, 0)
-	// args := make([]interface{}, 0)
-	// argId := 1
+// func (postgres *GroupPostgres) UpdateById(id uint64, groupUpdate entities.GroupUpdate) error {
+// 	// setValues := make([]string, 0)
+// 	// args := make([]interface{}, 0)
+// 	// argId := 1
 
-	// if groupUpdate.Name != nil {
-	// 	setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
-	// 	args = append(args, *groupUpdate.Name)
-	// 	argId++
-	// }
+// 	// if groupUpdate.Name != nil {
+// 	// 	setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+// 	// 	args = append(args, *groupUpdate.Name)
+// 	// 	argId++
+// 	// }
 
-	// if groupUpdate.Latitude != nil && groupUpdate.Longitude != nil {
-	// 	setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeGroup($%d, $%d), %d)", argId, argId+1, WGSSRID))
-	// 	args = append(args, *groupUpdate.Longitude)
-	// 	args = append(args, *groupUpdate.Latitude)
-	// 	argId += 2
-	// } else {
-	// 	if groupUpdate.Latitude != nil {
-	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeGroup(ST_X(geometry), $%d), %d)", argId, WGSSRID))
-	// 		args = append(args, *groupUpdate.Latitude)
-	// 		argId++
-	// 	} else {
-	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeGroup($%d, ST_Y(geometry)), %d)", argId, WGSSRID))
-	// 		args = append(args, *groupUpdate.Longitude)
-	// 		argId++
+// 	// if groupUpdate.Latitude != nil && groupUpdate.Longitude != nil {
+// 	// 	setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeGroup($%d, $%d), %d)", argId, argId+1, WGSSRID))
+// 	// 	args = append(args, *groupUpdate.Longitude)
+// 	// 	args = append(args, *groupUpdate.Latitude)
+// 	// 	argId += 2
+// 	// } else {
+// 	// 	if groupUpdate.Latitude != nil {
+// 	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeGroup(ST_X(geometry), $%d), %d)", argId, WGSSRID))
+// 	// 		args = append(args, *groupUpdate.Latitude)
+// 	// 		argId++
+// 	// 	} else {
+// 	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeGroup($%d, ST_Y(geometry)), %d)", argId, WGSSRID))
+// 	// 		args = append(args, *groupUpdate.Longitude)
+// 	// 		argId++
 
-	// 	}
-	// }
+// 	// 	}
+// 	// }
 
-	// setQuery := strings.Join(setValues, ", ")
+// 	// setQuery := strings.Join(setValues, ", ")
 
-	// query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", groupsTable, setQuery, argId)
-	// args = append(args, id)
+// 	// query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", groupsTable, setQuery, argId)
+// 	// args = append(args, id)
 
-	// _, err := postgres.postgres.Exec(query, args...)
+// 	// _, err := postgres.postgres.Exec(query, args...)
 
-	// return err
-	return nil
-}
+// 	// return err
+// 	return nil
+// }
 
 func (postgres *GroupPostgres) DeleteById(id uint64) error {
 	query := fmt.Sprintf(
@@ -123,6 +123,24 @@ func (postgres *GroupPostgres) DeleteById(id uint64) error {
 	row := postgres.postgres.QueryRow(query, id)
 
 	if err := row.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (postgres *GroupPostgres) AddUserToGroup(id uint64, userName string, roleId uint64) error {
+	query := fmt.Sprintf(
+		`
+		INSERT INTO %s (group_id, user_id, user_role_id)
+		VALUES ($1, (SELECT id FROM %s WHERE name = $2), $3)
+		ON CONFLICT (group_id, user_id)
+		DO UPDATE SET user_role_id = EXCLUDED.user_role_id;
+		`, usersGroupsRelationTable, usersTable,
+	)
+
+	_, err := postgres.postgres.Exec(query, id, userName, roleId)
+	if err != nil {
 		return err
 	}
 

@@ -61,17 +61,69 @@ func (handler *Handler) createGroup(context *gin.Context) {
 }
 
 func (handler *Handler) getGroupById(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
+	groupId, err := strconv.ParseUint(context.Param("id"), 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	group, err := handler.service.Group.GetById(groupId, user.ID)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	context.JSON(http.StatusOK, *group)
+}
+
+func (handler *Handler) addUserToGroup(context *gin.Context) {
+	authorAny, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	author, ok := authorAny.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	id, err := strconv.ParseUint(context.Param("id"), 10, 64)
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	group, err := handler.service.Group.GetById(id)
+	userName := context.Param("username")
+
+	roleId, err := strconv.ParseUint(context.Param("role_id"), 10, 64)
 	if err != nil {
-		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	context.JSON(http.StatusOK, group)
+	err = handler.service.Group.AddUserToGroup(id, author.ID, userName, roleId)
+	if err != nil {
+		if err.Error() == "not enough rights" {
+			newErrorResponse(context, http.StatusUnauthorized, err.Error())
+		} else {
+			newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	context.Status(http.StatusOK)
 }

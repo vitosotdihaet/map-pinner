@@ -80,9 +80,13 @@ class Marker {
         this.value.updateId(this.id)
     }
 
-    delete() {
+    async delete() {
+        try {
+            await MarkerFetch.delete(this)
+        } catch (error) {
+            return            
+        }
         this.hide()
-        MarkerFetch.delete(this)
     }
 
     draw() {

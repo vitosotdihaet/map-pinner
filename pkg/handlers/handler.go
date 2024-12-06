@@ -57,31 +57,31 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	router.StaticFile("/", "./web/auth.html")
 
 	users := router.Group("/users")
-	{
-		users.GET("/", handler.getUsers)
-		users.POST("/", handler.createUser)
-		users.GET("/bynamepassword", handler.getUserByNamePassword)
-		users.GET("/current-user", handler.JWTAuthMiddleware, handler.getAuthenticatedUser)
-	}
+	users.GET("/", handler.getUsers)
+	users.POST("/", handler.createUser)
+	users.GET("/bynamepassword", handler.getUserByNamePassword)
+	users.GET("/current-user", handler.JWTAuthMiddleware, handler.getAuthenticatedUser)
 
 	api := router.Group("/api", handler.JWTAuthMiddleware)
-	{
-		markers := api.Group("/markers")
-		markers.POST("/:type", handler.createMarker)
-		markers.GET("/", handler.getMarkers)
-		markers.GET("/:type/:id", handler.getMarkerById)
-		markers.PUT("/:type/:id", handler.updateMarkerById)
-		markers.DELETE("/:type/:id", handler.deleteMarkerById)
+	markers := api.Group("/markers")
+	markers.POST("/:type", handler.createMarker)
+	markers.GET("/", handler.getMarkers)
+	markers.GET("/:type/:id", handler.getMarkerById)
+	markers.PUT("/:type/:id", handler.updateMarkerById)
+	markers.DELETE("/:type/:id", handler.deleteMarkerById)
 
-		groups := api.Group("/groups")
-		groups.POST("/", handler.createGroup)
-		groups.GET("/:id", handler.getGroupById)
-		groups.GET("/", handler.getGroups)
+	groups := api.Group("/groups")
+	groups.POST("/", handler.createGroup)
+	groups.GET("/:id", handler.getGroupById)
+	groups.GET("/", handler.getGroups)
+	groups.POST("/:id/:username/:role_id", handler.addUserToGroup)
 
-		regions := api.Group("/regions")
-		regions.GET("/", handler.getRegions)
-		regions.POST("/", handler.createRegion)
-	}
+	regions := api.Group("/regions")
+	regions.GET("/", handler.getRegions)
+	regions.POST("/", handler.createRegion)
+
+	roles := api.Group("/roles")
+	roles.GET("/", handler.getRoles)
 
 	return router
 }

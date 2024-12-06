@@ -21,27 +21,27 @@ CREATE TABLE userspace.users (
 
 
 
-CREATE TABLE rbac.permissions (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(32) NOT NULL UNIQUE
-);
+-- CREATE TABLE rbac.permissions (
+--     id SERIAL PRIMARY KEY,
+--     name VARCHAR(32) NOT NULL UNIQUE
+-- );
 
 CREATE TABLE rbac.roles (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL UNIQUE
 );
 
-CREATE TABLE rbac.roles_permissions_relation (
-    role_id INT NOT NULL REFERENCES rbac.roles(id),
-    permission_id INT NOT NULL REFERENCES rbac.permissions(id),
-    PRIMARY KEY (role_id, permission_id)
-);
+-- CREATE TABLE rbac.roles_permissions_relation (
+--     role_id INT NOT NULL REFERENCES rbac.roles(id),
+--     permission_id INT NOT NULL REFERENCES rbac.permissions(id),
+--     PRIMARY KEY (role_id, permission_id)
+-- );
 
-CREATE TABLE rbac.system_roles_relation (
-    user_id INT NOT NULL REFERENCES userspace.users(id),
-    role_id INT NOT NULL REFERENCES rbac.roles(id),
-    PRIMARY KEY (user_id, role_id)
-);
+-- CREATE TABLE rbac.system_roles_relation (
+--     user_id INT NOT NULL REFERENCES userspace.users(id),
+--     role_id INT NOT NULL REFERENCES rbac.roles(id),
+--     PRIMARY KEY (user_id, role_id)
+-- );
 
 
 
@@ -96,9 +96,6 @@ CREATE TABLE markerspace.lines (
 );
 
 
--- TODO: populate roles
-INSERT INTO rbac.roles (name) VALUES ('admin');
-
 CREATE FUNCTION new_group(group_name VARCHAR(255), user_id INT)
 RETURNS INT AS $$
 DECLARE
@@ -109,8 +106,14 @@ BEGIN
     RETURNING id INTO group_id;
     
     INSERT INTO userspace.users_groups_relation (group_id, user_id, user_role_id)
-    VALUES (group_id, user_id, 1); -- 1 = 'admin'
+    VALUES (group_id, user_id, (SELECT id FROM rbac.roles WHERE name = 'admin'));
 
     RETURN group_id;
 END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
+
+
+-- # TODO: populate roles 
+INSERT INTO rbac.roles (name) VALUES ('admin');
+INSERT INTO rbac.roles (name) VALUES ('editor');
+INSERT INTO rbac.roles (name) VALUES ('viewer');

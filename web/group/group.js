@@ -50,9 +50,6 @@ Group.populateSelect = () => {
 
 
 const newGroupNameInput = document.getElementById('groupName');
-const newGroupButton = document.getElementById('createNewGroup');
-newGroupButton.disabled = true;
-
 newGroupNameInput.addEventListener('input', () => {
     const inputLength = newGroupNameInput.value.length;
     if (inputLength > 2 && inputLength < 256) {
@@ -62,6 +59,8 @@ newGroupNameInput.addEventListener('input', () => {
     }
 });
 
+const newGroupButton = document.getElementById('createNewGroup');
+newGroupButton.disabled = true;
 newGroupButton.addEventListener('click', function(event) {
     event.preventDefault()
     const inputLength = newGroupNameInput.value.length;
@@ -74,7 +73,7 @@ newGroupButton.addEventListener('click', function(event) {
 })
 
 
-const groupSelect = document.getElementById("groupSelect");
+const groupSelect = document.getElementById('groupSelect');
 groupSelect.addEventListener('change', async () => {
     const groupId = groupSelect.value
 
@@ -88,5 +87,47 @@ groupSelect.addEventListener('change', async () => {
         Region.reloadAll()
     }
 });
+
+
+const addUserToGroupInput = document.getElementById('addUserToGroupInput')
+addUserToGroupInput.addEventListener('input', () => {
+    const inputLength = addUserToGroupInput.value.length
+    if (inputLength > 2 && inputLength < 256) {
+        addUserToGroupButton.disabled = false
+    } else {
+        addUserToGroupButton.disabled = true
+    }
+});
+
+const addUserToGroupRoleSelect = document.getElementById('addUserToGroupRoleSelect')
+async function populateRoles() {
+    roles = new Map(Object.entries(await RoleFetch.getAll()))
+
+    for (let [id, name] of roles) {
+        const option = document.createElement('option')
+        option.value = id;
+        option.text = name;
+        addUserToGroupRoleSelect.appendChild(option)
+    }
+}
+populateRoles()
+
+const addUserToGroupButton = document.getElementById('addUserToGroupButton')
+addUserToGroupButton.disabled = true;
+addUserToGroupButton.addEventListener('click', async function(event) {
+    event.preventDefault()
+    const inputLength = addUserToGroupInput.value.length
+    if (inputLength > 2 && inputLength < 256) {
+        userName = addUserToGroupInput.value
+        roleId = addUserToGroupRoleSelect.value
+
+        add = await GroupFetch.addUserToGroup(groupSelect.value, userName, roleId)
+        if (add.ok) {
+            // TODO: add to a group user list
+        } else {
+            alert('You don\'t have enough rights to add a user to this group!')
+        }
+    }
+})
 
 Group.reloadAll()

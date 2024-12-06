@@ -91,23 +91,27 @@ class Polygon {
     }
 
     update(updateInfo) {
-        if (updateInfo.name !== undefined) {
-            this.name = updateInfo.name
-        }
-        if (updateInfo.latitude !== undefined) {
-            this.latitude = updateInfo.latitude
-        }
-        if (updateInfo.longitude !== undefined) {
-            this.longitude = updateInfo.longitude
-        }
+        try {
+            MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
+            
+            if (updateInfo.name !== undefined) {
+                this.name = updateInfo.name
+            }
+            if (updateInfo.latitude !== undefined) {
+                this.latitude = updateInfo.latitude
+            }
+            if (updateInfo.longitude !== undefined) {
+                this.longitude = updateInfo.longitude
+            }
+    
+            updateInfo.id = this.id
+    
+            this.hide()
+            this.setupMarker()
+            this.draw()
+        } catch (error) {
 
-        updateInfo.id = this.id
-
-        this.hide()
-        this.setupMarker()
-        this.draw()
-
-        MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
+        }
     }
 
     updateId(newId) {

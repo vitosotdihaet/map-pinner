@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/vitosotdihaet/map-pinner/pkg/controllers"
@@ -11,17 +12,28 @@ type MarkerService struct {
 	pointDB   controllers.Point
 	polygonDB controllers.Polygon
 	lineDB    controllers.Line
+	roleDB    controllers.Role
 }
 
-func NewMarkerService(pointDB controllers.Point, polygonDB controllers.Polygon, lineDB controllers.Line) *MarkerService {
+func NewMarkerService(pointDB controllers.Point, polygonDB controllers.Polygon, lineDB controllers.Line, roleDB controllers.Role) *MarkerService {
 	return &MarkerService{
 		pointDB:   pointDB,
 		polygonDB: polygonDB,
 		lineDB:    lineDB,
+		roleDB:    roleDB,
 	}
 }
 
-func (service *MarkerService) Create(regionId uint64, marker entities.Marker) (uint64, error) {
+func (service *MarkerService) Create(regionId uint64, userId uint64, marker entities.Marker) (uint64, error) {
+	ok, err := service.roleDB.HasAtLeastRoleInRegion(regionId, userId, "editor")
+	if err != nil {
+		return 0, err
+	}
+
+	if !ok {
+		return 0, errors.New("not enough rights")
+	}
+
 	switch marker.GetType() {
 	case entities.PointType:
 		return service.pointDB.Create(regionId, *marker.(*entities.Point))
@@ -30,10 +42,20 @@ func (service *MarkerService) Create(regionId uint64, marker entities.Marker) (u
 	case entities.LineType:
 		return service.lineDB.Create(regionId, *marker.(*entities.Line))
 	}
+
 	return 0, fmt.Errorf("service: invalid marker type %s", marker.GetType())
 }
 
-func (service *MarkerService) GetAll(regionId uint64) ([]entities.Marker, error) {
+func (service *MarkerService) GetAll(regionId uint64, userId uint64) ([]entities.Marker, error) {
+	ok, err := service.roleDB.HasAtLeastRoleInRegion(regionId, userId, "viewer")
+	if err != nil {
+		return []entities.Marker{}, err
+	}
+
+	if !ok {
+		return []entities.Marker{}, errors.New("not enough rights")
+	}
+
 	points, err := service.pointDB.GetAll(regionId)
 	if err != nil {
 		return []entities.Marker{}, err
@@ -70,7 +92,16 @@ func (service *MarkerService) GetAll(regionId uint64) ([]entities.Marker, error)
 	return all, nil
 }
 
-func (service *MarkerService) GetById(markerType entities.MarkerType, id uint64) (entities.Marker, error) {
+func (service *MarkerService) GetById(markerType entities.MarkerType, id uint64, userId uint64) (entities.Marker, error) {
+	ok, err := service.roleDB.HasAtLeastRoleForMarker(markerType, id, userId, "viewer")
+	if err != nil {
+		return &entities.None{}, err
+	}
+
+	if !ok {
+		return &entities.None{}, errors.New("not enough rights")
+	}
+
 	switch markerType {
 	case entities.PointType:
 		out, err := service.pointDB.GetById(id)
@@ -85,7 +116,16 @@ func (service *MarkerService) GetById(markerType entities.MarkerType, id uint64)
 	return &entities.None{}, fmt.Errorf("service: invalid marker type %s", markerType)
 }
 
-func (service *MarkerService) UpdateById(id uint64, markerUpdate entities.Marker) error {
+func (service *MarkerService) UpdateById(id uint64, markerUpdate entities.Marker, userId uint64) error {
+	ok, err := service.roleDB.HasAtLeastRoleForMarker(markerUpdate.GetType(), id, userId, "editor")
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return errors.New("not enough rights")
+	}
+
 	switch markerUpdate.GetType() {
 	case entities.PointType:
 		return service.pointDB.UpdateById(id, *markerUpdate.(*entities.PointUpdate))
@@ -97,7 +137,16 @@ func (service *MarkerService) UpdateById(id uint64, markerUpdate entities.Marker
 	return fmt.Errorf("service: invalid marker type %s", markerUpdate.GetType())
 }
 
-func (service *MarkerService) DeleteById(markerType entities.MarkerType, id uint64) error {
+func (service *MarkerService) DeleteById(markerType entities.MarkerType, id uint64, userId uint64) error {
+	ok, err := service.roleDB.HasAtLeastRoleForMarker(markerType, id, userId, "editor")
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return errors.New("not enough rights")
+	}
+
 	switch markerType {
 	case entities.PointType:
 		return service.pointDB.DeleteById(id)
