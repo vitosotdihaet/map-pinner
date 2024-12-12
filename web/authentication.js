@@ -2,8 +2,10 @@ const userNameInput = document.getElementById("userName")
 const passwordInput = document.getElementById("password")
 
 function inputsAreOk() {
-    // TODO: change to 8
-    return userNameInput.value.length >= 3 && passwordInput.value.length >= 3
+    return !(
+        (passwordInput.value.length < 8 && userNameInput.value.length < 8) ||
+        (passwordInput.value.length > 72 || userNameInput.value.length > 32)
+    )
 }
 
 function toggleButtons() {

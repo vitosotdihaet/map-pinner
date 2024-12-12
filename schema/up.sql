@@ -16,7 +16,8 @@ CREATE TYPE markerspace.marker_type AS ENUM ('point', 'polygon', 'line');
 CREATE TABLE userspace.users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL UNIQUE,
-    password BYTEA NOT NULL
+    password VARCHAR NOT NULL,
+    system_role_id INT NOT NULL
 );
 
 
@@ -27,6 +28,11 @@ CREATE TABLE userspace.users (
 -- );
 
 CREATE TABLE rbac.roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(32) NOT NULL UNIQUE
+);
+
+CREATE TABLE rbac.system_roles (
     id SERIAL PRIMARY KEY,
     name VARCHAR(32) NOT NULL UNIQUE
 );
@@ -113,7 +119,10 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- # TODO: populate roles 
+
 INSERT INTO rbac.roles (name) VALUES ('admin');
 INSERT INTO rbac.roles (name) VALUES ('editor');
 INSERT INTO rbac.roles (name) VALUES ('viewer');
+
+INSERT INTO rbac.system_roles (name) VALUES ('owner');
+INSERT INTO rbac.system_roles (name) VALUES ('user');

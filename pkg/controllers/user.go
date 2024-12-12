@@ -18,8 +18,13 @@ func NewUserPostgres(postgres *sqlx.DB) *UserPostgres {
 
 func (postgres *UserPostgres) Create(user entities.User, password entities.HashedPassword) (uint64, error) {
 	query := fmt.Sprintf(
-		"INSERT INTO %s (name, password) VALUES ($1, $2) RETURNING id;",
-		usersTable,
+		`INSERT INTO %s (name, password, system_role_id)
+		VALUES ($1, $2, (
+			SELECT id
+			FROM %s
+			WHERE name = 'user'
+		)) RETURNING id;`,
+		usersTable, systemRolesTable,
 	)
 	row := postgres.postgres.QueryRow(query, user.Name, password.Value)
 
@@ -72,26 +77,22 @@ func (postgres *UserPostgres) GetById(id uint64) (entities.User, error) {
 	return user, nil
 }
 
-func (postgres *UserPostgres) GetByNamePassword(user entities.User, password entities.HashedPassword) (*entities.User, error) {
-	var password_matching bool
+func (postgres *UserPostgres) GetByName(user entities.User) (*entities.User, entities.HashedPassword, error) {
+	var hashedPassword entities.HashedPassword
 	query := fmt.Sprintf(
-		"SELECT id, name, password = $2 as password_matching FROM %s WHERE name = $1;", usersTable,
+		"SELECT id, name, password FROM %s WHERE name = $1;", usersTable,
 	)
-	row := postgres.postgres.QueryRow(query, user.Name, password.Value)
-	err := row.Scan(&user.ID, &user.Name, &password_matching)
+	row := postgres.postgres.QueryRow(query, user.Name)
+	err := row.Scan(&user.ID, &user.Name, &hashedPassword.Value)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, entities.HashedPassword{}, nil
 		}
-		return nil, err
+		return nil, entities.HashedPassword{}, err
 	}
 
-	if password_matching {
-		return &user, nil
-	}
-
-	return nil, nil
+	return &user, hashedPassword, nil
 }
 
 // func (postgres *UserPostgres) UpdateById(id uint64, userUpdate entities.UserUpdate) error {

@@ -27,8 +27,8 @@ func (service *UserService) GetById(id uint64) (entities.User, error) {
 	return service.database.GetById(id)
 }
 
-func (service *UserService) GetByNamePassword(user entities.User, password entities.HashedPassword) (*entities.User, error) {
-	return service.database.GetByNamePassword(user, password)
+func (service *UserService) GetByName(user entities.User) (*entities.User, entities.HashedPassword, error) {
+	return service.database.GetByName(user)
 }
 
 // func (service *UserService) UpdateById(id uint64, userUpdate entities.UserUpdate) error {

@@ -33,7 +33,7 @@ type User interface {
 	GetAll() ([]entities.User, error)
 	Create(user entities.User, password entities.HashedPassword) (uint64, error)
 	GetById(id uint64) (entities.User, error)
-	GetByNamePassword(user entities.User, password entities.HashedPassword) (*entities.User, error)
+	GetByName(user entities.User) (*entities.User, entities.HashedPassword, error)
 	// UpdateById(id uint64, lineUpdate entities.GroupUpdate) error
 	DeleteById(id uint64) error
 }
@@ -56,11 +56,15 @@ type Region interface {
 }
 
 type Role interface {
-	GetAll() (map[uint64]string, error)
+	GetAllRoles() (map[uint64]string, error)
+
 	HasAtLeastRoleInGroup(groupId uint64, userId uint64, role string) (bool, error)
 	HasAtLeastRoleInRegion(regionId uint64, userId uint64, role string) (bool, error)
 	HasAtLeastRoleForMarker(markerType entities.MarkerType, markerId uint64, userId uint64, role string) (bool, error)
 	ThereIsARoleWithId(roleId uint64) (bool, error)
+
+	ThereIsASystemRoleWithId(roleId uint64) (bool, error)
+	HasAtLeastSystemRole(userId uint64, role string) (bool, error)
 }
 
 type Database struct {

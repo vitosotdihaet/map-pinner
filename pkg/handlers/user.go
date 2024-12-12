@@ -27,13 +27,23 @@ func (handler *Handler) createUser(context *gin.Context) {
 	inputPassword.Value = context.Query("password")
 	inputUser.Name = context.Query("username")
 
-	// TODO: change to 8
-	if len(inputPassword.Value) < 3 || len(inputUser.Name) < 3 {
+	passwordLength := len(inputPassword.Value)
+	nameLength := len(inputUser.Name)
+	if passwordLength < 8 || nameLength < 8 {
 		newErrorResponse(context, http.StatusBadRequest, "Input data is too small")
+		return
+	} else if passwordLength > 72 || nameLength > 32 {
+		newErrorResponse(context, http.StatusBadRequest, "Input data is too big")
 		return
 	}
 
-	var hashedPassword = entities.HashedPassword{Value: misc.Hash(inputPassword.Value)}
+	passwordHash, err := misc.Hash(inputPassword.Value)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var hashedPassword = entities.HashedPassword{Value: passwordHash}
 
 	id, err := handler.service.User.Create(inputUser, hashedPassword)
 	if err != nil {
@@ -53,21 +63,27 @@ func (handler *Handler) getUserByNamePassword(context *gin.Context) {
 	inputPassword.Value = context.Query("password")
 	inputUser.Name = context.Query("username")
 
-	// TODO: change to 8
-	if len(inputPassword.Value) < 3 || len(inputUser.Name) < 3 {
+	passwordLength := len(inputPassword.Value)
+	nameLength := len(inputUser.Name)
+	if passwordLength < 8 || nameLength < 8 {
 		newErrorResponse(context, http.StatusBadRequest, "Input data is too small")
+		return
+	} else if passwordLength > 72 || nameLength > 32 {
+		newErrorResponse(context, http.StatusBadRequest, "Input data is too big")
 		return
 	}
 
-	var hashedPassword = entities.HashedPassword{Value: misc.Hash(inputPassword.Value)}
-
-	user, err := handler.service.User.GetByNamePassword(inputUser, hashedPassword)
+	user, hashedPassword, err := handler.service.User.GetByName(inputUser)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
 	}
 	if user == nil {
 		newErrorResponse(context, http.StatusForbidden, "User not found")
+		return
+	}
+	if !misc.VerifyPassword(inputPassword.Value, hashedPassword.Value) {
+		newErrorResponse(context, http.StatusForbidden, "Wrong password")
 		return
 	}
 

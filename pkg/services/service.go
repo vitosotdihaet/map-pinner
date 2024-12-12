@@ -17,7 +17,7 @@ type User interface {
 	GetAll() ([]entities.User, error)
 	Create(user entities.User, password entities.HashedPassword) (uint64, error)
 	GetById(id uint64) (entities.User, error)
-	GetByNamePassword(user entities.User, password entities.HashedPassword) (*entities.User, error)
+	GetByName(user entities.User) (*entities.User, entities.HashedPassword, error)
 	// UpdateById(id uint64, lineUpdate entities.GroupUpdate) error
 	DeleteById(id uint64) error
 }

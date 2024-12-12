@@ -15,7 +15,7 @@ func NewRolePostgres(postgres *sqlx.DB) *RolePostgres {
 	return &RolePostgres{postgres: postgres}
 }
 
-func (postgres *RolePostgres) GetAll() (map[uint64]string, error) {
+func (postgres *RolePostgres) GetAllRoles() (map[uint64]string, error) {
 	query := fmt.Sprintf("SELECT id, name FROM %s", rolesTable)
 
 	rows, err := postgres.postgres.Query(query)
@@ -153,6 +153,50 @@ func (postgres *RolePostgres) ThereIsARoleWithId(roleId uint64) (bool, error) {
 
 	var count int
 	row := postgres.postgres.QueryRow(query, roleId)
+	if err := row.Scan(&count); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func (postgres *RolePostgres) ThereIsASystemRoleWithId(roleId uint64) (bool, error) {
+	query := fmt.Sprintf(
+		`
+		SELECT COUNT(*)
+		FROM %s
+		WHERE id = $1
+		`, systemRolesTable,
+	)
+
+	var count int
+	row := postgres.postgres.QueryRow(query, roleId)
+	if err := row.Scan(&count); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func (postgres *RolePostgres) HasAtLeastSystemRole(userId uint64, role string) (bool, error) {
+	query := fmt.Sprintf(
+		`
+		SELECT COUNT(*)
+		FROM %s
+		WHERE id = $1 AND user_role_id IN (
+			SELECT id
+			FROM %s
+			WHERE id <= (
+				SELECT id
+				FROM %s
+				WHERE name = $2
+			)
+		)
+		`, usersTable, systemRolesTable, systemRolesTable,
+	)
+
+	var count int
+	row := postgres.postgres.QueryRow(query, userId, role)
 	if err := row.Scan(&count); err != nil {
 		return false, err
 	}

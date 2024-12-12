@@ -13,5 +13,5 @@ func NewRoleService(database controllers.Role) *RoleService {
 }
 
 func (service *RoleService) GetAll() (map[uint64]string, error) {
-	return service.database.GetAll()
+	return service.database.GetAllRoles()
 }
