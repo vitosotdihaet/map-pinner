@@ -15,3 +15,7 @@ func NewRoleService(database controllers.Role) *RoleService {
 func (service *RoleService) GetAll() (map[uint64]string, error) {
 	return service.database.GetAllRoles()
 }
+
+func (service *RoleService) HasAtLeastSystemRole(userId uint64, role string) (bool, error) {
+	return service.database.HasAtLeastSystemRole(userId, role)
+}

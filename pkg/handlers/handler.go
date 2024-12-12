@@ -82,6 +82,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 
 	roles := api.Group("/roles")
 	roles.GET("/", handler.getRoles)
+	roles.GET("/is-owner", handler.isOwner)
 
 	return router
 }

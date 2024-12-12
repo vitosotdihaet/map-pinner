@@ -119,6 +119,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE PROCEDURE make_owner(user_id INT)
+AS $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM userspace.users WHERE id = user_id) THEN
+        UPDATE userspace.users
+        SET system_role_id = (SELECT id FROM rbac.system_roles WHERE name = 'owner')
+        WHERE id = user_id;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
 
 INSERT INTO rbac.roles (name) VALUES ('admin');
 INSERT INTO rbac.roles (name) VALUES ('editor');
