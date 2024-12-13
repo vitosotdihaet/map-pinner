@@ -124,7 +124,9 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION assign_default_roles_users()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.system_role_id := (SELECT id FROM rbac.system_roles WHERE name = 'user');
+    IF NEW.system_role_id IS NULL THEN
+        NEW.system_role_id := (SELECT id FROM rbac.system_roles WHERE name = 'user');
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -132,7 +134,9 @@ $$ LANGUAGE plpgsql;
 CREATE FUNCTION assign_default_roles_groups()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.user_role_id := (SELECT id FROM rbac.roles WHERE name = 'admin');
+    IF NEW.user_role_id IS NULL THEN
+        NEW.user_role_id := (SELECT id FROM rbac.roles WHERE name = 'admin');
+    END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
