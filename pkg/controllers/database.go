@@ -67,6 +67,8 @@ type Role interface {
 
 	ThereIsASystemRoleWithId(roleId uint64) (bool, error)
 	HasAtLeastSystemRole(userId uint64, role string) (bool, error)
+
+	GetRoleID(userId uint64, groupId uint64) (uint64, error)
 }
 
 type Database struct {

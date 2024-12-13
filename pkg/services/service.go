@@ -43,6 +43,7 @@ type Region interface {
 type Role interface {
 	GetAll() (map[uint64]string, error)
 	HasAtLeastSystemRole(userId uint64, role string) (bool, error)
+	GetRoleID(userId uint64, groupId uint64) (uint64, error)
 }
 
 type Service struct {

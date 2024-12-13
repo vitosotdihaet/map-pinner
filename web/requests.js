@@ -21,7 +21,6 @@ async function deleteJSON(url, body) {
 
 async function putJSON(url, body) {
     const response = await putFetch(url, body)
-    console.log(response)
     if (response.status == 401) { window.location.href = '/static/auth.html' }
     if (!response.ok) { throw 'invalid put request' }
     return response.json()

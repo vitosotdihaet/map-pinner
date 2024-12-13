@@ -82,8 +82,9 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	regions.POST("/", handler.createRegion)
 
 	roles := api.Group("/roles")
-	roles.GET("/", handler.getRoles)
+	roles.GET("/all", handler.getRoles)
 	roles.GET("/is-owner", handler.isOwner)
+	roles.GET("/:group_id", handler.getCurretRole)
 
 	return router
 }

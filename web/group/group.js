@@ -93,11 +93,13 @@ groupSelect.addEventListener('change', async () => {
 
     if (groupId != '') {
         Group.currentGroup = new Group(await GroupFetch.getById(groupId))
+        Role.currentRoleID = (await RoleFetch.getRole(Group.currentGroup.id)).role_id
         unhideSelect()
         unhideRegions()
         unhideAddUserToGroup()
     } else {
         Group.currentGroup = null
+        Role.currentRoleID = null
         hideSelect()
         hideRegions()
         hideAddUserToGroup()
@@ -130,6 +132,7 @@ function unhideAddUserToGroup() {
 
 const addUserToGroupInput = document.getElementById('addUserToGroupInput')
 addUserToGroupInput.addEventListener('input', () => {
+    if (!Role.hasAtLeastRole("admin")) { return }
     const inputLength = addUserToGroupInput.value.length
     if (inputLength >= 8 && inputLength <= 32 && Group.currentGroup != null) {
         addUserToGroupButton.disabled = false
@@ -140,10 +143,10 @@ addUserToGroupInput.addEventListener('input', () => {
 
 const addUserToGroupRoleSelect = document.getElementById('addUserToGroupRoleSelect')
 async function populateRoles() {
-    while (!allRoles) {
+    while (Role.allRoles == null) {
         await new Promise(resolve => setTimeout(resolve, 50))
     }
-    for (let [id, name] of allRoles) {
+    for (let [id, name] of Role.allRoles) {
         const option = document.createElement('option')
         option.value = id
         option.text = name
@@ -155,7 +158,7 @@ populateRoles()
 const addUserToGroupButton = document.getElementById('addUserToGroupButton')
 addUserToGroupButton.disabled = true
 addUserToGroupButton.addEventListener('click', async function(event) {
-    event.preventDefault()
+    if (!Role.hasAtLeastRole("admin")) { return }
     const inputLength = addUserToGroupInput.value.length
     if (inputLength >= 8 && inputLength <= 32 && Group.currentGroup != null) {
         userName = addUserToGroupInput.value

@@ -1,6 +1,6 @@
 class RoleFetch {
     static async getAll() {
-        return getJSON(`/api/roles`)
+        return getJSON(`/api/roles/all`)
     }
 
     static async isOwner() {
@@ -10,8 +10,7 @@ class RoleFetch {
         return false
     }
 
-    // TODO
-    static async getRole() {
-
+    static async getRole(group_id) {
+        return getJSON(`/api/roles/${group_id}`)
     }
 }

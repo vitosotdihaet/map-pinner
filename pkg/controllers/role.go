@@ -203,3 +203,17 @@ func (postgres *RolePostgres) HasAtLeastSystemRole(userId uint64, role string) (
 
 	return count > 0, nil
 }
+
+func (postgres *RolePostgres) GetRoleID(userId uint64, groupId uint64) (uint64, error) {
+	query := fmt.Sprintf(
+		"SELECT user_role_id FROM %s WHERE user_id = $1 AND group_id = $2;", usersGroupsRelationTable,
+	)
+
+	var roleId uint64
+	row := postgres.postgres.QueryRow(query, userId, groupId)
+	if err := row.Scan(&roleId); err != nil {
+		return 0, err
+	}
+
+	return roleId, nil
+}
