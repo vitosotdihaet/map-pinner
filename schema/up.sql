@@ -83,8 +83,8 @@ RETURNS INT AS $$
 DECLARE
     user_id INT;
 BEGIN
-    INSERT INTO userspace.users (name, password, system_role_id)
-    VALUES (user_name, password_hash, 1)
+    INSERT INTO userspace.users (name, password)
+    VALUES (user_name, password_hash)
     RETURNING id INTO user_id;
     RETURN user_id;
 END;
@@ -100,8 +100,8 @@ BEGIN
     VALUES (group_name)
     RETURNING id INTO group_id;
     
-    INSERT INTO userspace.users_groups_relation (group_id, user_id, user_role_id)
-    VALUES (group_id, user_id, 1);
+    INSERT INTO userspace.users_groups_relation (group_id, user_id)
+    VALUES (group_id, user_id);
 
     RETURN group_id;
 END;
@@ -121,28 +121,31 @@ END;
 $$ LANGUAGE plpgsql;
 
 
-CREATE FUNCTION assign_default_roles()
+CREATE FUNCTION assign_default_roles_users()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF TG_TABLE_NAME = 'userspace.users' THEN
-        NEW.system_role_id := (SELECT id FROM rbac.system_roles WHERE name = 'user');
-    ELSIF TG_TABLE_NAME = 'userspace.users_groups_relation' THEN
-        NEW.user_role_id := (SELECT id FROM rbac.roles WHERE name = 'admin');
-    END IF;
+    NEW.system_role_id := (SELECT id FROM rbac.system_roles WHERE name = 'user');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE FUNCTION assign_default_roles_groups()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.user_role_id := (SELECT id FROM rbac.roles WHERE name = 'admin');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE TRIGGER default_role_users
 BEFORE INSERT ON userspace.users
 FOR EACH ROW
-EXECUTE FUNCTION assign_default_roles();
+EXECUTE FUNCTION assign_default_roles_users();
 
 CREATE TRIGGER default_role_groups
-BEFORE INSERT ON userspace.groups
+BEFORE INSERT ON userspace.users_groups_relation
 FOR EACH ROW
-EXECUTE FUNCTION assign_default_roles();
+EXECUTE FUNCTION assign_default_roles_groups();
 
 
 INSERT INTO rbac.roles (name) VALUES ('admin');
