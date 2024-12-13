@@ -79,3 +79,21 @@ func (service *GroupService) AddUserToGroup(groupId uint64, authorId uint64, use
 
 	return service.groupDB.AddUserToGroup(groupId, userName, roleId)
 }
+
+func (service *GroupService) GetAllUsers(groupId uint64, userId uint64) ([]entities.User, []string, error) {
+	ok, err := service.roleDB.HasAtLeastRoleInGroup(groupId, userId, "viewer")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if !ok {
+		return nil, nil, errors.New("not enough rights")
+	}
+
+	users, roles, err := service.groupDB.GetAllUsers(groupId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return users, roles, nil
+}

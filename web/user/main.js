@@ -9,7 +9,7 @@ class User {
 
 
 userInfo = localStorage.getItem('user')
-if (userInfo != null) {
+if (userInfo != null && userInfo !== 'undefined') {
     // TODO: check if user is still in the db
     User.currentUser = new User(JSON.parse(userInfo))
 }

@@ -75,6 +75,7 @@ func (handler *Handler) InitEndpoints() *gin.Engine {
 	groups.GET("/:id", handler.getGroupById)
 	groups.GET("/", handler.getGroups)
 	groups.POST("/:id/:username/:role_id", handler.addUserToGroup)
+	groups.GET("/:id/users", handler.getAllUsersInGroup)
 
 	regions := api.Group("/regions")
 	regions.GET("/", handler.getRegions)

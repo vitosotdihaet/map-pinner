@@ -18,7 +18,7 @@ Group.reloadAll = async () => {
 
     groupsData = null
     try {
-        groupsData = await GroupFetch.getAll();
+        groupsData = await GroupFetch.getAll()
     } catch (error) {
         console.error(`${error}`)
     }
@@ -33,97 +33,137 @@ Group.reloadAll = async () => {
 }
 
 Group.addOption = (group) => {
-    const option = document.createElement('option');
-    option.value = group.id;
-    option.text = group.name;
-    groupSelect.appendChild(option);
+    const option = document.createElement('option')
+    option.value = group.id
+    option.text = group.name
+    groupSelect.appendChild(option)
 }
 
 Group.populateSelect = () => {
     groupSelect.options.length = 0
     Group.loaded.forEach(group => {
         Group.addOption(group) 
-    });
+    })
     groupSelect.dispatchEvent(new Event('change'))
 }
 
 
 
-const newGroupNameInput = document.getElementById('groupName');
+const newGroupNameInput = document.getElementById('groupName')
 newGroupNameInput.addEventListener('input', () => {
-    const inputLength = newGroupNameInput.value.length;
+    const inputLength = newGroupNameInput.value.length
     if (inputLength >= 1 && inputLength <= 255) {
-        newGroupButton.disabled = false;
+        newGroupButton.disabled = false
     } else {
-        newGroupButton.disabled = true;
+        newGroupButton.disabled = true
     }
-});
+})
 
-const newGroupButton = document.getElementById('createNewGroup');
-newGroupButton.disabled = true;
+const newGroupButton = document.getElementById('createNewGroup')
+newGroupButton.disabled = true
 newGroupButton.addEventListener('click', function(event) {
     event.preventDefault()
-    const inputLength = newGroupNameInput.value.length;
+    const inputLength = newGroupNameInput.value.length
     if (inputLength >= 1 && inputLength <= 255) {
         const newGroup = Group.createNewGroup(newGroupNameInput.value)
-        groupSelect.value = newGroup.id;
+        groupSelect.value = newGroup.id
         groupSelect.dispatchEvent(new Event('change'))
         newGroupNameInput.value = ''
     }
 })
 
 
-const groupSelect = document.getElementById('groupSelect');
+function hideSelect() {
+    groupSelectLabel.hidden = true
+    groupSelect.hidden = true
+}
+
+function unhideSelect() {
+    groupSelectLabel.hidden = false
+    groupSelect.hidden = false
+}
+
+
+const groupSelectLabel = document.getElementById('groupSelectLabel')
+const groupSelect = document.getElementById('groupSelect')
 groupSelect.addEventListener('change', async () => {
     const groupId = groupSelect.value
 
+    addUserToGroupInput.value = ''
+
     if (groupId != '') {
         Group.currentGroup = new Group(await GroupFetch.getById(groupId))
-        activateRegions()
-        Region.reloadAll()
+        unhideSelect()
+        unhideRegions()
+        unhideAddUserToGroup()
     } else {
         Group.currentGroup = null
-        deactivateRegions()
-        Region.reloadAll()
+        hideSelect()
+        hideRegions()
+        hideAddUserToGroup()
     }
-});
 
+    Group.populateUsers()
+    Region.reloadAll()
+})
+
+
+addUserToGroupLabel = document.getElementById('addUserToGroupLabel')
+addUserToGroupWithRoleLabel = document.getElementById('addUserToGroupWithRoleLabel')
+function hideAddUserToGroup() {
+    addUserToGroupInput.hidden = true
+    addUserToGroupLabel.hidden = true
+    addUserToGroupInput.hidden = true
+    addUserToGroupRoleSelect.hidden = true
+    addUserToGroupButton.hidden = true
+    addUserToGroupWithRoleLabel.hidden = true
+}
+
+function unhideAddUserToGroup() {
+    addUserToGroupInput.hidden = false
+    addUserToGroupLabel.hidden = false
+    addUserToGroupInput.hidden = false
+    addUserToGroupRoleSelect.hidden = false
+    addUserToGroupButton.hidden = false
+    addUserToGroupWithRoleLabel.hidden = false
+}
 
 const addUserToGroupInput = document.getElementById('addUserToGroupInput')
 addUserToGroupInput.addEventListener('input', () => {
     const inputLength = addUserToGroupInput.value.length
-    if (inputLength >= 1 && inputLength <= 255) {
+    if (inputLength >= 8 && inputLength <= 32 && Group.currentGroup != null) {
         addUserToGroupButton.disabled = false
     } else {
         addUserToGroupButton.disabled = true
     }
-});
+})
 
 const addUserToGroupRoleSelect = document.getElementById('addUserToGroupRoleSelect')
 async function populateRoles() {
-    roles = new Map(Object.entries(await RoleFetch.getAll()))
-
-    for (let [id, name] of roles) {
+    while (!allRoles) {
+        await new Promise(resolve => setTimeout(resolve, 50))
+    }
+    for (let [id, name] of allRoles) {
         const option = document.createElement('option')
-        option.value = id;
-        option.text = name;
+        option.value = id
+        option.text = name
         addUserToGroupRoleSelect.appendChild(option)
     }
 }
 populateRoles()
 
 const addUserToGroupButton = document.getElementById('addUserToGroupButton')
-addUserToGroupButton.disabled = true;
+addUserToGroupButton.disabled = true
 addUserToGroupButton.addEventListener('click', async function(event) {
     event.preventDefault()
     const inputLength = addUserToGroupInput.value.length
-    if (inputLength >= 1 && inputLength <= 255) {
+    if (inputLength >= 8 && inputLength <= 32 && Group.currentGroup != null) {
         userName = addUserToGroupInput.value
         roleId = addUserToGroupRoleSelect.value
 
         add = await GroupFetch.addUserToGroup(groupSelect.value, userName, roleId)
         if (add.ok) {
-            // TODO: add to a group user list
+            Group.populateUsers()
         } else {
             if (add.status == 400) {
                 alert('No user with such name found! Check your spelling!')
@@ -133,5 +173,48 @@ addUserToGroupButton.addEventListener('click', async function(event) {
         }
     }
 })
+
+
+Group.addUserTableEntry = (userRole) => {
+    const row = usersInGroup.insertRow()
+    let role = row.insertCell(0)
+    role.innerHTML = userRole.role
+    let name = row.insertCell(1)
+    name.innerHTML = userRole.name
+}
+
+function hideUsersInGroup() {
+    usersInGroup.hidden = true
+    usersInGroupLabel.hidden = true
+}
+
+function unhideUsersInGroup() {
+    usersInGroup.hidden = false
+    usersInGroupLabel.hidden = false
+}
+
+const usersInGroupLabel = document.getElementById('usersInGroupLabel')
+const usersInGroup = document.getElementById('usersInGroup')
+Group.populateUsers = async () => {
+    if (Group.currentGroup == null) {
+        hideUsersInGroup()
+        return
+    } else {
+        unhideUsersInGroup()
+    }
+    const rows = usersInGroup.querySelectorAll("tr")
+    usersRoles = await GroupFetch.getAllUsers(Group.currentGroup.id)
+
+    // remove previously loaded rows
+    rows.forEach((row, index) => {
+        if (index > 0) {
+            row.remove()
+        }
+    })
+
+    for (let i = 0; i < usersRoles.users.length; ++i) {
+        Group.addUserTableEntry({name: usersRoles.users[i].name, role: usersRoles.roles[i]})
+    }
+}
 
 Group.reloadAll()

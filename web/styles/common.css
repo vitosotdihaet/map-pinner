@@ -72,3 +72,19 @@ select:hover {
     background-color: var(--red-hover);
     transition: 0.25s;
 }
+
+
+table {
+    border-collapse: collapse;
+    width: 200px;
+}
+
+td, th {
+    border: 1px solid #d7d7d7;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: var(--back);
+}

@@ -28,6 +28,7 @@ type Group interface {
 	GetById(groupId uint64, userId uint64) (*entities.Group, error)
 	// UpdateById(id uint64, groupUpdate entities.GroupUpdate) error
 	// DeleteById(id uint64) error
+	GetAllUsers(groupId uint64, userId uint64) ([]entities.User, []string, error)
 	AddUserToGroup(groupId uint64, authorId uint64, userName string, roleId uint64) error
 }
 

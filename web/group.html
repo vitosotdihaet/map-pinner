@@ -23,14 +23,22 @@
             <input type="text" id="groupName" placeholder="New group name"/>
             <button id="createNewGroup">Create</button>
             <br>
-            <label>Select a group:</label>
+            <label id="groupSelectLabel">Select a group:</label>
             <select id="groupSelect"></select>
             <br>
-            <label>Add user to this group:</label>
+            <label id="addUserToGroupLabel">Add user to this group:</label>
             <input type="text" id="addUserToGroupInput" placeholder="Username"/>
-            <label>with role</label>
+            <label id="addUserToGroupWithRoleLabel">with role</label>
             <select id="addUserToGroupRoleSelect"></select>
             <button id="addUserToGroupButton">Add</button>
+            <br>
+            <label for="usersInGroup" id="usersInGroupLabel">Users in this group:</label>
+            <table id="usersInGroup">
+                <tr>
+                    <th>Role</th>
+                    <th>Name</th>
+                </tr>
+            </table>
         </div>
 
         <div id="region">
@@ -48,12 +56,13 @@
         </div>
     </div>
 
+    <script src="/static/check-jwt.js"></script>
     <script src="/static/requests.js"></script>
     <script src="/static/role/fetch.js"></script>
+    <script src="/static/role/main.js"></script>
     <script src="/static/user/fetch.js"></script>
     <script src="/static/user/main.js"></script>
     <script src="/static/user/group.js"></script>
-    <script src="/static/check-jwt.js"></script>
     <script src="/static/group/fetch.js"></script>
     <script src="/static/group/main.js"></script>
     <script src="/static/group/group.js"></script>

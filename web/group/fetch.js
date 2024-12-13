@@ -22,4 +22,8 @@ class GroupFetch {
     static async addUserToGroup(groupId, userName, roleId) {
         return postFetch(`/api/groups/${groupId}/${userName}/${roleId}`)
     }
+
+    static async getAllUsers(groupId) {
+        return getJSON(`/api/groups/${groupId}/users`)
+    }
 }

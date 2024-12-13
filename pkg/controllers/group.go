@@ -76,6 +76,46 @@ func (postgres *GroupPostgres) GetById(id uint64) (*entities.Group, error) {
 	return &group, nil
 }
 
+func (postgres *GroupPostgres) GetAllUsers(id uint64) ([]entities.User, []string, error) {
+	query := fmt.Sprintf(
+		`
+		SELECT 
+			u.id AS id,
+			u.name AS name,
+			r.name AS role
+		FROM 
+			%s ugr
+		JOIN
+			%s u ON ugr.user_id = u.id
+		JOIN
+			%s r ON ugr.user_role_id = r.id
+		JOIN
+			%s g ON ugr.group_id = g.id
+		WHERE 
+			g.id = $1;
+		`, usersGroupsRelationTable, usersTable, rolesTable, groupsTable,
+	)
+
+	rows, err := postgres.postgres.Query(query, id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var users []entities.User
+	var roles []string
+	for rows.Next() {
+		var user entities.User
+		var role string
+		if err := rows.Scan(&user.ID, &user.Name, &role); err != nil {
+			return nil, nil, err
+		}
+		users = append(users, user)
+		roles = append(roles, role)
+	}
+
+	return users, roles, nil
+}
+
 // func (postgres *GroupPostgres) UpdateById(id uint64, groupUpdate entities.GroupUpdate) error {
 // 	// setValues := make([]string, 0)
 // 	// args := make([]interface{}, 0)

@@ -129,3 +129,34 @@ func (handler *Handler) addUserToGroup(context *gin.Context) {
 
 	context.Status(http.StatusOK)
 }
+
+func (handler *Handler) getAllUsersInGroup(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
+	groupId, err := strconv.ParseUint(context.Param("id"), 10, 64)
+	if err != nil {
+		newErrorResponse(context, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	users, roles, err := handler.service.Group.GetAllUsers(groupId, user.ID)
+	if err != nil {
+		newErrorResponse(context, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	context.JSON(http.StatusOK, map[string]interface{}{
+		"users": users,
+		"roles": roles,
+	})
+}

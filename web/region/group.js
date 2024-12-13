@@ -92,16 +92,12 @@ newRegionButton.addEventListener('click', function(event) {
 
 
 regionsDiv = document.getElementById('region')
-function deactivateRegions() {
-    regionsDiv.style.pointerEvents = 'none'
-    regionsDiv.style.opacity = '0.5'
-    regionsDiv.style.filter = 'grayscale(100%)'
+function hideRegions() {
+    regionsDiv.hidden = true
 }
 
-function activateRegions() {
-    regionsDiv.style.pointerEvents = 'auto'
-    regionsDiv.style.opacity = '1'
-    regionsDiv.style.filter = 'none'
+function unhideRegions() {
+    regionsDiv.hidden = false
 }
 
 
