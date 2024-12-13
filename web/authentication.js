@@ -3,7 +3,7 @@ const passwordInput = document.getElementById("password")
 
 function inputsAreOk() {
     return !(
-        (passwordInput.value.length < 8 && userNameInput.value.length < 8) ||
+        (passwordInput.value.length < 8 || userNameInput.value.length < 8) ||
         (passwordInput.value.length > 72 || userNameInput.value.length > 32)
     )
 }
