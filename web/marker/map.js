@@ -90,7 +90,9 @@ class Marker {
     }
 
     draw() {
-        if (Marker.shown.get(this.type).has(this.id)) { return }
+        if (Marker.shown.get(this.type).has(this.id)) {
+            Marker.shown.get(this.type).get(this.id).hide()
+        }
         this.value.draw()
         Marker.shown.get(this.type).set(this.id, this)
     }

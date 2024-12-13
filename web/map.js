@@ -47,7 +47,12 @@ class MapCallback {
     }
 }
 
+
+
+
+
 async function addPointOnMapClick(event) {
+    if (!Role.hasAtLeastRole('editor')) { return }
     // don't add new mapPoint if not left mouse button is pressed
     if (event.originalEvent.button != 0) return
 
@@ -64,6 +69,7 @@ async function addPointOnMapClick(event) {
 
 
 function addPolygonPointOnAMapClick(event) {
+    if (!Role.hasAtLeastRole('editor')) { return }
     if (event.originalEvent.button != 0) return
 
     let latlng = event.latlng
@@ -76,6 +82,7 @@ function addPolygonPointOnAMapClick(event) {
 
 
 function addLinePointOnMapClick(event) {
+    if (!Role.hasAtLeastRole('editor')) { return }
     if (event.originalEvent.button != 0) return
 
     let latlng = event.latlng
@@ -86,6 +93,20 @@ function addLinePointOnMapClick(event) {
     lineAccumulatedPoints.push(new Point({ id: 0, name: '', latitude: latlng.lat, longitude: latlng.lng}))
 }
 
+
+async function hideButtonsIfUserNotEditor() {
+    while (Role.allRoles == null) {
+        await new Promise(resolve => setTimeout(resolve, 50))
+    }
+
+    if (!Role.hasAtLeastRole('editor')) {
+        document.getElementById('newPolygon').hidden = true
+        document.getElementById('newLine').hidden = true
+    }
+}
+
+
+hideButtonsIfUserNotEditor()
 
 MapCallback.assignDefault(addPointOnMapClick)
 

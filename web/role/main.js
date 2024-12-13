@@ -16,6 +16,6 @@ class Role {
     Role.allRoles = new Map(Object.entries(await RoleFetch.getAll()))
 })();
 
-(async function __() {
+(async function _() {
     Role.currentRoleID = (await RoleFetch.getRole(Group.currentGroup.id)).role_id
 })();

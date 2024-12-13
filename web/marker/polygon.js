@@ -31,6 +31,8 @@ class Polygon {
     }
     
     setupMarker() {
+        let isEditor = Role.hasAtLeastRole('editor')
+
         this.color = randomColor({ 'luminosity': 'bright', 'hue': 'blue' })
 
         let coordinates = []
@@ -51,9 +53,7 @@ class Polygon {
         })
     
         latlngs.forEach(place => {
-            let isEditor = Role.hasAtLeastRole('editor')
             var marker = L.marker(place, { draggable: isEditor, icon: altIcon });
-            // TODO: if role is not at least editor do nothing on drag
             if (isEditor) {
                 marker.on('drag', (_) => { this.onPointDrag() })
                 marker.on('dragend', (_) => { this.pullUpdate() })
@@ -61,17 +61,31 @@ class Polygon {
             this.pointMarkers.push(marker);
         })
     
-        this.shapeMarker.bindPopup(
-            L.popup().setContent(
-                `
-                <div class='popup'>
-                    Name: <input type='text' class='popupNameInput' id='${this.id}' maxlength='255' size='10' value='${this.name}'/><br/>
-                </div>
-                <button class='popupDeleteButton' onclick='Marker.shown.get(MarkerableTypes.Polygon).get(${this.id}).delete()'>Delete</button>
-                <button class='popupUpdateButton' onclick='Marker.shown.get(MarkerableTypes.Polygon).get(${this.id}).pullUpdate()'>Update</button>
-                `
-            )
-        ).openPopup()
+        if (isEditor) {
+            this.shapeMarker.bindPopup(
+                L.popup().setContent(
+                    `
+                    <div class='popup'>
+                        Name: <input type='text' class='popupNameInput' id='${this.id}' maxlength='255' size='10' value='${this.name}'/><br/>
+                    </div>
+                    <button class='popupDeleteButton' onclick='Marker.shown.get(MarkerableTypes.Polygon).get(${this.id}).delete()'>Delete</button>
+                    <button class='popupUpdateButton' onclick='Marker.shown.get(MarkerableTypes.Polygon).get(${this.id}).pullUpdate()'>Update</button>
+                    `
+                )
+            ).openPopup()
+        } else {
+            this.shapeMarker.bindPopup(
+                L.popup().setContent(
+                    `
+                    <div class='popup'>
+                        Name: <label class='popupNameInput' id='${this.id}' maxlength='255' size='10'>${this.name}</label><br/>
+                    </div>
+                    `
+                )
+            ).openPopup()
+        }
+
+        
     }
 
     pullUpdate() {
@@ -95,7 +109,14 @@ class Polygon {
     }
 
     update(updateInfo) {
-        // TODO: prevent updating if not enough rights
+        updateInfo.id = this.id
+
+        try {
+            MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
+        } catch (e) {
+            return
+        }
+
         if (updateInfo.name !== undefined) {
             this.name = updateInfo.name
         }
@@ -111,8 +132,6 @@ class Polygon {
         this.hide()
         this.setupMarker()
         this.draw()
-    
-        MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
     }
 
     updateId(newId) {

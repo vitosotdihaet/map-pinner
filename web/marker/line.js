@@ -28,6 +28,8 @@ class Line {
     }
     
     setupMarker() {
+        let isEditor = Role.hasAtLeastRole('editor')
+
         this.color = randomColor({ "luminosity": "bright", "hue": "red" })
 
         let coordinates = []
@@ -47,7 +49,6 @@ class Line {
         })
     
         latlngs.forEach(place => {
-            let isEditor = Role.hasAtLeastRole('editor')
             var marker = L.marker(place, { draggable: isEditor, icon: altIcon });
             if (isEditor) {
                 marker.on('drag', (_) => { this.onPointDrag() })
@@ -56,17 +57,29 @@ class Line {
             this.pointMarkers.push(marker);
         })
     
-        this.lineMarker.bindPopup(
-            L.popup().setContent(
-                `
-                <div class="popup">
-                    Name: <input type="text" class="popupNameInput" id="${this.id}" maxlength="255" size="10" value="${this.name}"/><br/>
-                </div>
-                <button class="popupDeleteButton" onclick="Marker.shown.get(MarkerableTypes.Line).get(${this.id}).delete()">Delete</button>
-                <button class="popupUpdateButton" onclick="Marker.shown.get(MarkerableTypes.Line).get(${this.id}).pullUpdate()">Update</button>
-                `
-            )
-        ).openPopup()
+        if (isEditor) {
+            this.lineMarker.bindPopup(
+                L.popup().setContent(
+                    `
+                    <div class='popup'>
+                        Name: <input type='text' class='popupNameInput' id='${this.id}' maxlength='255' size='10' value='${this.name}'/><br/>
+                    </div>
+                    <button class='popupDeleteButton' onclick='Marker.shown.get(MarkerableTypes.Line).get(${this.id}).delete()'>Delete</button>
+                    <button class='popupUpdateButton' onclick='Marker.shown.get(MarkerableTypes.Line).get(${this.id}).pullUpdate()'>Update</button>
+                    `
+                )
+            ).openPopup()
+        } else {
+            this.lineMarker.bindPopup(
+                L.popup().setContent(
+                    `
+                    <div class='popup'>
+                        Name: <label class='popupNameInput' id='${this.id}' maxlength='255' size='10'>${this.name}</label><br/>
+                    </div>
+                    `
+                )
+            ).openPopup()
+        }
     }
     
     pullUpdate() {
@@ -87,6 +100,13 @@ class Line {
     }
     
     update(updateInfo) {
+        updateInfo.id = this.id
+        try {
+            MarkerFetch.updateType(MarkerableTypes.Line, updateInfo)
+        } catch (e) {
+            return
+        }
+
         // TODO: prevent updating if not enough rights
         if (updateInfo.name !== undefined) {
             this.name = updateInfo.name
@@ -98,13 +118,10 @@ class Line {
             this.longitude = updateInfo.longitude
         }
     
-        updateInfo.id = this.id
     
         this.hide()
         this.setupMarker()
         this.draw()
-    
-        MarkerFetch.updateType(MarkerableTypes.Line, updateInfo)
     }
     
     updateId(newId) {
