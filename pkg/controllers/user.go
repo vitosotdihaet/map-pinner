@@ -17,16 +17,7 @@ func NewUserPostgres(postgres *sqlx.DB) *UserPostgres {
 }
 
 func (postgres *UserPostgres) Create(user entities.User, password entities.HashedPassword) (uint64, error) {
-	query := fmt.Sprintf(
-		`INSERT INTO %s (name, password, system_role_id)
-		VALUES ($1, $2, (
-			SELECT id
-			FROM %s
-			WHERE name = 'user'
-		)) RETURNING id;`,
-		usersTable, systemRolesTable,
-	)
-	row := postgres.postgres.QueryRow(query, user.Name, password.Value)
+	row := postgres.postgres.QueryRow("SELECT new_user($1, $2) AS user_id;", user.Name, password.Value)
 
 	var id uint64
 	if err := row.Scan(&id); err != nil {
@@ -93,6 +84,20 @@ func (postgres *UserPostgres) GetByName(user entities.User) (*entities.User, ent
 	}
 
 	return &user, hashedPassword, nil
+}
+
+func (postgres *UserPostgres) ExistsWithName(userName string) (bool, error) {
+	query := fmt.Sprintf(
+		"SELECT COUNT(*) FROM %s WHERE name = $1;", usersTable,
+	)
+
+	var count int
+	row := postgres.postgres.QueryRow(query, userName)
+	if err := row.Scan(&count); err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }
 
 // func (postgres *UserPostgres) UpdateById(id uint64, userUpdate entities.UserUpdate) error {

@@ -27,17 +27,16 @@ type Group interface {
 	Create(group entities.Group, authorId uint64) (uint64, error)
 	GetById(groupId uint64, userId uint64) (*entities.Group, error)
 	// UpdateById(id uint64, groupUpdate entities.GroupUpdate) error
-	DeleteById(id uint64) error
+	// DeleteById(id uint64) error
 	AddUserToGroup(groupId uint64, authorId uint64, userName string, roleId uint64) error
 }
 
 type Region interface {
-	GetAll(groupId uint64) ([]entities.Region, error)
-	// TODO: check for roles
-	Create(region entities.Region, groupId uint64) (uint64, error)
-	GetById(id uint64) (entities.Region, error)
-	UpdateById(id uint64, regionUpdate entities.RegionUpdate) error
-	DeleteById(id uint64) error
+	GetAll(groupId uint64, userId uint64) ([]entities.Region, error)
+	Create(region entities.Region, groupId uint64, authorId uint64) (uint64, error)
+	// GetById(id uint64) (entities.Region, error)
+	// UpdateById(id uint64, regionUpdate entities.RegionUpdate) error
+	DeleteById(id uint64, userId uint64) error
 }
 
 type Role interface {
@@ -57,8 +56,8 @@ func NewService(database *controllers.Database) *Service {
 	return &Service{
 		Marker: NewMarkerService(database.Point, database.Polygon, database.Line, database.Role),
 		User:   NewUserService(database.User),
-		Group:  NewGroupService(database.Group, database.Role),
-		Region: NewRegionService(database.Region),
+		Group:  NewGroupService(database.Group, database.Role, database.User),
+		Region: NewRegionService(database.Region, database.Role),
 		Role:   NewRoleService(database.Role),
 	}
 }

@@ -71,45 +71,45 @@ func (postgres *RegionPostgres) GetById(id uint64) (entities.Region, error) {
 	return region, nil
 }
 
-func (postgres *RegionPostgres) UpdateById(id uint64, regionUpdate entities.RegionUpdate) error {
-	// setValues := make([]string, 0)
-	// args := make([]interface{}, 0)
-	// argId := 1
+// func (postgres *RegionPostgres) UpdateById(id uint64, regionUpdate entities.RegionUpdate) error {
+// 	// setValues := make([]string, 0)
+// 	// args := make([]interface{}, 0)
+// 	// argId := 1
 
-	// if regionUpdate.Name != nil {
-	// 	setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
-	// 	args = append(args, *regionUpdate.Name)
-	// 	argId++
-	// }
+// 	// if regionUpdate.Name != nil {
+// 	// 	setValues = append(setValues, fmt.Sprintf("name=$%d", argId))
+// 	// 	args = append(args, *regionUpdate.Name)
+// 	// 	argId++
+// 	// }
 
-	// if regionUpdate.Latitude != nil && regionUpdate.Longitude != nil {
-	// 	setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeRegion($%d, $%d), %d)", argId, argId+1, WGSSRID))
-	// 	args = append(args, *regionUpdate.Longitude)
-	// 	args = append(args, *regionUpdate.Latitude)
-	// 	argId += 2
-	// } else {
-	// 	if regionUpdate.Latitude != nil {
-	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeRegion(ST_X(geometry), $%d), %d)", argId, WGSSRID))
-	// 		args = append(args, *regionUpdate.Latitude)
-	// 		argId++
-	// 	} else {
-	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeRegion($%d, ST_Y(geometry)), %d)", argId, WGSSRID))
-	// 		args = append(args, *regionUpdate.Longitude)
-	// 		argId++
+// 	// if regionUpdate.Latitude != nil && regionUpdate.Longitude != nil {
+// 	// 	setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeRegion($%d, $%d), %d)", argId, argId+1, WGSSRID))
+// 	// 	args = append(args, *regionUpdate.Longitude)
+// 	// 	args = append(args, *regionUpdate.Latitude)
+// 	// 	argId += 2
+// 	// } else {
+// 	// 	if regionUpdate.Latitude != nil {
+// 	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeRegion(ST_X(geometry), $%d), %d)", argId, WGSSRID))
+// 	// 		args = append(args, *regionUpdate.Latitude)
+// 	// 		argId++
+// 	// 	} else {
+// 	// 		setValues = append(setValues, fmt.Sprintf("geometry=ST_SetSRID(ST_MakeRegion($%d, ST_Y(geometry)), %d)", argId, WGSSRID))
+// 	// 		args = append(args, *regionUpdate.Longitude)
+// 	// 		argId++
 
-	// 	}
-	// }
+// 	// 	}
+// 	// }
 
-	// setQuery := strings.Join(setValues, ", ")
+// 	// setQuery := strings.Join(setValues, ", ")
 
-	// query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", regionsTable, setQuery, argId)
-	// args = append(args, id)
+// 	// query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d", regionsTable, setQuery, argId)
+// 	// args = append(args, id)
 
-	// _, err := postgres.postgres.Exec(query, args...)
+// 	// _, err := postgres.postgres.Exec(query, args...)
 
-	// return err
-	return nil
-}
+// 	// return err
+// 	return nil
+// }
 
 func (postgres *RegionPostgres) DeleteById(id uint64) error {
 	query := fmt.Sprintf(

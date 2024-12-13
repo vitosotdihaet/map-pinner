@@ -20,6 +20,7 @@ class Point {
         this.marker = L.marker([this.latitude, this.longitude], { draggable: true })
 
         let lat, lng = (this.latitude, this.longitude)
+        // TODO: if role is not at least editor do nothing on drag
         this.marker.on('drag', function (event) {
             // for some reason this shit works, though should be event.originalEvent.button
             if (event.originalEvent.buttons == 1) return
@@ -30,6 +31,7 @@ class Point {
 
         let point = this
         let marker = this.marker
+        // TODO: if role is not at least editor do nothing on drag
         this.marker.on('dragend', async function (event) {
             let latlng = event.target.getLatLng()
             marker.update({

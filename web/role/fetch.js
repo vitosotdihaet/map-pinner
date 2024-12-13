@@ -9,4 +9,9 @@ class RoleFetch {
         }
         return false
     }
+
+    // TODO
+    static async getRole() {
+
+    }
 }

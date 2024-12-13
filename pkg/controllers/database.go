@@ -34,6 +34,7 @@ type User interface {
 	Create(user entities.User, password entities.HashedPassword) (uint64, error)
 	GetById(id uint64) (entities.User, error)
 	GetByName(user entities.User) (*entities.User, entities.HashedPassword, error)
+	ExistsWithName(userName string) (bool, error)
 	// UpdateById(id uint64, lineUpdate entities.GroupUpdate) error
 	DeleteById(id uint64) error
 }
@@ -51,7 +52,7 @@ type Region interface {
 	GetAll(groupId uint64) ([]entities.Region, error)
 	Create(region entities.Region, groupId uint64) (uint64, error)
 	GetById(id uint64) (entities.Region, error)
-	UpdateById(id uint64, lineUpdate entities.RegionUpdate) error
+	// UpdateById(id uint64, lineUpdate entities.RegionUpdate) error
 	DeleteById(id uint64) error
 }
 

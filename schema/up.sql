@@ -1,31 +1,14 @@
--- https://dbdiagram.io/d/DB-course-project-6720daa8b4216d5a2898e693
-
-
 -- enable postgis extension
 CREATE extension IF NOT EXISTS postgis;
 
 
--- CREATE SCHEMA media;
 CREATE SCHEMA rbac;
 CREATE SCHEMA userspace;
 CREATE SCHEMA markerspace;
+
 CREATE TYPE markerspace.marker_type AS ENUM ('point', 'polygon', 'line');
 
 
-
-CREATE TABLE userspace.users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(32) NOT NULL UNIQUE,
-    password VARCHAR NOT NULL,
-    system_role_id INT NOT NULL
-);
-
-
-
--- CREATE TABLE rbac.permissions (
---     id SERIAL PRIMARY KEY,
---     name VARCHAR(32) NOT NULL UNIQUE
--- );
 
 CREATE TABLE rbac.roles (
     id SERIAL PRIMARY KEY,
@@ -37,19 +20,14 @@ CREATE TABLE rbac.system_roles (
     name VARCHAR(32) NOT NULL UNIQUE
 );
 
--- CREATE TABLE rbac.roles_permissions_relation (
---     role_id INT NOT NULL REFERENCES rbac.roles(id),
---     permission_id INT NOT NULL REFERENCES rbac.permissions(id),
---     PRIMARY KEY (role_id, permission_id)
--- );
-
--- CREATE TABLE rbac.system_roles_relation (
---     user_id INT NOT NULL REFERENCES userspace.users(id),
---     role_id INT NOT NULL REFERENCES rbac.roles(id),
---     PRIMARY KEY (user_id, role_id)
--- );
 
 
+CREATE TABLE userspace.users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(32) NOT NULL UNIQUE,
+    password VARCHAR NOT NULL,
+    system_role_id INT NOT NULL REFERENCES rbac.system_roles(id)
+);
 
 CREATE TABLE userspace.groups (
     id SERIAL PRIMARY KEY,
@@ -66,8 +44,6 @@ CREATE TABLE userspace.users_groups_relation (
 CREATE TABLE userspace.regions (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    -- top_left GEOMETRY(POINT, 4326) NOT NULL,
-    -- bottom_right GEOMETRY(POINT, 4326) NOT NULL,
     group_id INT NOT NULL REFERENCES userspace.groups(id)
 );
 
@@ -79,7 +55,6 @@ CREATE TABLE markerspace.points (
     type markerspace.marker_type NOT NULL DEFAULT 'point' CHECK (type = 'point'),
     name VARCHAR(255) NOT NULL,
     geometry GEOMETRY(POINT, 4326) NOT NULL,
-    -- image_id INT REFERENCES media.images(id),
     region_id INT NOT NULL REFERENCES userspace.regions(id)
 );
 
@@ -102,6 +77,20 @@ CREATE TABLE markerspace.lines (
 );
 
 
+
+CREATE FUNCTION new_user(user_name VARCHAR(32), password_hash VARCHAR)
+RETURNS INT AS $$
+DECLARE
+    user_id INT;
+BEGIN
+    INSERT INTO userspace.users (name, password, system_role_id)
+    VALUES (user_name, password_hash, 1)
+    RETURNING id INTO user_id;
+    RETURN user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- create a new group
 CREATE FUNCTION new_group(group_name VARCHAR(255), user_id INT)
 RETURNS INT AS $$
 DECLARE
@@ -112,13 +101,14 @@ BEGIN
     RETURNING id INTO group_id;
     
     INSERT INTO userspace.users_groups_relation (group_id, user_id, user_role_id)
-    VALUES (group_id, user_id, (SELECT id FROM rbac.roles WHERE name = 'admin'));
+    VALUES (group_id, user_id, 1);
 
     RETURN group_id;
 END;
 $$ LANGUAGE plpgsql;
 
 
+-- make user an owner
 CREATE PROCEDURE make_owner(user_id INT)
 AS $$
 BEGIN
@@ -130,6 +120,29 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE FUNCTION assign_default_roles()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_TABLE_NAME = 'userspace.users' THEN
+        NEW.system_role_id := (SELECT id FROM rbac.system_roles WHERE name = 'user');
+    ELSIF TG_TABLE_NAME = 'userspace.users_groups_relation' THEN
+        NEW.user_role_id := (SELECT id FROM rbac.roles WHERE name = 'admin');
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER default_role_users
+BEFORE INSERT ON userspace.users
+FOR EACH ROW
+EXECUTE FUNCTION assign_default_roles();
+
+CREATE TRIGGER default_role_groups
+BEFORE INSERT ON userspace.groups
+FOR EACH ROW
+EXECUTE FUNCTION assign_default_roles();
 
 
 INSERT INTO rbac.roles (name) VALUES ('admin');

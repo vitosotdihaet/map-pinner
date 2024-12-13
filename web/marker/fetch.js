@@ -27,6 +27,6 @@ class MarkerFetch {
 
 
     static async updateType(type, updateInfo) {
-        return putJSON(`/api/markers/${type}/${updateInfo.id}`, JSON.stringify(updateInfo))
+        return putFetch(`/api/markers/${type}/${updateInfo.id}`, JSON.stringify(updateInfo))
     }
 }

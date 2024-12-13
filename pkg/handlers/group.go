@@ -119,6 +119,8 @@ func (handler *Handler) addUserToGroup(context *gin.Context) {
 	if err != nil {
 		if err.Error() == "not enough rights" {
 			newErrorResponse(context, http.StatusUnauthorized, err.Error())
+		} else if err.Error() == "no such user" {
+			newErrorResponse(context, http.StatusBadRequest, err.Error())
 		} else {
 			newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		}

@@ -52,6 +52,7 @@ class Polygon {
     
         latlngs.forEach(place => {
             var marker = L.marker(place, { draggable: true, icon: altIcon });
+            // TODO: if role is not at least editor do nothing on drag
             marker.on('drag', (_) => { this.onPointDrag() })
             marker.on('dragend', (_) => { this.pullUpdate() })
             this.pointMarkers.push(marker);
@@ -92,27 +93,23 @@ class Polygon {
 
     update(updateInfo) {
         // TODO: prevent updating if not enough rights
-        try {
-            MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
-            
-            if (updateInfo.name !== undefined) {
-                this.name = updateInfo.name
-            }
-            if (updateInfo.latitude !== undefined) {
-                this.latitude = updateInfo.latitude
-            }
-            if (updateInfo.longitude !== undefined) {
-                this.longitude = updateInfo.longitude
-            }
-    
-            updateInfo.id = this.id
-    
-            this.hide()
-            this.setupMarker()
-            this.draw()
-        } catch (error) {
-
+        if (updateInfo.name !== undefined) {
+            this.name = updateInfo.name
         }
+        if (updateInfo.latitude !== undefined) {
+            this.latitude = updateInfo.latitude
+        }
+        if (updateInfo.longitude !== undefined) {
+            this.longitude = updateInfo.longitude
+        }
+    
+        updateInfo.id = this.id
+    
+        this.hide()
+        this.setupMarker()
+        this.draw()
+    
+        MarkerFetch.updateType(MarkerableTypes.Polygon, updateInfo)
     }
 
     updateId(newId) {

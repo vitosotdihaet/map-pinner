@@ -10,13 +10,17 @@ import (
 type GroupService struct {
 	groupDB controllers.Group
 	roleDB  controllers.Role
+	userDB  controllers.User
 }
 
-func NewGroupService(groupController controllers.Group, roleController controllers.Role) *GroupService {
-	return &GroupService{groupDB: groupController, roleDB: roleController}
+func NewGroupService(groupDB controllers.Group, roleDB controllers.Role, userDB controllers.User) *GroupService {
+	return &GroupService{groupDB: groupDB, roleDB: roleDB, userDB: userDB}
 }
 
 func (service *GroupService) Create(group entities.Group, authorId uint64) (uint64, error) {
+	if len(group.Name) < 1 || len(group.Name) > 255 {
+		return 0, errors.New("group name length is out of bounds")
+	}
 	return service.groupDB.Create(group, authorId)
 }
 
@@ -41,9 +45,9 @@ func (service *GroupService) GetById(groupId uint64, userId uint64) (*entities.G
 // 	return service.database.UpdateById(id, groupUpdate)
 // }
 
-func (service *GroupService) DeleteById(id uint64) error {
-	return service.groupDB.DeleteById(id)
-}
+// func (service *GroupService) DeleteById(id uint64) error {
+// 	return service.groupDB.DeleteById(id)
+// }
 
 func (service *GroupService) AddUserToGroup(groupId uint64, authorId uint64, userName string, roleId uint64) error {
 	ok, err := service.roleDB.ThereIsARoleWithId(roleId)
@@ -62,6 +66,15 @@ func (service *GroupService) AddUserToGroup(groupId uint64, authorId uint64, use
 
 	if !ok {
 		return errors.New("not enough rights")
+	}
+
+	ok, err = service.userDB.ExistsWithName(userName)
+	if err != nil {
+		return err
+	}
+
+	if !ok {
+		return errors.New("no such user")
 	}
 
 	return service.groupDB.AddUserToGroup(groupId, userName, roleId)

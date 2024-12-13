@@ -9,13 +9,25 @@ import (
 )
 
 func (handler *Handler) getRegions(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	groupId, err := strconv.ParseUint(context.Query("group_id"), 10, 64)
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	regions, err := handler.service.Region.GetAll(groupId)
+	regions, err := handler.service.Region.GetAll(groupId, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return
@@ -25,6 +37,18 @@ func (handler *Handler) getRegions(context *gin.Context) {
 }
 
 func (handler *Handler) createRegion(context *gin.Context) {
+	userany, exists := context.Get("user")
+	if !exists {
+		newErrorResponse(context, http.StatusUnauthorized, "User not found")
+		return
+	}
+
+	user, ok := userany.(entities.User)
+	if !ok {
+		newErrorResponse(context, http.StatusInternalServerError, "Could not unpack user")
+		return
+	}
+
 	groupId, err := strconv.ParseUint(context.Query("group_id"), 10, 64)
 	if err != nil {
 		newErrorResponse(context, http.StatusBadRequest, err.Error())
@@ -37,7 +61,7 @@ func (handler *Handler) createRegion(context *gin.Context) {
 		return
 	}
 
-	id, err := handler.service.Region.Create(inputRegion, groupId)
+	id, err := handler.service.Region.Create(inputRegion, groupId, user.ID)
 	if err != nil {
 		newErrorResponse(context, http.StatusInternalServerError, err.Error())
 		return

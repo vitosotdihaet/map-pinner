@@ -52,7 +52,7 @@ Group.populateSelect = () => {
 const newGroupNameInput = document.getElementById('groupName');
 newGroupNameInput.addEventListener('input', () => {
     const inputLength = newGroupNameInput.value.length;
-    if (inputLength > 2 && inputLength < 256) {
+    if (inputLength >= 1 && inputLength <= 255) {
         newGroupButton.disabled = false;
     } else {
         newGroupButton.disabled = true;
@@ -64,7 +64,7 @@ newGroupButton.disabled = true;
 newGroupButton.addEventListener('click', function(event) {
     event.preventDefault()
     const inputLength = newGroupNameInput.value.length;
-    if (inputLength > 2 && inputLength < 256) {
+    if (inputLength >= 1 && inputLength <= 255) {
         const newGroup = Group.createNewGroup(newGroupNameInput.value)
         groupSelect.value = newGroup.id;
         groupSelect.dispatchEvent(new Event('change'))
@@ -92,7 +92,7 @@ groupSelect.addEventListener('change', async () => {
 const addUserToGroupInput = document.getElementById('addUserToGroupInput')
 addUserToGroupInput.addEventListener('input', () => {
     const inputLength = addUserToGroupInput.value.length
-    if (inputLength > 2 && inputLength < 256) {
+    if (inputLength >= 1 && inputLength <= 255) {
         addUserToGroupButton.disabled = false
     } else {
         addUserToGroupButton.disabled = true
@@ -117,7 +117,7 @@ addUserToGroupButton.disabled = true;
 addUserToGroupButton.addEventListener('click', async function(event) {
     event.preventDefault()
     const inputLength = addUserToGroupInput.value.length
-    if (inputLength > 2 && inputLength < 256) {
+    if (inputLength >= 1 && inputLength <= 255) {
         userName = addUserToGroupInput.value
         roleId = addUserToGroupRoleSelect.value
 
@@ -125,7 +125,11 @@ addUserToGroupButton.addEventListener('click', async function(event) {
         if (add.ok) {
             // TODO: add to a group user list
         } else {
-            alert('You don\'t have enough rights to add a user to this group!')
+            if (add.status == 400) {
+                alert('No user with such name found! Check your spelling!')
+            } else {
+                alert('You don\'t have enough rights to add a user to this group!')
+            }
         }
     }
 })
