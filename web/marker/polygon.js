@@ -51,10 +51,13 @@ class Polygon {
         })
     
         latlngs.forEach(place => {
-            var marker = L.marker(place, { draggable: true, icon: altIcon });
+            let isEditor = Role.hasAtLeastRole('editor')
+            var marker = L.marker(place, { draggable: isEditor, icon: altIcon });
             // TODO: if role is not at least editor do nothing on drag
-            marker.on('drag', (_) => { this.onPointDrag() })
-            marker.on('dragend', (_) => { this.pullUpdate() })
+            if (isEditor) {
+                marker.on('drag', (_) => { this.onPointDrag() })
+                marker.on('dragend', (_) => { this.pullUpdate() })
+            }
             this.pointMarkers.push(marker);
         })
     

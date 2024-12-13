@@ -73,8 +73,9 @@ const newRegionButton = document.getElementById('createNewRegion');
 newRegionButton.disabled = true;
 
 newRegionNameInput.addEventListener('input', () => {
+    if (!Role.hasAtLeastRole('editor')) { return }
     const inputLength = newRegionNameInput.value.length;
-    if (inputLength > 2 && inputLength < 256) {
+    if (inputLength >= 1 && inputLength <= 255) {
         newRegionButton.disabled = false;
     } else {
         newRegionButton.disabled = true;
@@ -82,9 +83,9 @@ newRegionNameInput.addEventListener('input', () => {
 });
 
 newRegionButton.addEventListener('click', function(event) {
-    event.preventDefault()
+    if (!Role.hasAtLeastRole('editor')) { return }
     const inputLength = newRegionNameInput.value.length;
-    if (inputLength > 2 && inputLength < 256) {
+    if (inputLength >= 1 && inputLength <= 255) {
         Region.createNewRegion(newRegionNameInput.value)
         newRegionNameInput.value = ''
     }

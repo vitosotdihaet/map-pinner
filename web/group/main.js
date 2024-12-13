@@ -5,7 +5,7 @@ class Group {
     constructor(data) {
         this.id = data.id
         this.name = data.name
-        this.users = data.users
+        // this.users = data.users
     }
 }
 

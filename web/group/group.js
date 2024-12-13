@@ -93,6 +93,7 @@ groupSelect.addEventListener('change', async () => {
 
     if (groupId != '') {
         Group.currentGroup = new Group(await GroupFetch.getById(groupId))
+        localStorage.setItem('group', JSON.stringify(Group.currentGroup))
         Role.currentRoleID = (await RoleFetch.getRole(Group.currentGroup.id)).role_id
         unhideSelect()
         unhideRegions()

@@ -4,7 +4,6 @@ class Point {
         this.name = data.name
         this.latitude = data.latitude
         this.longitude = data.longitude
-        this.latestPosition = [this.latitude, this.longitude]
     }
 
     JSONify() {
@@ -17,33 +16,32 @@ class Point {
     }
 
     setupMarker() {
-        this.marker = L.marker([this.latitude, this.longitude], { draggable: true })
+        this.marker = L.marker([this.latitude, this.longitude], { draggable: Role.hasAtLeastRole('editor') })
 
         let lat, lng = (this.latitude, this.longitude)
-        // TODO: if role is not at least editor do nothing on drag
-        this.marker.on('drag', function (event) {
-            // for some reason this shit works, though should be event.originalEvent.button
-            if (event.originalEvent.buttons == 1) return
-            event.target.dragging.disable()
-            event.target.setLatLng([lat, lng])
-            setTimeout(() => event.target.dragging.enable());
-        })
-
-        let point = this
-        let marker = this.marker
-        // TODO: if role is not at least editor do nothing on drag
-        this.marker.on('dragend', async function (event) {
-            let latlng = event.target.getLatLng()
-            marker.update({
-                latitude: latlng.lat,
-                longitude: latlng.lng
+        if (Role.hasAtLeastRole('editor')) {
+            this.marker.on('drag', function (event) {
+                // for some reason this shit works, though should be event.originalEvent.button
+                if (event.originalEvent.buttons == 1) return
+                event.target.dragging.disable()
+                event.target.setLatLng([lat, lng])
+                setTimeout(() => event.target.dragging.enable());
             })
-            await point.update({
-                latitude: latlng.lat,
-                longitude: latlng.lng
+            
+            let point = this
+            let marker = this.marker
+            this.marker.on('dragend', async function (event) {
+                let latlng = event.target.getLatLng()
+                marker.update({
+                    latitude: latlng.lat,
+                    longitude: latlng.lng
+                })
+                await point.update({
+                    latitude: latlng.lat,
+                    longitude: latlng.lng
+                })
             })
-            this.latestPosition = [latlng.lat, latlng.lng]
-        })
+        }
 
         this.marker.bindPopup(
             L.popup().setContent(
@@ -74,27 +72,22 @@ class Point {
     async update(updateInfo) {
         updateInfo.id = this.id        
 
-        try {
-            await MarkerFetch.updateType(MarkerableTypes.Point, updateInfo)
+        await MarkerFetch.updateType(MarkerableTypes.Point, updateInfo)
 
-            if (updateInfo.name !== undefined) {
-                this.name = updateInfo.name
-            }
-            if (updateInfo.latitude !== undefined) {
-                this.latitude = updateInfo.latitude
-            }
-            if (updateInfo.longitude !== undefined) {
-                this.longitude = updateInfo.longitude
-            }
-
-            this.latestPosition = [this.latitude, this.longitude]
-            this.hide()
-            // update the popup with new info
-            this.setupMarker()
-            this.draw()
-        } catch (error) {
-            this.marker.setLatLng(this.latestPosition)
+        if (updateInfo.name !== undefined) {
+            this.name = updateInfo.name
         }
+        if (updateInfo.latitude !== undefined) {
+            this.latitude = updateInfo.latitude
+        }
+        if (updateInfo.longitude !== undefined) {
+            this.longitude = updateInfo.longitude
+        }
+
+        this.hide()
+        // update the popup with new info
+        this.setupMarker()
+        this.draw()
     }
 
     updateId(newId) {
